@@ -6,8 +6,11 @@ User = api.model(
     "User",
     {
         "id": fields.Integer(),
-        "first_name": fields.String(),
-        "last_name": fields.String(),
+        "name": fields.String(),
+        "email": fields.String(),
+        "subscription": fields.String(),
+        "status": fields.String(),
+
     },
 )
 

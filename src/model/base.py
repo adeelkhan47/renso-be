@@ -35,12 +35,16 @@ class Base(object):
         row = db.session.query(cls).filter_by(id=id).first()
         return row
 
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
     @classmethod
     def filtration(cls, args: Dict):
 
         def inspect_field(field: String) -> InstrumentedAttribute:
             if field not in inspect(cls).all_orm_descriptors:
-                raise BadRequest({"message": "Invalid field search requested"})
+                raise BadRequest("Invalid field search requested")
             field = getattr(cls, field)
             return field
 

@@ -3,7 +3,7 @@ import sys
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import MetaData, engine_from_config, pool
+from sqlalchemy import  engine_from_config, pool
 
 sys.path.append("..")
 
@@ -11,6 +11,12 @@ import os
 
 from model.base import Base
 from model.user import User
+from model.item import Item
+from model.item_type import ItemType
+from model.order_bookings import OrderBookings
+from model.order import Order
+from model.booking import Booking
+
 
 config = context.config
 config.set_main_option("sqlalchemy.url", "postgresql://postgres:postgres@localhost:5432/renso")
