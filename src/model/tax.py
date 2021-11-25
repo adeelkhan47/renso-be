@@ -1,0 +1,27 @@
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.schema import Column, ForeignKey
+from sqlalchemy.sql.sqltypes import String, Integer
+
+from model.base import Base, db
+
+
+class Tax(Base, db.Model):
+    __tablename__ = "tax"
+    name = Column(String, nullable=False, unique=False)
+    percentage = Column(Integer, nullable=False, unique=True)
+    description = Column(String, nullable=False, unique=True)
+
+    payment_tax = relationship("PaymentTax", backref="tax")
+
+    def __init__(self, name, percentage, description):
+        self.name = name
+        self.percentage = percentage
+        self.description = description
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    @classmethod
+    def delete(cls, id):
+        cls.query.filter(cls.id == id).delete()
+        db.session.commit()

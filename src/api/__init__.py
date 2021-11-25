@@ -2,9 +2,14 @@ from flask import Blueprint
 from flask_restx import Api
 
 from .booking.endpoint import api as booking_api
+from .booking_widget.endpoint import api as booking_widget_api
+from .date_picker.endpoint import api as date_picker_api
 from .item.endpoint import api as item_api
 from .item_type.endpoint import api as item_type_api
+from .language.endpoint import api as language_api
 from .order.endpoint import api as order_api
+from .payment_methods.endpoint import api as payment_method_api
+from .tax.endpoint import api as tax_api
 from .user.endpoint import api as user_api
 
 blueprint = Blueprint("api", __name__)
@@ -15,3 +20,8 @@ api.add_namespace(item_api)
 api.add_namespace(item_type_api)
 api.add_namespace(booking_api)
 api.add_namespace(order_api)
+api.add_namespace(payment_method_api)
+api.add_namespace(tax_api)
+api.add_namespace(language_api)
+api.add_namespace(booking_widget_api)
+api.add_namespace(date_picker_api)

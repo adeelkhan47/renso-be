@@ -1,3 +1,3 @@
 from flask_restx import Namespace
 
-api = Namespace("User", description="User Operations", path="/user")
+api = Namespace("BookingWidget", description="Booking widget Operations", path="/booking_widget")

@@ -3,7 +3,7 @@ import sys
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import  engine_from_config, pool
+from sqlalchemy import engine_from_config, pool
 
 sys.path.append("..")
 
@@ -16,12 +16,16 @@ from model.item_type import ItemType
 from model.order_bookings import OrderBookings
 from model.order import Order
 from model.booking import Booking
-
+from model.booking_widget import BookingWidget
+from model.payment_method import PaymentMethod
+from model.tax import Tax
+from model.payment_tax import PaymentTax
+from model.date_picker import DatePicker
+from model.language import Language
 
 config = context.config
 config.set_main_option("sqlalchemy.url", "postgresql://postgres:postgres@localhost:5432/renso")
 fileConfig(config.config_file_name, disable_existing_loggers=False)
-
 
 target_metadata = Base.metadata
 

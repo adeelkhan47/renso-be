@@ -1,16 +1,13 @@
-from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import String
 
 from model.base import Base, db
 
 
-class PaymentMethod(Base, db.Model):
-    __tablename__ = "payment_method"
+class Language(Base, db.Model):
+    __tablename__ = "language"
     name = Column(String, nullable=False, unique=False)
     status = Column(String, nullable=False, unique=True)
-
-    payment_tax = relationship("PaymentTax", backref="payment_method")
 
     def __init__(self, name, status):
         self.name = name
