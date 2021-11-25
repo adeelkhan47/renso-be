@@ -1,3 +1,4 @@
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import String, Integer
 
@@ -14,14 +15,16 @@ class Item(Base, db.Model):
 
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=True)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+    bookings = relationship("Booking", backref="item")
 
-    def __init__(self, name, image, tags, description, price, user_id):
+    def __init__(self, name, image, tags, description, price, user_id,item_type_id):
         self.name = name
         self.image = image
         self.tags = tags
         self.description = description
         self.price = price
         self.user_id = user_id
+        self.item_type_id = item_type_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

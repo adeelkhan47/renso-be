@@ -13,7 +13,7 @@ class Booking(Base, db.Model):
     end_time = Column(String, nullable=False, unique=True)
 
     item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
-    order_bookings = relationship("order_bookings", backref="booking")
+    order_bookings = relationship("OrderBookings", backref="booking")
 
     def __init__(self, discount, location, start_time, end_time, item_id):
         self.discount = discount

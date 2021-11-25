@@ -2,9 +2,10 @@ from flask_restx import fields
 
 from . import api
 from ..user.schema import User
+from ..item_type.schema import Item_type
 
 Item = api.model(
-    "User",
+    "item",
     {
         "id": fields.Integer(),
         "name": fields.String(),
@@ -13,6 +14,7 @@ Item = api.model(
         "description": fields.String(),
         "price": fields.Integer(),
         "user":  fields.Nested(User),
+        "item_type": fields.Nested(Item_type)
     },
 )
 

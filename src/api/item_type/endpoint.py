@@ -2,7 +2,6 @@ from flask import request
 from flask_restx import Resource
 
 from common.helper import response_structure
-from model.item import Item
 from model.item_type import ItemType
 from . import api, schema
 
@@ -13,7 +12,7 @@ class items_list(Resource):
     @api.marshal_list_with(schema.get_list_response)
     def get(self):
         args = request.args
-        all_items, count = Item.filtration(args)
+        all_items, count = ItemType.filtration(args)
         return response_structure(all_items, count), 200
 
     @api.param("name", required=True)
@@ -24,14 +23,13 @@ class items_list(Resource):
         maintenance = request.args.get("maintenance")
         delivery_available = request.args.get("delivery_available")
 
-        item_type = ItemType(name, maintenance,delivery_available)
+        item_type = ItemType(name, maintenance, delivery_available)
         item_type.insert()
         return "ok", 201
 
 
 @api.route("/<int:item_type_id>")
 class item_by_id(Resource):
-    @api.doc("Get all accounts")
     @api.marshal_list_with(schema.get_by_id_response)
     def get(self, item_type_id):
         item = ItemType.query_by_id(item_type_id)

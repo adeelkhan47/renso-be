@@ -21,6 +21,7 @@ class items_list(Resource):
     @api.param("description", required=True)
     @api.param("price", required=True)
     @api.param("user_id", required=True)
+    @api.param("item_type_id", required=True)
     def post(self):
         name = request.args.get("name")
         image = request.args.get("image")
@@ -28,7 +29,8 @@ class items_list(Resource):
         description = request.args.get("description")
         price = request.args.get("price")
         user_id = request.args.get("user_id")
-        item = Item(name, image, tags, description, price, user_id)
+        item_type_id = request.args.get("item_type_id")
+        item = Item(name, image, tags, description, price, user_id,item_type_id)
         item.insert()
         return "ok", 201
 
