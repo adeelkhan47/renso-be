@@ -7,7 +7,7 @@ from . import api, schema
 
 
 @api.route("")
-class BookingWidgetList(Resource):
+class Date_Picker_lList(Resource):
     @api.doc("Get all Date Pickers")
     @api.marshal_list_with(schema.get_list_response)
     def get(self):
@@ -27,7 +27,7 @@ class BookingWidgetList(Resource):
 
 
 @api.route("/<int:date_picker_id>")
-class widget_by_id(Resource):
+class date_picker_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_response)
     def get(self, date_picker_id):
         widget = DatePicker.query_by_id(date_picker_id)
