@@ -7,9 +7,9 @@ from model.base import Base, db
 
 class Tax(Base, db.Model):
     __tablename__ = "tax"
-    name = Column(String, nullable=False, unique=False)
-    percentage = Column(Integer, nullable=False, unique=True)
-    description = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False, unique=True)
+    percentage = Column(Integer, nullable=False)
+    description = Column(String, nullable=False)
 
     payment_tax = relationship("PaymentTax", backref="tax")
 

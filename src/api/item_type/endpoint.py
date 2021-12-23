@@ -17,11 +17,11 @@ class items_list(Resource):
 
     @api.param("name", required=True)
     @api.param("maintenance", required=True)
-    @api.param("delivery_available", required=True)
+    @api.param("delivery_available", required=True, type=bool)
     def post(self):
         name = request.args.get("name")
         maintenance = request.args.get("maintenance")
-        delivery_available = request.args.get("delivery_available")
+        delivery_available = bool(request.args.get("delivery_available"))
 
         item_type = ItemType(name, maintenance, delivery_available)
         item_type.insert()
@@ -39,3 +39,14 @@ class item_by_id(Resource):
     def delete(self, item_type_id):
         ItemType.delete(item_type_id)
         return "ok", 200
+
+    @api.param("name", required=True)
+    @api.param("maintenance", required=True)
+    @api.param("delivery_available", required=True, type=bool)
+    def patch(self, item_type_id):
+        data = request.args
+        if "delivery_available" in data.keys():
+            data["delivery_available"] = bool(data["delivery_available"])
+        ItemType.update(item_type_id, data)
+        itemType = ItemType.query_by_id(item_type_id)
+        return response_structure(itemType), 200

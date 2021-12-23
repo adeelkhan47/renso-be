@@ -20,9 +20,9 @@ get_list_response = api.model(
     },
 )
 get_by_id_response = api.model(
-    "getById",
+    "getById_tax",
     {
-        "objects": fields.Nested(Tax),
+        "objects_tax": fields.Nested(Tax),
 
     },
 )

@@ -5,7 +5,7 @@ from model.base import db
 
 app = Flask(__name__)
 
-app.register_blueprint(blueprint, url_prefix="/v1")
+app.register_blueprint(blueprint, url_prefix="")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:postgres@localhost:5432/renso"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

@@ -15,11 +15,14 @@ class BookingWidgetList(Resource):
         all_rows, count = BookingWidget.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.param("name", required=True)
+    @api.param("time_picker", required=True, type=int)
+    @api.param("date_picker", required=True, type=int)
+    @api.param("date_range_Picker", required=True, type=int)
     def post(self):
-        name = request.args.get("name")
-
-        widget = BookingWidget(name, "Active")
+        time_picker = bool(request.args.get("time_picker"))
+        date_picker = bool(request.args.get("date_picker"))
+        date_range_Picker = bool(request.args.get("date_range_Picker"))
+        widget = BookingWidget(date_picker=date_picker, time_Picker=time_picker, date_range_Picker=date_range_Picker)
         widget.insert()
         return "ok", 201
 
@@ -36,3 +39,16 @@ class widget_by_id(Resource):
     def delete(self, booking_widget_id):
         BookingWidget.delete(booking_widget_id)
         return "ok", 200
+
+    @api.marshal_list_with(schema.get_by_id_response, skip_none=True)
+    @api.param("time_picker", required=True, type=int)
+    @api.param("date_picker", required=True, type=int)
+    @api.param("date_range_Picker", required=True, type=int)
+    def patch(self, booking_widget_id):
+        data = {}
+        data["time_picker"] = bool(request.args.get("time_picker"))
+        data["date_picker"] = bool(request.args.get("date_picker"))
+        data["date_range_Picker"] = bool(request.args.get("date_range_Picker"))
+        BookingWidget.update(booking_widget_id, data)
+        bookingWidget = BookingWidget.query_by_id(booking_widget_id)
+        return response_structure(bookingWidget), 200

@@ -7,10 +7,10 @@ from model.base import Base, db
 
 class Booking(Base, db.Model):
     __tablename__ = "booking"
-    discount = Column(Integer, nullable=False, unique=False)
-    location = Column(String, nullable=False, unique=True)
-    start_time = Column(String, nullable=False, unique=False)
-    end_time = Column(String, nullable=False, unique=True)
+    discount = Column(Integer, nullable=False)
+    location = Column(String, nullable=False)
+    start_time = Column(String, nullable=False)
+    end_time = Column(String, nullable=False)
 
     item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
     order_bookings = relationship("OrderBookings", backref="booking")

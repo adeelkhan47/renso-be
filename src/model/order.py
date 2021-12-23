@@ -7,11 +7,11 @@ from model.base import Base, db
 
 class Order(Base, db.Model):
     __tablename__ = "order"
-    client_name = Column(String, nullable=False, unique=False)
-    client_email = Column(String, nullable=False, unique=False)
-    phone_number = Column(String, nullable=False, unique=False)
-    status = Column(String, nullable=False, unique=False)
-    time_period = Column(String, nullable=False, unique=False)
+    client_name = Column(String, nullable=False)
+    client_email = Column(String, nullable=False)
+    phone_number = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    time_period = Column(String, nullable=False)
 
     order_bookings = relationship("OrderBookings", backref="order")
 

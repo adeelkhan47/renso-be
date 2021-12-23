@@ -8,7 +8,7 @@ bookings = api.model(
     {"booking": fields.Nested(Booking, as_list=True)}
 )
 Order = api.model(
-    "User",
+    "Order",
     {
         "id": fields.Integer(),
         "client_name": fields.String(),
@@ -21,14 +21,14 @@ Order = api.model(
 )
 
 get_list_response = api.model(
-    "getAll",
+    "getAll_Order",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(Order, as_list=True),
     },
 )
 get_by_id_response = api.model(
-    "getById",
+    "getById_Order",
     {
         "objects": fields.Nested(Order),
 

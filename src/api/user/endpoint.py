@@ -18,13 +18,33 @@ class user_list(Resource):
     @api.param("name", required=True)
     @api.param("password", required=True)
     @api.param("email", required=True)
+    @api.param("subscription", required=True)
+    @api.param("status", required=True, type=int)
     def post(self):
         name = request.args.get("name")
         password = request.args.get("password")
         email = request.args.get("email")
-        user = User(name, password, email, "Basic", "Active")
+        subscription = request.args.get("subscription")
+        status = bool(request.args.get("status"))
+        user = User(name, email, password, subscription, status)
         user.insert()
         return "ok", 201
+
+
+@api.route("/login")
+class user_by_id(Resource):
+    @api.param("password", required=True)
+    @api.param("email", required=True)
+    @api.marshal_list_with(schema.get_by_id_response)
+    def post(self):
+        args = {}
+        args["email:eq"] = request.args.get("email")
+        args["password:eq"] = request.args.get("password")
+        all_users, count = User.filtration(args)
+        if count >= 1:
+            return response_structure(all_users[0]), 200
+        else:
+            return "User not found with these credentials", 404
 
 
 @api.route("/<int:user_id>")
@@ -39,3 +59,17 @@ class user_by_id(Resource):
     def delete(self, user_id):
         User.delete(user_id)
         return "ok", 200
+
+    @api.marshal_list_with(schema.get_by_id_response, skip_none=True)
+    @api.param("name")
+    @api.param("password")
+    @api.param("email")
+    @api.param("subscription")
+    @api.param("status", type=int)
+    def patch(self, user_id):
+        data = request.args
+        if "status" in data.keys():
+            data["status"] = bool(data["status"])
+        User.update(user_id, request.args)
+        user = User.query_by_id(user_id)
+        return response_structure(user), 200

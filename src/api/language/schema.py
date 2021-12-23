@@ -13,14 +13,14 @@ Language = api.model(
 )
 
 get_list_response = api.model(
-    "getAll",
+    "getAll_language",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(Language, as_list=True),
     },
 )
 get_by_id_response = api.model(
-    "getById",
+    "getById_language",
     {
         "objects": fields.Nested(Language),
 

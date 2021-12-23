@@ -19,14 +19,14 @@ Item = api.model(
 )
 
 get_list_response = api.model(
-    "getAll",
+    "getAll_item",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(Item, as_list=True),
     },
 )
 get_by_id_response = api.model(
-    "getById",
+    "getById_item",
     {
         "objects": fields.Nested(Item),
 

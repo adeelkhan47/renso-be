@@ -6,8 +6,8 @@ from model.base import Base, db
 
 class Language(Base, db.Model):
     __tablename__ = "language"
-    name = Column(String, nullable=False, unique=False)
-    status = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
+    status = Column(String, nullable=False)
 
     def __init__(self, name, status):
         self.name = name

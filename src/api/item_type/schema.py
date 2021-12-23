@@ -15,14 +15,14 @@ Item_type = api.model(
 )
 
 get_list_response = api.model(
-    "getAll",
+    "getAll_item_type",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(Item_type, as_list=True),
     },
 )
 get_by_id_response = api.model(
-    "getById",
+    "getById_item_type",
     {
         "objects": fields.Nested(Item_type),
 

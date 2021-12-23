@@ -9,7 +9,7 @@ Tax_sc = api.model(
 )
 
 PaymentMethod = api.model(
-    "payment method",
+    "payment_method",
     {
         "id": fields.Integer(),
         "name": fields.String(),
@@ -20,14 +20,14 @@ PaymentMethod = api.model(
 )
 
 get_list_response = api.model(
-    "getAll",
+    "getAll_payment_method",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(PaymentMethod, as_list=True),
     },
 )
 get_by_id_response = api.model(
-    "getById",
+    "getById_payment_method",
     {
         "objects": fields.Nested(PaymentMethod),
 

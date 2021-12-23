@@ -7,11 +7,11 @@ from model.base import Base, db
 
 class Item(Base, db.Model):
     __tablename__ = "item"
-    name = Column(String, nullable=False, unique=False)
-    image = Column(String, nullable=False, unique=True)
-    tags = Column(String, nullable=False, unique=False)
-    description = Column(String, nullable=False, unique=True)
-    price = Column(Integer, nullable=False, unique=True)
+    name = Column(String, nullable=False)
+    image = Column(String, nullable=False)
+    tags = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    price = Column(Integer, nullable=False)
 
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=True)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)

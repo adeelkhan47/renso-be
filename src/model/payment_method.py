@@ -7,9 +7,8 @@ from model.base import Base, db
 
 class PaymentMethod(Base, db.Model):
     __tablename__ = "payment_method"
-    name = Column(String, nullable=False, unique=False)
-    status = Column(String, nullable=False, unique=True)
-
+    name = Column(String, nullable=False, unique=True)
+    status = Column(String, nullable=False)
     payment_tax = relationship("PaymentTax", backref="payment_method")
 
     def __init__(self, name, status):
@@ -23,3 +22,4 @@ class PaymentMethod(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
