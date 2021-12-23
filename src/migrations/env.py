@@ -20,7 +20,8 @@ from model.booking_widget import BookingWidget
 from model.payment_method import PaymentMethod
 from model.tax import Tax
 from model.payment_tax import PaymentTax
-from model.date_picker import DatePicker
+from model.day_picker import DayPicker
+from model.time_picker import TimePicker
 from model.language import Language
 
 config = context.config
