@@ -9,7 +9,7 @@ from . import api, schema
 @api.route("")
 class LanguageList(Resource):
     @api.doc("Get all Languages")
-    @api.marshal_list_with(schema.get_list_response)
+    @api.marshal_list_with(schema.get_list_responseLanguage)
     def get(self):
         args = request.args
         all_rows, count = Language.filtration(args)
@@ -27,7 +27,7 @@ class LanguageList(Resource):
 @api.route("/<int:language_id>")
 class Language_by_id(Resource):
     @api.doc("Get Widget by id")
-    @api.marshal_list_with(schema.get_by_id_response)
+    @api.marshal_list_with(schema.get_by_id_responseLanguage)
     def get(self, language_id):
         lan = Language.query_by_id(language_id)
         return response_structure(lan), 200

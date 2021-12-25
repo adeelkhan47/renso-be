@@ -14,14 +14,14 @@ User = api.model(
     },
 )
 
-get_list_response = api.model(
+get_list_responseUser = api.model(
     "getAll_User",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(User, as_list=True),
     },
 )
-get_by_id_response = api.model(
+get_by_id_responseUser = api.model(
     "getUserById_User",
     {
         "objects": fields.Nested(User),

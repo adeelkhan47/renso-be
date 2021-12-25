@@ -10,7 +10,7 @@ from . import api, schema
 @api.route("")
 class PaymentMethodList(Resource):
     @api.doc("Get all payment methods")
-    @api.marshal_list_with(schema.get_list_response)
+    @api.marshal_list_with(schema.get_list_responsePaymentMethod)
     def get(self):
         args = request.args
         all_rows, count = PaymentMethod.filtration(args)
@@ -32,7 +32,7 @@ class PaymentMethodList(Resource):
 @api.route("/<int:payment_method_id>")
 class Payment_Method_by_id(Resource):
     @api.doc("Get Widget by id")
-    @api.marshal_list_with(schema.get_by_id_response)
+    @api.marshal_list_with(schema.get_by_id_responsePaymentMethod)
     def get(self, payment_method_id):
         lan = PaymentMethod.query_by_id(payment_method_id)
         return response_structure(lan), 200

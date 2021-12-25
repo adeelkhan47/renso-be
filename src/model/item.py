@@ -9,21 +9,18 @@ class Item(Base, db.Model):
     __tablename__ = "item"
     name = Column(String, nullable=False)
     image = Column(String, nullable=False)
-    tags = Column(String, nullable=False)
     description = Column(String, nullable=False)
     price = Column(Integer, nullable=False)
 
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=True)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     bookings = relationship("Booking", backref="item")
+    item_tags = relationship("ItemTag", backref="item")
 
-    def __init__(self, name, image, tags, description, price, user_id,item_type_id):
+    def __init__(self, name, image, description, price, item_type_id):
         self.name = name
         self.image = image
-        self.tags = tags
         self.description = description
         self.price = price
-        self.user_id = user_id
         self.item_type_id = item_type_id
 
     def __repr__(self):

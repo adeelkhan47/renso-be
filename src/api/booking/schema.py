@@ -17,14 +17,14 @@ Booking = api.model(
 )
 
 
-get_list_response = api.model(
+get_list_responseBooking = api.model(
     "getAll",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(Booking, as_list=True),
     },
 )
-get_by_id_response = api.model(
+get_by_id_responseBooking = api.model(
     "getById",
     {
         "objects": fields.Nested(Booking),

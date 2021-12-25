@@ -11,6 +11,7 @@ from .order.endpoint import api as order_api
 from .payment_methods.endpoint import api as payment_method_api
 from .tax.endpoint import api as tax_api
 from .user.endpoint import api as user_api
+from .tag.endpoint import api as tag_api
 from .time_picker.endpoint import api as time_picker_api
 
 blueprint = Blueprint("api", __name__)
@@ -27,3 +28,4 @@ api.add_namespace(language_api)
 api.add_namespace(booking_widget_api)
 api.add_namespace(day_picker_api)
 api.add_namespace(time_picker_api)
+api.add_namespace(tag_api)

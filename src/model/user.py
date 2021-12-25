@@ -13,8 +13,6 @@ class User(Base, db.Model):
     subscription = Column(String, nullable=True)
     status = Column(Boolean, nullable=True)
 
-    items = relationship("Item", backref="user")
-
     def __init__(self, name, email, password, subscription, status):
         self.name = name
         self.password = password

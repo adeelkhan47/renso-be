@@ -9,7 +9,7 @@ from . import api, schema
 @api.route("")
 class TaxList(Resource):
     @api.doc("Get all Tax")
-    @api.marshal_list_with(schema.get_list_response)
+    @api.marshal_list_with(schema.get_list_responseTax)
     def get(self):
         args = request.args
         all_rows, count = Tax.filtration(args)
@@ -28,9 +28,9 @@ class TaxList(Resource):
 
 
 @api.route("/<int:tax_id>")
-class Payment_Method_by_id(Resource):
+class tax_by_id(Resource):
     @api.doc("Get tax by id")
-    @api.marshal_list_with(schema.get_by_id_response)
+    @api.marshal_list_with(schema.get_by_id_responseTax)
     def get(self, tax_id):
         tax = Tax.query_by_id(tax_id)
         return response_structure(tax), 200

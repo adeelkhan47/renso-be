@@ -10,13 +10,13 @@ from . import api, schema
 @api.route("")
 class TimePickerList(Resource):
     @api.doc("Get all Time Pickers")
-    @api.marshal_list_with(schema.get_list_response)
+    @api.marshal_list_with(schema.get_list_responseTime_Picker)
     def get(self):
         args = request.args
         all_rows, count = TimePicker.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.marshal_list_with(schema.get_by_id_response)
+    @api.marshal_list_with(schema.get_by_id_responseTime_Picker)
     @api.param("start_time", required=True)
     @api.param("end_time", required=True)
     @api.param("day", required=True)
@@ -37,7 +37,7 @@ class TimePickerList(Resource):
 
 @api.route("/<int:time_picker_id>")
 class picker_by_id(Resource):
-    @api.marshal_list_with(schema.get_by_id_response)
+    @api.marshal_list_with(schema.get_by_id_responseTime_Picker)
     def get(self, time_picker_id):
         widget = TimePicker.query_by_id(time_picker_id)
         return response_structure(widget), 200

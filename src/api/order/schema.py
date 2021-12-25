@@ -20,14 +20,14 @@ Order = api.model(
     },
 )
 
-get_list_response = api.model(
+get_list_responseOrder = api.model(
     "getAll_Order",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(Order, as_list=True),
     },
 )
-get_by_id_response = api.model(
+get_by_id_responseOrder = api.model(
     "getById_Order",
     {
         "objects": fields.Nested(Order),

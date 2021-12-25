@@ -10,7 +10,7 @@ from . import api, schema
 @api.route("")
 class order_list(Resource):
     @api.doc("Get all items")
-    @api.marshal_list_with(schema.get_list_response)
+    @api.marshal_list_with(schema.get_list_responseOrder)
     def get(self):
         args = request.args
         all_items, count = Order.filtration(args)
@@ -37,7 +37,7 @@ class order_list(Resource):
 
 @api.route("/<int:order_id>")
 class order_by_id(Resource):
-    @api.marshal_list_with(schema.get_by_id_response)
+    @api.marshal_list_with(schema.get_by_id_responseOrder)
     def get(self, order_id):
         order = Order.query_by_id(order_id)
 

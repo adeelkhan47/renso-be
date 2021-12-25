@@ -10,13 +10,13 @@ from . import api, schema
 @api.route("")
 class DayPickerList(Resource):
     @api.doc("Get all Date Pickers")
-    @api.marshal_list_with(schema.get_list_response)
+    @api.marshal_list_with(schema.get_list_responseDay_Picker)
     def get(self):
         args = request.args
         all_rows, count = DayPicker.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.marshal_list_with(schema.get_by_id_response)
+    @api.marshal_list_with(schema.get_by_id_responseDay_Picker)
     @api.param("monday", required=True, type=int)
     @api.param("tuesday", required=True, type=int)
     @api.param("wednesday", required=True, type=int)
@@ -44,8 +44,8 @@ class DayPickerList(Resource):
 
 
 @api.route("/<int:day_picker_id>")
-class picker_by_id(Resource):
-    @api.marshal_list_with(schema.get_by_id_response)
+class day_picker_by_id(Resource):
+    @api.marshal_list_with(schema.get_by_id_responseDay_Picker)
     def get(self, day_picker_id):
         widget = DayPicker.query_by_id(day_picker_id)
         return response_structure(widget), 200
@@ -55,7 +55,7 @@ class picker_by_id(Resource):
         DayPicker.delete(day_picker_id)
         return "ok", 200
 
-    @api.marshal_list_with(schema.get_by_id_response, skip_none=True)
+    @api.marshal_list_with(schema.get_by_id_responseDay_Picker, skip_none=True)
     @api.param("monday", required=True, type=int)
     @api.param("tuesday", required=True, type=int)
     @api.param("wednesday", required=True, type=int)
