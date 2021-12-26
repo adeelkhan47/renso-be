@@ -19,6 +19,8 @@ class user_list(Resource):
     @api.param("password", required=True)
     @api.param("email", required=True)
     @api.param("subscription", required=True)
+    @api.param("image", required=True)
+    @api.param("gender", required=True)
     @api.param("status", required=True, type=int)
     @api.marshal_list_with(schema.get_list_responseUser)
     def post(self):
@@ -26,8 +28,10 @@ class user_list(Resource):
         password = request.args.get("password")
         email = request.args.get("email")
         subscription = request.args.get("subscription")
+        image = request.args.get("image")
+        gender = request.args.get("gender")
         status = bool(request.args.get("status"))
-        user = User(name, email, password, subscription, status)
+        user = User(name, email, password, subscription, image, gender, status)
         user.insert()
         return response_structure(User.query_by_id(user.id)), 201
 
@@ -66,9 +70,12 @@ class user_by_id(Resource):
     @api.param("password")
     @api.param("email")
     @api.param("subscription")
+    @api.param("image")
+    @api.param("gender")
     @api.param("status", type=int)
     def patch(self, user_id):
-        data = request.args
+
+        data = request.args.copy()
         if "status" in data.keys():
             data["status"] = bool(data["status"])
         User.update(user_id, request.args)

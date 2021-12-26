@@ -9,6 +9,8 @@ User = api.model(
         "name": fields.String(),
         "email": fields.String(),
         "subscription": fields.String(),
+        "image": fields.String(),
+        "gender": fields.String(),
         "status": fields.String(),
 
     },

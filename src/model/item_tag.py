@@ -21,3 +21,8 @@ class ItemTag(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
+    @classmethod
+    def delete_by_item_id(cls, item_id):
+        cls.query.filter(cls.item_id == item_id).delete()
+        db.session.commit()

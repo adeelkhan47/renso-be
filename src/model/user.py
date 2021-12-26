@@ -1,4 +1,3 @@
-from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import String, Boolean
 
@@ -11,13 +10,18 @@ class User(Base, db.Model):
     email = Column(String, nullable=True, unique=True)
     password = Column(String, nullable=True)
     subscription = Column(String, nullable=True)
+    image = Column(String, nullable=True)
+    gender = Column(String, nullable=True)
+
     status = Column(Boolean, nullable=True)
 
-    def __init__(self, name, email, password, subscription, status):
+    def __init__(self, name, email, password, subscription, image, gender, status):
         self.name = name
         self.password = password
         self.email = email
         self.subscription = subscription
+        self.image = image
+        self.gender = gender
         self.status = status
 
     def __repr__(self):

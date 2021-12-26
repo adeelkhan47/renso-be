@@ -17,6 +17,8 @@ Item = api.model(
         "image": fields.String(),
         "description": fields.String(),
         "price": fields.Integer(),
+        "status": fields.String(),
+        "person": fields.String(),
         "item_type": fields.Nested(Item_type),
         "item_tags": fields.Nested(tags, as_list=True)
     },

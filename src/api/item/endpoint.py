@@ -21,18 +21,22 @@ class items_list(Resource):
     @api.param("tag_ids")
     @api.param("description", required=True)
     @api.param("price", required=True)
+    @api.param("status", required=True)
+    @api.param("person", required=True, type=int)
     @api.param("item_type_id", required=True)
-    @api.param("tag_ids", )
+    @api.param("tag_ids")
     def post(self):
         name = request.args.get("name")
         image = request.args.get("image")
         description = request.args.get("description")
         price = request.args.get("price")
+        status = request.args.get("status")
+        person = request.args.get("person")
         item_type_id = request.args.get("item_type_id")
-        item = Item(name, image, description, price, item_type_id)
+        item = Item(name, image, description, price, status, person, item_type_id)
         item.insert()
         if "tag_ids" in request.args.keys():
-            tag_ids = request.args.get("item_type_id").split(",")
+            tag_ids = request.args.get("tag_ids").split(",")
             for each in tag_ids:
                 ItemTag(item_id=item.id, tag_id=each).insert()
 
@@ -51,3 +55,25 @@ class item_by_id(Resource):
     def delete(self, item_id):
         Item.delete(item_id)
         return "ok", 200
+
+    @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)
+    @api.param("name")
+    @api.param("image")
+    @api.param("tag_ids")
+    @api.param("description")
+    @api.param("price")
+    @api.param("status")
+    @api.param("person", type=int)
+    @api.param("item_type_id")
+    @api.param("tag_ids")
+    def patch(self, item_id):
+        data = request.args.copy()
+        if "tag_ids" in data.keys():
+            ItemTag.delete_by_item_id(item_id)
+            tag_ids = request.args.get("tag_ids").split(",")
+            for each in tag_ids:
+                ItemTag(item_id=item_id, tag_id=each).insert()
+            del data["tag_ids"]
+        Item.update(item_id, data)
+        item = Item.query_by_id(item_id)
+        return response_structure(item), 200
