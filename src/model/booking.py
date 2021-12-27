@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import String, Integer
+from sqlalchemy.sql.sqltypes import String, Integer, DateTime
 
 from model.base import Base, db
 
@@ -9,17 +9,19 @@ class Booking(Base, db.Model):
     __tablename__ = "booking"
     discount = Column(Integer, nullable=False)
     location = Column(String, nullable=False)
-    start_time = Column(String, nullable=False)
-    end_time = Column(String, nullable=False)
+    start_time = Column(DateTime, nullable=False)
+    end_time = Column(DateTime, nullable=False)
+    status = Column(String, nullable=False)
 
     item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
     order_bookings = relationship("OrderBookings", backref="booking")
 
-    def __init__(self, discount, location, start_time, end_time, item_id):
+    def __init__(self, discount, location, start_time, end_time, status, item_id):
         self.discount = discount
         self.location = location
         self.start_time = start_time
         self.end_time = end_time
+        self.status = status
         self.item_id = item_id
 
     def __repr__(self):

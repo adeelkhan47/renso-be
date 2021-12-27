@@ -9,13 +9,13 @@ Booking = api.model(
         "id": fields.Integer(),
         "discount": fields.Integer(),
         "location": fields.String(),
-        "start_time": fields.String(),
-        "end_time": fields.String(),
+        "start_time": fields.DateTime(),
+        "end_time": fields.DateTime(),
+        "status": fields.String(),
         "item": fields.Nested(Item),
 
     },
 )
-
 
 get_list_responseBooking = api.model(
     "getAll",
