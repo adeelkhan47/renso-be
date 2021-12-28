@@ -16,18 +16,28 @@ Booking = api.model(
 
     },
 )
+error = api.model(
+    "Error",
+    {
+
+        "msg": fields.String(),
+
+    },
+)
 
 get_list_responseBooking = api.model(
     "getAll",
     {
         "total_rows": fields.Integer(),
-        "objects": fields.Nested(Booking, as_list=True),
+        "objects": fields.Nested(Booking, as_list=True, skip_none=True, allow_null=True),
+        "error": fields.Nested(error, allow_null=True),
     },
 )
 get_by_id_responseBooking = api.model(
     "getById",
     {
-        "objects": fields.Nested(Booking),
+        "objects": fields.Nested(Booking, skip_none=True, allow_null=True),
+        "error": fields.Nested(error, allow_null=True),
 
     },
 )

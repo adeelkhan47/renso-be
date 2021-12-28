@@ -1,10 +1,35 @@
+from datetime import datetime
+
 from flask import request
 from flask_restx import Resource
 
 from common.helper import response_structure
+from model.booking import Booking
 from model.item import Item
 from model.item_tag import ItemTag
 from . import api, schema
+
+
+@api.route("/available")
+class items_list(Resource):
+    @api.doc("Get all items with date filter")
+    @api.marshal_list_with(schema.get_list_responseItem)
+    @api.param("start_time", required=True)
+    @api.param("end_time", required=True)
+    def get(self):
+        args = request.args
+        start_time = datetime.strptime(args["start_time"], '%Y-%m-%d %H:%M:%S')
+        end_time = datetime.strptime(args["end_time"], '%Y-%m-%d %H:%M:%S')
+        available_items_ids = []
+        for item in Item.get_all_active_items():
+            for each in Booking.get_bookings_by_item_id(item.id):
+                if not (each.start_time <= end_time and start_time <= each.end_time):
+                    available_items_ids.append(str(item.id))
+        if available_items_ids:
+            new_args = {"id:eq": ",".join(available_items_ids)}
+            all_items, count = Item.filtration(new_args)
+            return response_structure(all_items, count), 200
+        return response_structure([], 0), 200
 
 
 @api.route("")

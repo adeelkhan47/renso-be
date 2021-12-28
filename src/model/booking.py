@@ -31,3 +31,7 @@ class Booking(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
+    @classmethod
+    def get_bookings_by_item_id(cls, item_id):
+        return cls.query.filter(cls.item_id == item_id, cls.status == "Active").all()

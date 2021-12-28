@@ -3,3 +3,8 @@ def response_structure(data, total_rows: int = None):
     if total_rows is not None:
         response["total_rows"] = total_rows
     return response
+
+
+def error_message(msg):
+    response = {"error": {"msg": msg}}
+    return response

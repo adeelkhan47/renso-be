@@ -37,6 +37,10 @@ class Item(Base, db.Model):
         db.session.commit()
 
     @classmethod
+    def get_all_active_items(cls):
+        return db.session.query(cls).filter(cls.status == "Available").all()
+
+    @classmethod
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
