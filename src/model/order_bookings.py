@@ -22,3 +22,8 @@ class OrderBookings(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
+    @classmethod
+    def delete_by_order_id(cls, order_id):
+        cls.query.filter(cls.order_id == order_id).delete()
+        db.session.commit()

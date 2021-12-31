@@ -60,3 +60,16 @@ class booking_by_id(Resource):
     def delete(self, booking_id):
         Booking.delete(booking_id)
         return "ok", 200
+
+    @api.marshal_list_with(schema.get_by_id_responseBooking, skip_none=True)
+    @api.param("discount")
+    @api.param("location")
+    @api.param("start_time")
+    @api.param("end_time")
+    @api.param("status")
+    @api.param("item_id")
+    def patch(self, booking_id):
+        data = request.args.copy()
+        Booking.update(booking_id, data)
+        booking = Booking.query_by_id(booking_id)
+        return response_structure(booking), 200

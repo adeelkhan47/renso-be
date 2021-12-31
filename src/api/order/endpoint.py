@@ -1,7 +1,8 @@
 from flask import request
 from flask_restx import Resource
 
-from common.helper import response_structure
+from common.helper import response_structure, error_message
+from model.booking import Booking
 from model.order import Order
 from model.order_bookings import OrderBookings
 from . import api, schema
@@ -16,7 +17,9 @@ class order_list(Resource):
         all_items, count = Order.filtration(args)
         return response_structure(all_items, count), 200
 
+    @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
     @api.param("client_name", required=True)
+    @api.param("status", required=True)
     @api.param("client_email", required=True)
     @api.param("phone_number", required=True)
     @api.param("time_period", required=True)
@@ -24,15 +27,26 @@ class order_list(Resource):
     def post(self):
         client_name = request.args.get("client_name")
         client_email = request.args.get("client_email")
+        status = request.args.get("status")
         phone_number = request.args.get("phone_number")
         time_period = request.args.get("time_period")
-        order = Order(client_name, client_email, phone_number, "Active", time_period)
-        order.insert()
         all_booking_ids = request.args.get("booking_ids").split(",")
+        total_cost = 0.0
+        for booking_id in all_booking_ids:
+            booking = Booking.query_by_id(booking_id)
+            if not booking:
+                return error_message(f"Item_id {booking_id} no found."), 400
+            diff = booking.end_time - booking.start_time
+            days, seconds = diff.days, diff.seconds
+            hours = days * 24 + seconds // 3600
+            item_price = booking.item.price * hours
+            cost = item_price * (100 - booking.discount) / 100
+            total_cost += cost
+        order = Order(client_name, client_email, phone_number, status, time_period, total_cost)
+        order.insert()
         for each in all_booking_ids:
             OrderBookings(each, order.id).insert()
-
-        return "ok", 201
+        return response_structure(order), 201
 
 
 @api.route("/<int:order_id>")
@@ -47,3 +61,39 @@ class order_by_id(Resource):
     def delete(self, order_id):
         Order.delete(order_id)
         return "ok", 200
+
+    @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
+    @api.param("client_name")
+    @api.param("client_email")
+    @api.param("status")
+    @api.param("phone_number")
+    @api.param("time_period")
+    @api.param("booking_ids")
+    def patch(self, order_id):
+        data = request.args.copy()
+        if "status" in data.keys() and data["status"] == "Completed":
+            order = Order.query_by_id(order_id)
+            for each in order.order_bookings:
+                Booking.close_booking(each.booking.id)
+
+        if "booking_ids" in data.keys():
+            all_booking_ids = request.args.get("booking_ids").split(",")
+            total_cost = 0.0
+            for booking_id in all_booking_ids:
+                booking = Booking.query_by_id(booking_id)
+                if not booking:
+                    return error_message(f"Item_id {booking_id} no found."), 400
+                diff = booking.end_time - booking.start_time
+                days, seconds = diff.days, diff.seconds
+                hours = days * 24 + seconds // 3600
+                item_price = float(booking.item.price) * float(hours)
+                cost = item_price * (100 - booking.discount) / 100
+                total_cost += cost
+            del data["booking_ids"]
+            data["total_cost"] = cost
+            OrderBookings.delete_by_order_id(order_id)
+            for each in all_booking_ids:
+                OrderBookings(each, order_id).insert()
+        Order.update(order_id, data)
+        order = Order.query_by_id(order_id)
+        return response_structure(order), 200

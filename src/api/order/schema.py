@@ -16,7 +16,16 @@ Order = api.model(
         "phone_number": fields.String(),
         "status": fields.String(),
         "time_period": fields.String(),
+        "total_cost": fields.Float(),
         "order_bookings": fields.Nested(bookings, as_list=True)
+    },
+)
+error = api.model(
+    "Error",
+    {
+
+        "msg": fields.String(),
+
     },
 )
 
@@ -25,12 +34,14 @@ get_list_responseOrder = api.model(
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(Order, as_list=True),
+        "error": fields.Nested(error, allow_null=True),
     },
 )
 get_by_id_responseOrder = api.model(
     "getById_Order",
     {
         "objects": fields.Nested(Order),
+        "error": fields.Nested(error, allow_null=True),
 
     },
 )

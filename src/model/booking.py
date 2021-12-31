@@ -33,5 +33,15 @@ class Booking(Base, db.Model):
         db.session.commit()
 
     @classmethod
+    def update(cls, id, data):
+        db.session.query(cls).filter(cls.id == id).update(data)
+        db.session.commit()
+
+    @classmethod
     def get_bookings_by_item_id(cls, item_id):
         return cls.query.filter(cls.item_id == item_id, cls.status == "Active").all()
+
+    @classmethod
+    def close_booking(cls,booking_id):
+        cls.query.filter(cls.id == booking_id).update({"status": "Closed"})
+        db.session.commit()
