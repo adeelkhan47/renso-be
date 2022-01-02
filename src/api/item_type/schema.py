@@ -8,7 +8,7 @@ Item_type = api.model(
         "id": fields.Integer(),
         "name": fields.String(),
         "maintenance": fields.Integer(),
-        "delivery_available": fields.String(),
+        "delivery_available": fields.Boolean(),
         #"items": fields.Nested(Item)
 
     },

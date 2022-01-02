@@ -9,6 +9,7 @@ Tax = api.model(
         "name": fields.String(),
         "percentage": fields.Integer(),
         "description": fields.String(),
+        "payment_id":fields.Integer()
     },
 )
 

@@ -22,7 +22,7 @@ class user_list(Resource):
     @api.param("image", required=True)
     @api.param("gender", required=True)
     @api.param("status", required=True, type=int)
-    @api.marshal_list_with(schema.get_list_responseUser)
+    @api.marshal_list_with(schema.get_by_id_responseUser)
     def post(self):
         name = request.args.get("name")
         password = request.args.get("password")

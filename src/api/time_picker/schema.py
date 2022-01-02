@@ -10,7 +10,7 @@ Time_Picker = api.model(
         "start_time": fields.String(),
         "end_time": fields.String(),
         "day": fields.String(),
-        #"day_picker": fields.Nested(Day_Picker),
+        "day_picker_id": fields.Integer(),
 
     },
 )

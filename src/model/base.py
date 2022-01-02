@@ -73,7 +73,7 @@ class Base(object):
                 filter_by = inspect_field(field.split(":")[0])
                 filter_by = cast(filter_by, String)
                 query = query.filter(filter_by.ilike("%" + value + "%"))
-        if "order_by" in args:
+        if "order_by" in args.keys():
             for ordering in reversed(args["order_by"].split(",")):
                 field, order = ordering.split(":")
                 if order == "desc":
