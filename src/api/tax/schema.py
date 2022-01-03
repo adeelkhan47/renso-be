@@ -1,7 +1,6 @@
 from flask_restx import fields
 
 from . import api
-
 Tax = api.model(
     "tax",
     {
@@ -9,7 +8,6 @@ Tax = api.model(
         "name": fields.String(),
         "percentage": fields.Integer(),
         "description": fields.String(),
-        "payment_id":fields.Integer()
     },
 )
 

@@ -2,7 +2,6 @@ from flask_restx import fields
 
 from . import api
 from ..tag.schema import Tag
-from ..user.schema import User
 from ..item_type.schema import Item_type
 
 tags = api.model(
