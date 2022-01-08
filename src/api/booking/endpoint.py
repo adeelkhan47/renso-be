@@ -23,14 +23,14 @@ class booking_list(Resource):
     @api.param("location", required=True)
     @api.param("start_time", required=True)
     @api.param("end_time", required=True)
-    @api.param("status", required=True)
+    @api.param("status_id", required=True)
     @api.param("item_id", required=True, type=int)
     def post(self):
         discount = request.args.get("discount")
         location = request.args.get("location")
         start_time = request.args.get("start_time")
         end_time = request.args.get("end_time")
-        status = request.args.get("status")
+        status_id = request.args.get("status_id")
         item_id = request.args.get("item_id")
         ##
         item = Item.query_by_id(item_id)
@@ -43,7 +43,7 @@ class booking_list(Resource):
         for each in all_bookings:
             if each.start_time <= end_time and start_time <= each.end_time:
                 return error_message("Item Already booked with this time."), 400
-        booking = Booking(discount, location, start_time, end_time, status, item_id)
+        booking = Booking(discount, location, start_time, end_time, status_id, item_id)
         booking.insert()
         return response_structure(booking), 201
 
@@ -66,10 +66,20 @@ class booking_by_id(Resource):
     @api.param("location")
     @api.param("start_time")
     @api.param("end_time")
-    @api.param("status")
+    @api.param("status_id")
     @api.param("item_id")
     def patch(self, booking_id):
         data = request.args.copy()
         Booking.update(booking_id, data)
         booking = Booking.query_by_id(booking_id)
         return response_structure(booking), 200
+
+
+@api.route("/by_item_type/<int:item_type_id>")
+class bookings_by_item_type_id(Resource):
+    @api.marshal_list_with(schema.get_list_responseBooking)
+    def get(self, item_type_id):
+        args = request.args.copy()
+        booking_query = Booking.getQuery_BookingByItemType(item_type_id)
+        allBookings, rows = Booking.filtration(args, booking_query)
+        return response_structure(allBookings, rows), 200

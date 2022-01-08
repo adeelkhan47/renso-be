@@ -5,6 +5,7 @@ from common.helper import response_structure, error_message
 from model.booking import Booking
 from model.order import Order
 from model.order_bookings import OrderBookings
+from model.order_status import OrderStatus
 from . import api, schema
 
 
@@ -19,7 +20,7 @@ class order_list(Resource):
 
     @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
     @api.param("client_name", required=True)
-    @api.param("status", required=True)
+    @api.param("status_id", required=True)
     @api.param("client_email", required=True)
     @api.param("phone_number", required=True)
     @api.param("time_period", required=True)
@@ -27,7 +28,7 @@ class order_list(Resource):
     def post(self):
         client_name = request.args.get("client_name")
         client_email = request.args.get("client_email")
-        status = request.args.get("status")
+        status_id = request.args.get("status_id")
         phone_number = request.args.get("phone_number")
         time_period = request.args.get("time_period")
         all_booking_ids = request.args.get("booking_ids").split(",")
@@ -42,7 +43,7 @@ class order_list(Resource):
             item_price = booking.item.price * hours
             cost = item_price * (100 - booking.discount) / 100
             total_cost += cost
-        order = Order(client_name, client_email, phone_number, status, time_period, total_cost)
+        order = Order(client_name, client_email, phone_number, status_id, time_period, total_cost)
         order.insert()
         for each in all_booking_ids:
             OrderBookings(each, order.id).insert()
@@ -65,13 +66,14 @@ class order_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
     @api.param("client_name")
     @api.param("client_email")
-    @api.param("status")
+    @api.param("status_id")
     @api.param("phone_number")
     @api.param("time_period")
     @api.param("booking_ids")
     def patch(self, order_id):
         data = request.args.copy()
-        if "status" in data.keys() and data["status"] == "Completed":
+
+        if "status_id" in data.keys() and int(data["status_id"]) == OrderStatus.get_id_by_name("Completed"):
             order = Order.query_by_id(order_id)
             for each in order.order_bookings:
                 Booking.close_booking(each.booking.id)
@@ -97,3 +99,13 @@ class order_by_id(Resource):
         Order.update(order_id, data)
         order = Order.query_by_id(order_id)
         return response_structure(order), 200
+
+
+@api.route("/by_item_type/<int:item_type_id>")
+class order_by_id(Resource):
+    @api.marshal_list_with(schema.get_list_responseOrder)
+    def get(self, item_type_id):
+        args = request.args.copy()
+        orders_query = Order.getQuery_OrderByItemType(item_type_id)
+        allorders, rows = Order.filtration(args, orders_query)
+        return response_structure(allorders, rows), 200

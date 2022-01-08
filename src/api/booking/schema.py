@@ -1,6 +1,7 @@
 from flask_restx import fields
 
 from . import api
+from ..booking_status.schema import BookingStatus
 from ..item.schema import Item
 
 Booking = api.model(
@@ -11,7 +12,7 @@ Booking = api.model(
         "location": fields.String(),
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
-        "status": fields.String(),
+        "booking_status": fields.Nested(BookingStatus),
         "item": fields.Nested(Item),
 
     },

@@ -2,11 +2,27 @@ from flask_restx import fields
 
 from . import api
 
-
-get_all_item_status = api.model(
-    "getById_booking",
+ItemStatus = api.model(
+    "itemStatus",
     {
-        "objects": fields.List(fields.String()),
+        "id": fields.Integer(),
+        "name": fields.String(),
+        "color": fields.String(),
+
+    },
+)
+
+get_list_responseItemStatus = api.model(
+    "getAll_Tag",
+    {
+        "total_rows": fields.Integer(),
+        "objects": fields.Nested(ItemStatus, as_list=True),
+    },
+)
+get_by_id_responseItemStatus = api.model(
+    "getById_tag",
+    {
+        "objects": fields.Nested(ItemStatus),
 
     },
 )

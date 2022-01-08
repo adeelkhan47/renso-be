@@ -5,18 +5,15 @@ from sqlalchemy.sql.sqltypes import String
 from model.base import Base, db
 
 
-class Tag(Base, db.Model):
-    __tablename__ = "tag"
+class BookingStatus(Base, db.Model):
+    __tablename__ = "booking_status"
     name = Column(String, nullable=False, unique=True)
-    description = Column(String, nullable=True)
-    color = Column(String, nullable=True)
-    item_tags = relationship("ItemTag", backref="tag")
+    color = Column(String, nullable=False)
+    booking_status = relationship("Booking", backref="booking_status")
 
-    def __init__(self, name, description,color):
+    def __init__(self, name, color):
         self.name = name
-        self.description = description
         self.color = color
-
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -25,3 +22,8 @@ class Tag(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
+    @classmethod
+    def get_id_by_name(cls, name: str):
+        row = db.session.query(cls).filter_by(name=name).first()
+        return row.id

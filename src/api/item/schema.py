@@ -1,8 +1,9 @@
 from flask_restx import fields
 
 from . import api
-from ..tag.schema import Tag
+from ..item_status.schema import ItemStatus
 from ..item_type.schema import Item_type
+from ..tag.schema import Tag
 
 tags = api.model(
     "tags",
@@ -16,7 +17,7 @@ Item = api.model(
         "image": fields.String(),
         "description": fields.String(),
         "price": fields.Integer(),
-        "status": fields.String(),
+        "item_status": fields.Nested(ItemStatus),
         "person": fields.String(),
         "item_type": fields.Nested(Item_type),
         "item_tags": fields.Nested(tags, as_list=True)

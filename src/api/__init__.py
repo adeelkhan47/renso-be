@@ -10,7 +10,7 @@ from .item_status.endpoint import api as item_status_api
 from .item_type.endpoint import api as item_type_api
 from .language.endpoint import api as language_api
 from .order.endpoint import api as order_api
-from .order_statuse.endpoint import api as order_status_api
+from .order_status.endpoint import api as order_status_api
 from .payment_methods.endpoint import api as payment_method_api
 from .tag.endpoint import api as tag_api
 from .tax.endpoint import api as tax_api

@@ -40,16 +40,21 @@ class Base(object):
         db.session.commit()
 
     @classmethod
-    def filtration(cls, args: Dict):
+    def modify_query_filter(cls, query: str, args: Dict) -> str:
+        """
+        Modify query as per the arguments passed in request
+        :param args: Dict containing the query args passed in request
+        :return: query
+        """
 
         def inspect_field(field: String) -> InstrumentedAttribute:
             if field not in inspect(cls).all_orm_descriptors:
-                raise BadRequest("Invalid field search requested")
+                raise BadRequest({"message": "Invalid field search requested"})
             field = getattr(cls, field)
             return field
 
-        query = db.session.query(cls)
         for field, value in args.items():
+            # The ordering is important, changing the ordering will break functionality
 
             if ":neq" in field:
                 filter_by = inspect_field(field.split(":")[0])
@@ -73,7 +78,28 @@ class Base(object):
                 filter_by = inspect_field(field.split(":")[0])
                 filter_by = cast(filter_by, String)
                 query = query.filter(filter_by.ilike("%" + value + "%"))
-        if "order_by" in args.keys():
+        return query
+
+    @classmethod
+    def filtration(cls, args: Dict, query: str = None):
+        """
+        Get list of rows queried from database as per the arguments passed in request
+        :param query:
+        :param args: Dict containing the query args passed in request
+        :return: List of objects of the class on which the function is called and an Int representing length of list
+        """
+
+        def inspect_field(field: String) -> InstrumentedAttribute:
+            if field not in inspect(cls).all_orm_descriptors:
+                raise BadRequest({"message": "Invalid field search requested"})
+            field = getattr(cls, field)
+            return field
+
+        if not query:
+            query = cls.modify_query_filter(db.session.query(cls), args)
+        else:
+            query = cls.modify_query_filter(query, args)
+        if "order_by" in args:
             for ordering in reversed(args["order_by"].split(",")):
                 field, order = ordering.split(":")
                 if order == "desc":

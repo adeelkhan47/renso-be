@@ -40,11 +40,13 @@ class item_type_by_id(Resource):
         ItemType.delete(item_type_id)
         return "ok", 200
 
-    @api.param("name", required=True)
-    @api.param("maintenance", required=True)
-    @api.param("delivery_available", required=True, type=int)
+    @api.marshal_list_with(schema.get_by_id_responseItem_type)
+    @api.param("name", )
+    @api.param("maintenance")
+    @api.param("delivery_available", type=int)
     def patch(self, item_type_id):
-        data = request.args
+        data = request.args.copy()
+
         if "delivery_available" in data.keys():
             data["delivery_available"] = int(data["delivery_available"])
         ItemType.update(item_type_id, data)

@@ -17,10 +17,12 @@ class TagList(Resource):
 
     @api.param("name", required=True)
     @api.param("description")
+    @api.param("color", required=True)
     def post(self):
         name = request.args.get("name")
+        color = request.args.get("color")
         description = request.args.get("description")
-        tag = Tag(name, description)
+        tag = Tag(name, description, color)
         tag.insert()
         return "ok", 201
 

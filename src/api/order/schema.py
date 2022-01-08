@@ -2,6 +2,7 @@ from flask_restx import fields
 
 from . import api
 from ..booking.schema import Booking
+from ..order_status.schema import OrderStatus
 
 bookings = api.model(
     "bookings",
@@ -14,7 +15,7 @@ Order = api.model(
         "client_name": fields.String(),
         "client_email": fields.String(),
         "phone_number": fields.String(),
-        "status": fields.String(),
+        "order_status": fields.Nested(OrderStatus),
         "time_period": fields.String(),
         "total_cost": fields.Float(),
         "order_bookings": fields.Nested(bookings, as_list=True)

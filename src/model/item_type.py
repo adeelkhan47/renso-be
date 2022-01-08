@@ -20,6 +20,10 @@ class ItemType(Base, db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+    @classmethod
+    def update(cls, id, data):
+        db.session.query(cls).filter(cls.id == id).update(data)
+        db.session.commit()
 
     @classmethod
     def delete(cls, id):
