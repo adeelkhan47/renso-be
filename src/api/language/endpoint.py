@@ -17,8 +17,8 @@ class LanguageList(Resource):
 
     @api.param("name", required=True)
     def post(self):
-        name = request.args.get("name")
-
+        payload = api.payload
+        name = payload.get("name")
         lan = Language(name, "Active")
         lan.insert()
         return "ok", 201

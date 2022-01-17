@@ -19,9 +19,10 @@ class item_types_list(Resource):
     @api.param("maintenance", required=True)
     @api.param("delivery_available", required=True, type=int)
     def post(self):
-        name = request.args.get("name")
-        maintenance = request.args.get("maintenance")
-        delivery_available = int(request.args.get("delivery_available"))
+        payload = api.payload
+        name = payload.get("name")
+        maintenance = payload.get("maintenance")
+        delivery_available = int(payload.get("delivery_available"))
 
         item_type = ItemType(name, maintenance, delivery_available)
         item_type.insert()
@@ -45,8 +46,8 @@ class item_type_by_id(Resource):
     @api.param("maintenance")
     @api.param("delivery_available", type=int)
     def patch(self, item_type_id):
-        data = request.args.copy()
-
+        payload = api.payload
+        data = payload.copy()
         if "delivery_available" in data.keys():
             data["delivery_available"] = int(data["delivery_available"])
         ItemType.update(item_type_id, data)

@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.user import User
@@ -43,13 +44,14 @@ class user_by_id(Resource):
     @api.marshal_list_with(schema.get_list_responseUser)
     def post(self):
         args = {}
-        args["email:eq"] = request.args.get("email")
-        args["password:eq"] = request.args.get("password")
+        payload = api.payload
+        args["email:eq"] = payload["email"]
+        args["password:eq"] = payload["password"]
         all_users, count = User.filtration(args)
         if count >= 1:
             return response_structure(all_users[0]), 200
         else:
-            return "User not found with these credentials", 404
+            raise NotFound("User not found with these credentials")
 
 
 @api.route("/<int:user_id>")
@@ -74,8 +76,8 @@ class user_by_id(Resource):
     @api.param("gender")
     @api.param("status", type=int)
     def patch(self, user_id):
-
-        data = request.args.copy()
+        payload = api.payload
+        data = payload.copy()
         if "status" in data.keys():
             data["status"] = bool(data["status"])
         User.update(user_id, request.args)

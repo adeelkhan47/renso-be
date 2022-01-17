@@ -19,13 +19,13 @@ class PaymentMethodList(Resource):
     @api.param("name", required=True)
     @api.param("tax_ids", required=True)
     def post(self):
-        name = request.args.get("name")
+        payload = api.payload
+        name = payload.get("name")
         pay = PaymentMethod(name, "Active")
         pay.insert()
-        all_tax_ids = request.args.get("tax_ids").split(",")
+        all_tax_ids = payload.get("tax_ids").split(",")
         for each in all_tax_ids:
             PaymentTax(each, pay.id).insert()
-
         return "ok", 201
 
 

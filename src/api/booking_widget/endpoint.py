@@ -19,9 +19,10 @@ class BookingWidgetList(Resource):
     @api.param("day_picker_status", required=True, type=int)
     @api.param("date_range_Picker_status", required=True, type=int)
     def post(self):
-        time_picker_status = int(request.args.get("time_picker"))
-        day_picker_status = int(request.args.get("day_picker_status"))
-        date_range_Picker_status = int(request.args.get("date_range_Picker_status"))
+        payload = api.payload
+        time_picker_status = int(payload.get("time_picker"))
+        day_picker_status = int(payload.get("day_picker_status"))
+        date_range_Picker_status = int(payload.get("date_range_Picker_status"))
         widget = BookingWidget(day_picker_status=day_picker_status, time_picker_status=time_picker_status,
                                date_range_picker_status=date_range_Picker_status)
         widget.insert()
@@ -47,9 +48,10 @@ class widget_by_id(Resource):
     @api.param("date_range_picker_status", required=True, type=int)
     def patch(self, booking_widget_id):
         data = {}
-        data["time_picker_status"] = int(request.args.get("time_picker_status"))
-        data["day_picker_status"] = int(request.args.get("day_picker_status"))
-        data["date_range_picker_status"] = int(request.args.get("date_range_picker_status"))
+        payload = api.payload
+        data["time_picker_status"] = int(payload.get("time_picker_status"))
+        data["day_picker_status"] = int(payload.get("day_picker_status"))
+        data["date_range_picker_status"] = int(payload.get("date_range_picker_status"))
         BookingWidget.update(booking_widget_id, data)
         bookingWidget = BookingWidget.query_by_id(booking_widget_id)
         return response_structure(bookingWidget), 200

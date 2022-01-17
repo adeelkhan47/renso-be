@@ -11,8 +11,7 @@ User = api.model(
         "subscription": fields.String(),
         "image": fields.String(),
         "gender": fields.String(),
-        "status": fields.String(),
-
+        "status": fields.Boolean(),
     },
 )
 

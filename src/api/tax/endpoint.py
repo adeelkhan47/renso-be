@@ -19,9 +19,10 @@ class TaxList(Resource):
     @api.param("percentage", required=True)
     @api.param("description", required=True)
     def post(self):
-        name = request.args.get("name")
-        percentage = request.args.get("percentage")
-        description = request.args.get("description")
+        payload = api.payload
+        name = payload.get("name")
+        percentage = payload.get("percentage")
+        description = payload.get("description")
         tax = Tax(name, percentage, description)
         tax.insert()
         return "ok", 201

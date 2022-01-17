@@ -18,8 +18,9 @@ class BookingStatusList(Resource):
     @api.param("name", required=True)
     @api.param("color", required=True)
     def post(self):
-        name = request.args.get("name")
-        color = request.args.get("color")
+        payload = api.payload
+        name = payload.get("name")
+        color = payload.get("color")
         order_status = BookingStatus(name, color)
         order_status.insert()
         return "ok", 201

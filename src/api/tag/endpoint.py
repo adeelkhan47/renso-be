@@ -19,9 +19,10 @@ class TagList(Resource):
     @api.param("description")
     @api.param("color", required=True)
     def post(self):
-        name = request.args.get("name")
-        color = request.args.get("color")
-        description = request.args.get("description")
+        payload = api.payload
+        name = payload.get("name")
+        color = payload.get("color")
+        description = payload.get("description")
         tag = Tag(name, description, color)
         tag.insert()
         return "ok", 201

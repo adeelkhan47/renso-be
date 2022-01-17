@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure, error_message
 from model.booking import Booking
@@ -26,17 +27,18 @@ class order_list(Resource):
     @api.param("time_period", required=True)
     @api.param("booking_ids", required=True)
     def post(self):
-        client_name = request.args.get("client_name")
-        client_email = request.args.get("client_email")
-        status_id = request.args.get("status_id")
-        phone_number = request.args.get("phone_number")
-        time_period = request.args.get("time_period")
-        all_booking_ids = request.args.get("booking_ids").split(",")
+        payload = api.payload
+        client_name = payload.get("client_name")
+        client_email = payload.get("client_email")
+        status_id = payload.get("status_id")
+        phone_number = payload.get("phone_number")
+        time_period = payload.get("time_period")
+        all_booking_ids = payload.get("booking_ids").split(",")
         total_cost = 0.0
         for booking_id in all_booking_ids:
             booking = Booking.query_by_id(booking_id)
             if not booking:
-                return error_message(f"Item_id {booking_id} no found."), 400
+                raise NotFound(f"Item_id {booking_id} no found.")
             diff = booking.end_time - booking.start_time
             days, seconds = diff.days, diff.seconds
             hours = days * 24 + seconds // 3600
@@ -55,7 +57,6 @@ class order_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseOrder)
     def get(self, order_id):
         order = Order.query_by_id(order_id)
-
         return response_structure(order), 200
 
     @api.doc("Delete item by id")
@@ -71,7 +72,7 @@ class order_by_id(Resource):
     @api.param("time_period")
     @api.param("booking_ids")
     def patch(self, order_id):
-        data = request.args.copy()
+        data = api.payload.copy()
 
         if "status_id" in data.keys() and int(data["status_id"]) == OrderStatus.get_id_by_name("Completed"):
             order = Order.query_by_id(order_id)
@@ -79,12 +80,12 @@ class order_by_id(Resource):
                 Booking.close_booking(each.booking.id)
 
         if "booking_ids" in data.keys():
-            all_booking_ids = request.args.get("booking_ids").split(",")
+            all_booking_ids = api.payload.get("booking_ids").split(",")
             total_cost = 0.0
             for booking_id in all_booking_ids:
                 booking = Booking.query_by_id(booking_id)
                 if not booking:
-                    return error_message(f"Item_id {booking_id} no found."), 400
+                    raise NotFound(f"Item_id {booking_id} no found.")
                 diff = booking.end_time - booking.start_time
                 days, seconds = diff.days, diff.seconds
                 hours = days * 24 + seconds // 3600
@@ -105,7 +106,7 @@ class order_by_id(Resource):
 class order_by_id(Resource):
     @api.marshal_list_with(schema.get_list_responseOrder)
     def get(self, item_type_id):
-        args = request.args.copy()
+        args = api.payload.copy()
         orders_query = Order.getQuery_OrderByItemType(item_type_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200

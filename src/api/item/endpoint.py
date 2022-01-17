@@ -51,20 +51,19 @@ class items_list(Resource):
     @api.param("item_type_id", required=True)
     @api.param("tag_ids")
     def post(self):
-        name = request.args.get("name")
-        image = request.args.get("image")
-        description = request.args.get("description")
-        price = request.args.get("price")
-        status_id = request.args.get("status_id")
-        person = request.args.get("person")
-        item_type_id = request.args.get("item_type_id")
+        name = request.json("name")
+        image = request.json("image")
+        description = request.json("description")
+        price = request.json("price")
+        status_id = request.json("status_id")
+        person = request.json("person")
+        item_type_id = request.json("item_type_id")
         item = Item(name, image, description, price, status_id, person, item_type_id)
         item.insert()
         if "tag_ids" in request.args.keys():
             tag_ids = request.args.get("tag_ids").split(",")
             for each in tag_ids:
                 ItemTag(item_id=item.id, tag_id=each).insert()
-
         return "ok", 201
 
 
@@ -92,10 +91,10 @@ class item_by_id(Resource):
     @api.param("item_type_id")
     @api.param("tag_ids")
     def patch(self, item_id):
-        data = request.args.copy()
+        data = api.payload.copy()
         if "tag_ids" in data.keys():
             ItemTag.delete_by_item_id(item_id)
-            tag_ids = request.args.get("tag_ids").split(",")
+            tag_ids = data.get("tag_ids").split(",")
             for each in tag_ids:
                 ItemTag(item_id=item_id, tag_id=each).insert()
             del data["tag_ids"]

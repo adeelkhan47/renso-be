@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.day_picker import DayPicker
@@ -26,7 +27,7 @@ class DayPickerList(Resource):
     @api.param("sunday", required=True, type=int)
     @api.param("item_type_id", required=True, type=int)
     def post(self):
-        args = request.args
+        args = api.payload
         monday = int(args["monday"])
         tuesday = int(args["tuesday"])
         wednesday = int(args["wednesday"])
@@ -65,7 +66,7 @@ class day_picker_by_id(Resource):
     @api.param("sunday", required=True, type=int)
     @api.param("item_type_id", required=True, type=int)
     def patch(self, day_picker_id):
-        args = request.args
+        args = api.payload
         data = {}
         data["monday"] = int(args["monday"])
         data["tuesday"] = int(args["tuesday"])
@@ -81,4 +82,4 @@ class day_picker_by_id(Resource):
 
             return response_structure(DayPicker.query_by_id(day_picker_id)), 201
         else:
-            return "item_type_id not exist", 404
+            raise NotFound("item_type_id not exist")

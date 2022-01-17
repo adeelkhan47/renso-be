@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.day_picker import DayPicker
@@ -22,7 +23,7 @@ class TimePickerList(Resource):
     @api.param("day", required=True)
     @api.param("day_picker_id", required=True, type=int)
     def post(self):
-        args = request.args
+        args = api.payload
         start_time = args["start_time"]
         end_time = args["end_time"]
         day = args["day"]
@@ -32,7 +33,7 @@ class TimePickerList(Resource):
             time_picker.insert()
             return response_structure(TimePicker.query_by_id(time_picker.id)), 201
         else:
-            return "day_picker_id not exist", 404
+            raise NotFound("day_picker_id not exist")
 
 
 @api.route("/<int:time_picker_id>")
