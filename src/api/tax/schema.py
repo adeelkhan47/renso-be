@@ -21,7 +21,7 @@ get_list_responseTax = api.model(
 get_by_id_responseTax = api.model(
     "getById_tax",
     {
-        "objects_tax": fields.Nested(Tax),
+        "objects": fields.Nested(Tax),
 
     },
 )

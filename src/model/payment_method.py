@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.sql.sqltypes import String, Boolean
 
 from model.base import Base, db
 
@@ -8,7 +8,7 @@ from model.base import Base, db
 class PaymentMethod(Base, db.Model):
     __tablename__ = "payment_method"
     name = Column(String, nullable=False, unique=True)
-    status = Column(String, nullable=False)
+    status = Column(Boolean, nullable=False)
     payment_tax = relationship("PaymentTax", backref="payment_method")
 
     def __init__(self, name, status):
@@ -23,3 +23,7 @@ class PaymentMethod(Base, db.Model):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
 
+    @classmethod
+    def update(cls, id, data):
+        db.session.query(cls).filter(cls.id == id).update(data)
+        db.session.commit()

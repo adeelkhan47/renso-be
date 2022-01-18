@@ -40,3 +40,14 @@ class tax_by_id(Resource):
     def delete(self, tax_id):
         Tax.delete(tax_id)
         return "ok", 200
+
+    @api.marshal_list_with(schema.get_by_id_responseTax, skip_none=True)
+    @api.param("name")
+    @api.param("percentage")
+    @api.param("description")
+    def patch(self, tax_id):
+        payload = api.payload
+        data = payload.copy()
+        Tax.update(tax_id, data)
+        tax = Tax.query_by_id(tax_id)
+        return response_structure(tax), 200

@@ -17,11 +17,13 @@ class PaymentMethodList(Resource):
         return response_structure(all_rows, count), 200
 
     @api.param("name", required=True)
+    @api.param("status", required=True, type=int)
     @api.param("tax_ids", required=True)
     def post(self):
         payload = api.payload
         name = payload.get("name")
-        pay = PaymentMethod(name, "Active")
+        status = payload.get("status")
+        pay = PaymentMethod(name, bool(status))
         pay.insert()
         all_tax_ids = payload.get("tax_ids").split(",")
         for each in all_tax_ids:
@@ -41,3 +43,16 @@ class Payment_Method_by_id(Resource):
     def delete(self, payment_method_id):
         PaymentMethod.delete(payment_method_id)
         return "ok", 200
+
+    @api.marshal_list_with(schema.get_by_id_responsePaymentMethod, skip_none=True)
+    @api.param("name", )
+    @api.param("status", type=int)
+    @api.param("tax_ids")
+    def patch(self, payment_method_id):
+        payload = api.payload
+        data = payload.copy()
+        if "status" in data.keys():
+            data["status"] = bool(data["status"])
+        PaymentMethod.update(payment_method_id, data)
+        payment_method = PaymentMethod.query_by_id(payment_method_id)
+        return response_structure(payment_method), 200

@@ -16,15 +16,15 @@ class Order(Base, db.Model):
     phone_number = Column(String, nullable=False)
     time_period = Column(String, nullable=False)
     total_cost = Column(Float, nullable=False)
-    status_id = Column(Integer, ForeignKey("order_status.id", ondelete="CASCADE"), nullable=True)
+    order_status_id = Column(Integer, ForeignKey("order_status.id", ondelete="CASCADE"), nullable=True)
 
     order_bookings = relationship("OrderBookings", backref="order")
 
-    def __init__(self, client_name, client_email, phone_number, status_id, time_period, total_cost):
+    def __init__(self, client_name, client_email, phone_number, order_status_id, time_period, total_cost):
         self.client_name = client_name
         self.client_email = client_email
         self.phone_number = phone_number
-        self.status_id = status_id
+        self.order_status_id = order_status_id
         self.time_period = time_period
         self.total_cost = total_cost
 

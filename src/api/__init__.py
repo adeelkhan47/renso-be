@@ -92,4 +92,4 @@ def handle_internal_server_error(exception_cause):
     :return objects , response Code:
     """
 
-    return error_message(), HTTPStatus.INTERNAL_SERVER_ERROR
+    return error_message("internal server error"), HTTPStatus.INTERNAL_SERVER_ERROR

@@ -13,17 +13,17 @@ class Booking(Base, db.Model):
     location = Column(String, nullable=False)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
-    status_id = Column(Integer, ForeignKey("booking_status.id", ondelete="CASCADE"), nullable=True)
+    booking_status_id = Column(Integer, ForeignKey("booking_status.id", ondelete="CASCADE"), nullable=True)
 
     item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
     order_bookings = relationship("OrderBookings", backref="booking")
 
-    def __init__(self, discount, location, start_time, end_time, status_id, item_id):
+    def __init__(self, discount, location, start_time, end_time, booking_status_id, item_id):
         self.discount = discount
         self.location = location
         self.start_time = start_time
         self.end_time = end_time
-        self.status_id = status_id
+        self.booking_status_id = booking_status_id
         self.item_id = item_id
 
     def __repr__(self):
@@ -47,7 +47,7 @@ class Booking(Base, db.Model):
     @classmethod
     def close_booking(cls, booking_id):
         closed_id = BookingStatus.get_id_by_name("Closed")
-        cls.query.filter(cls.id == booking_id).update({"status_id": closed_id})
+        cls.query.filter(cls.id == booking_id).update({"booking_status_id": closed_id})
         db.session.commit()
 
     @classmethod

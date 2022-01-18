@@ -24,7 +24,7 @@ class booking_list(Resource):
     @api.param("location", required=True)
     @api.param("start_time", required=True)
     @api.param("end_time", required=True)
-    @api.param("status_id", required=True)
+    @api.param("booking_status_id", required=True)
     @api.param("item_id", required=True, type=int)
     def post(self):
         payload = api.payload
@@ -32,7 +32,7 @@ class booking_list(Resource):
         location = payload.get("location")
         start_time = payload.get("start_time")
         end_time = payload.get("end_time")
-        status_id = payload.get("status_id")
+        booking_status_id = payload.get("booking_status_id")
         item_id = payload.get("item_id")
         ##
         item = Item.query_by_id(item_id)
@@ -45,7 +45,7 @@ class booking_list(Resource):
         for each in all_bookings:
             if each.start_time <= end_time and start_time <= each.end_time:
                 raise BadRequest("Item Already booked with this time.")
-        booking = Booking(discount, location, start_time, end_time, status_id, item_id)
+        booking = Booking(discount, location, start_time, end_time, booking_status_id, item_id)
         booking.insert()
         return response_structure(booking), 201
 
@@ -67,7 +67,7 @@ class booking_by_id(Resource):
     @api.param("location")
     @api.param("start_time")
     @api.param("end_time")
-    @api.param("status_id")
+    @api.param("booking_status_id")
     @api.param("item_id")
     def patch(self, booking_id):
         payload = api.payload
