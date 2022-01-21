@@ -41,6 +41,7 @@ class items_list(Resource):
         all_items, count = Item.filtration(args)
         return response_structure(all_items, count), 200
 
+    @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)
     @api.param("name", required=True)
     @api.param("image", required=True)
     @api.param("tag_ids")
@@ -60,11 +61,11 @@ class items_list(Resource):
         item_type_id = request.json.get("item_type_id")
         item = Item(name, image, description, price, item_status_id, person, item_type_id)
         item.insert()
-        if "tag_ids" in request.args.keys():
-            tag_ids = request.args.get("tag_ids").split(",")
+        if "tag_ids" in request.json.keys():
+            tag_ids = request.json.get("tag_ids").split(",")
             for each in tag_ids:
                 ItemTag(item_id=item.id, tag_id=each).insert()
-        return "ok", 201
+        return response_structure(item), 201
 
 
 @api.route("/<int:item_id>")

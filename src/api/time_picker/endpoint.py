@@ -45,5 +45,5 @@ class picker_by_id(Resource):
 
     @api.doc("Delete time Picker by id")
     def delete(self, time_picker_id):
-        time_picker_id.delete(time_picker_id)
+        TimePicker.delete(time_picker_id)
         return "ok", 204

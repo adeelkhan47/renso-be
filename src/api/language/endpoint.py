@@ -15,13 +15,14 @@ class LanguageList(Resource):
         all_rows, count = Language.filtration(args)
         return response_structure(all_rows, count), 200
 
+    @api.marshal_list_with(schema.get_by_id_responseLanguage)
     @api.param("name", required=True)
     def post(self):
         payload = api.payload
         name = payload.get("name")
         lan = Language(name, "Active")
         lan.insert()
-        return "ok", 201
+        return response_structure(lan), 201
 
 
 @api.route("/<int:language_id>")

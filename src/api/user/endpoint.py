@@ -25,13 +25,14 @@ class user_list(Resource):
     @api.param("status", required=True, type=int)
     @api.marshal_list_with(schema.get_by_id_responseUser)
     def post(self):
-        name = request.args.get("name")
-        password = request.args.get("password")
-        email = request.args.get("email")
-        subscription = request.args.get("subscription")
-        image = request.args.get("image")
-        gender = request.args.get("gender")
-        status = bool(request.args.get("status"))
+        payload = api.payload
+        name = payload.get("name")
+        password = payload.get("password")
+        email = payload.get("email")
+        subscription = payload.get("subscription")
+        image = payload.get("image")
+        gender = payload.get("gender")
+        status = bool(payload.get("status"))
         user = User(name, email, password, subscription, image, gender, status)
         user.insert()
         return response_structure(User.query_by_id(user.id)), 201
