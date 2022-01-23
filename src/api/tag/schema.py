@@ -2,6 +2,16 @@ from flask_restx import fields
 
 from . import api
 
+Tag_Expect = api.model(
+    "Tag_Expect",
+    {
+        "name": fields.String(),
+        "description": fields.String(),
+        "color": fields.String(),
+
+    },
+)
+
 Tag = api.model(
     "tag",
     {

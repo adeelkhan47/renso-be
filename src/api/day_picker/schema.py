@@ -3,6 +3,19 @@ from flask_restx import fields
 from . import api
 from ..item_type.schema import Item_type
 
+Day_Picker_Expect = api.model(
+    "day_picker_Expect",
+    {
+        "monday": fields.Boolean(),
+        "tuesday": fields.Boolean(),
+        "wednesday": fields.Boolean(),
+        "thursday": fields.Boolean(),
+        "friday": fields.Boolean(),
+        "saturday": fields.Boolean(),
+        "sunday": fields.Boolean(),
+        "item_type_id": fields.Integer(),
+    },
+)
 Day_Picker = api.model(
     "booking",
     {

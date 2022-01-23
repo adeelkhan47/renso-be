@@ -15,15 +15,14 @@ class OrderStatusList(Resource):
         all_rows, count = OrderStatus.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.param("name", required=True)
-    @api.param("color", required=True)
+    @api.marshal_list_with(schema.get_by_id_responseOrderStatus)
     def post(self):
         payload = api.payload
         name = payload.get("name")
         color = payload.get("color")
         order_status = OrderStatus(name, color)
         order_status.insert()
-        return "ok", 201
+        return response_structure(order_status), 201
 
 
 @api.route("/<int:order_status_id>")

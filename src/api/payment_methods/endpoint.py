@@ -16,9 +16,8 @@ class PaymentMethodList(Resource):
         all_rows, count = PaymentMethod.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.param("name", required=True)
-    @api.param("status", required=True, type=int)
-    @api.param("tax_ids", required=True)
+    @api.expect(schema.PaymentMethodExpect)
+    @api.marshal_list_with(schema.get_by_id_responsePaymentMethod)
     def post(self):
         payload = api.payload
         name = payload.get("name")
@@ -28,7 +27,7 @@ class PaymentMethodList(Resource):
         all_tax_ids = payload.get("tax_ids").split(",")
         for each in all_tax_ids:
             PaymentTax(each, pay.id).insert()
-        return "ok", 201
+        return response_structure(pay), 201
 
 
 @api.route("/<int:payment_method_id>")
@@ -45,9 +44,7 @@ class Payment_Method_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responsePaymentMethod, skip_none=True)
-    @api.param("name", )
-    @api.param("status", type=int)
-    @api.param("tax_ids")
+    @api.expect(schema.PaymentMethodExpect)
     def patch(self, payment_method_id):
         payload = api.payload
         data = payload.copy()

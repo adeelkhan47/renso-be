@@ -15,9 +15,7 @@ class TagList(Resource):
         all_rows, count = Tag.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.param("name", required=True)
-    @api.param("description")
-    @api.param("color", required=True)
+    @api.expect(schema.Tag_Expect)
     def post(self):
         payload = api.payload
         name = payload.get("name")

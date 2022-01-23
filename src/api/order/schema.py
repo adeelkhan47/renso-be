@@ -8,6 +8,20 @@ bookings = api.model(
     "bookings",
     {"booking": fields.Nested(Booking, as_list=True)}
 )
+
+Order_Expect = api.model(
+    "Order_Expect",
+    {
+
+        "client_name": fields.String(),
+        "client_email": fields.String(),
+        "phone_number": fields.String(),
+        "order_status_id": fields.Nested(OrderStatus),
+        "time_period": fields.String(),
+        "booking_ids": fields.String()
+    },
+)
+
 Order = api.model(
     "Order",
     {

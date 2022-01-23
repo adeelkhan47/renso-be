@@ -2,6 +2,14 @@ from flask_restx import fields
 
 from . import api
 
+OrderStatusExpect = api.model(
+    "orderStatusExpect",
+    {
+        "name": fields.String(),
+        "color": fields.String(),
+
+    },
+)
 OrderStatus = api.model(
     "orderStatus",
     {

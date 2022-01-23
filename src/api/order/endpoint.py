@@ -20,12 +20,7 @@ class order_list(Resource):
         return response_structure(all_items, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
-    @api.param("client_name", required=True)
-    @api.param("order_status_id", required=True)
-    @api.param("client_email", required=True)
-    @api.param("phone_number", required=True)
-    @api.param("time_period", required=True)
-    @api.param("booking_ids", required=True)
+    @api.expect(schema.Order_Expect)
     def post(self):
         payload = api.payload
         client_name = payload.get("client_name")
@@ -65,12 +60,7 @@ class order_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
-    @api.param("client_name")
-    @api.param("client_email")
-    @api.param("order_status_id")
-    @api.param("phone_number")
-    @api.param("time_period")
-    @api.param("booking_ids")
+    @api.expect(schema.Order_Expect)
     def patch(self, order_id):
         data = api.payload.copy()
 

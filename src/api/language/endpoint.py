@@ -16,11 +16,12 @@ class LanguageList(Resource):
         return response_structure(all_rows, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseLanguage)
-    @api.param("name", required=True)
+    @api.expect(schema.LanguageExpect)
     def post(self):
         payload = api.payload
         name = payload.get("name")
-        lan = Language(name, "Active")
+        status = payload.get("status")
+        lan = Language(name,status)
         lan.insert()
         return response_structure(lan), 201
 

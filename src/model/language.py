@@ -1,5 +1,5 @@
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.sql.sqltypes import String, Boolean
 
 from model.base import Base, db
 
@@ -7,7 +7,7 @@ from model.base import Base, db
 class Language(Base, db.Model):
     __tablename__ = "language"
     name = Column(String, nullable=False)
-    status = Column(String, nullable=False)
+    status = Column(Boolean, nullable=False)
 
     def __init__(self, name, status):
         self.name = name

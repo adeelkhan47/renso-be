@@ -18,24 +18,17 @@ class DayPickerList(Resource):
         return response_structure(all_rows, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseDay_Picker)
-    @api.param("monday", required=True, type=int)
-    @api.param("tuesday", required=True, type=int)
-    @api.param("wednesday", required=True, type=int)
-    @api.param("thursday", required=True, type=int)
-    @api.param("friday", required=True, type=int)
-    @api.param("saturday", required=True, type=int)
-    @api.param("sunday", required=True, type=int)
-    @api.param("item_type_id", required=True, type=int)
+    @api.expect(schema.Day_Picker_Expect)
     def post(self):
         args = api.payload
-        monday = int(args["monday"])
-        tuesday = int(args["tuesday"])
-        wednesday = int(args["wednesday"])
-        thursday = int(args["thursday"])
-        friday = int(args["friday"])
-        saturday = int(args["saturday"])
-        sunday = int(args["sunday"])
-        item_type_id = int(args["item_type_id"])
+        monday = args["monday"]
+        tuesday = args["tuesday"]
+        wednesday = args["wednesday"]
+        thursday = args["thursday"]
+        friday = args["friday"]
+        saturday = args["saturday"]
+        sunday = args["sunday"]
+        item_type_id = args["item_type_id"]
         if ItemType.query_by_id(item_type_id):
             day_picker = DayPicker(monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id)
             day_picker.insert()
@@ -57,25 +50,18 @@ class day_picker_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseDay_Picker, skip_none=True)
-    @api.param("monday", required=True, type=int)
-    @api.param("tuesday", required=True, type=int)
-    @api.param("wednesday", required=True, type=int)
-    @api.param("thursday", required=True, type=int)
-    @api.param("friday", required=True, type=int)
-    @api.param("saturday", required=True, type=int)
-    @api.param("sunday", required=True, type=int)
-    @api.param("item_type_id", required=True, type=int)
+    @api.expect(schema.Day_Picker_Expect)
     def patch(self, day_picker_id):
         args = api.payload
         data = {}
-        data["monday"] = int(args["monday"])
-        data["tuesday"] = int(args["tuesday"])
-        data["wednesday"] = int(args["wednesday"])
-        data["thursday"] = int(args["thursday"])
-        data["friday"] = int(args["friday"])
-        data["saturday"] = int(args["saturday"])
-        data["sunday"] = int(args["sunday"])
-        data["item_type_id"] = int(args["item_type_id"])
+        data["monday"] = args["monday"]
+        data["tuesday"] = args["tuesday"]
+        data["wednesday"] = args["wednesday"]
+        data["thursday"] = args["thursday"]
+        data["friday"] = args["friday"]
+        data["saturday"] = args["saturday"]
+        data["sunday"] = args["sunday"]
+        data["item_type_id"] = args["item_type_id"]
 
         if ItemType.query_by_id(data["item_type_id"]):
             DayPicker.update(day_picker_id, data)

@@ -2,6 +2,25 @@ from flask_restx import fields
 
 from . import api
 
+userPostExpect = api.model(
+    "userPostExpect",
+    {
+        "email": fields.String(),
+        "name": fields.String(),
+        "subscription": fields.String(),
+        "image": fields.String(),
+        "gender": fields.String(),
+        "status": fields.Boolean(),
+        "password": fields.String(),
+    }
+)
+userLoginPostExpect = api.model(
+    "userLoginPostExpect",
+    {
+        "email": fields.String(),
+        "password": fields.String(),
+    }
+)
 User = api.model(
     "User",
     {

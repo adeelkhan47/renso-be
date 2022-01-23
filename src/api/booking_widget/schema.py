@@ -2,6 +2,14 @@ from flask_restx import fields
 
 from . import api
 
+Booking_Widget_Expect = api.model(
+    "Booking_widget_expect",
+    {
+        "day_picker_status": fields.Boolean(),
+        "time_picker_status": fields.Boolean(),
+        "date_range_picker_status": fields.Boolean(),
+    },
+)
 Booking_Widget = api.model(
     "Booking_widget",
     {

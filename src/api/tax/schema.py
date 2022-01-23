@@ -1,6 +1,14 @@
 from flask_restx import fields
 
 from . import api
+Tax_expect = api.model(
+    "Tax_expect",
+    {
+        "name": fields.String(),
+        "percentage": fields.Integer(),
+        "description": fields.String(),
+    },
+)
 Tax = api.model(
     "tax",
     {

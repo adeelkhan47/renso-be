@@ -5,6 +5,20 @@ from ..item_status.schema import ItemStatus
 from ..item_type.schema import Item_type
 from ..tag.schema import Tag
 
+ItemExpect = api.model(
+    "item",
+    {
+        "name": fields.String(),
+        "image": fields.String(),
+        "description": fields.String(),
+        "price": fields.Integer(),
+        "item_status_id": fields.Integer(),
+        "person": fields.String(),
+        "item_type_id": fields.Integer(),
+        "tag_ids": fields.String()
+    },
+)
+
 tags = api.model(
     "tags",
     {"tag": fields.Nested(Tag, as_list=True)}

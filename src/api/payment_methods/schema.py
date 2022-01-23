@@ -8,6 +8,15 @@ Tax_nested = api.model(
     {"tax": fields.Nested(Tax, as_list=True)}
 )
 
+PaymentMethodExpect = api.model(
+    "PaymentMethodExpect",
+    {
+        "name": fields.String(),
+        "status": fields.Boolean(),
+        "tax_ids": fields.String(),
+
+    },
+)
 PaymentMethod = api.model(
     "payment_method",
     {

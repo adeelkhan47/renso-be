@@ -2,6 +2,15 @@ from flask_restx import fields
 
 from . import api
 
+Item_type_Expect = api.model(
+    "item_type_expect",
+    {
+
+        "name": fields.String(),
+        "maintenance": fields.Integer(),
+        "delivery_available": fields.Boolean(),
+    },
+)
 Item_type = api.model(
     "item_type",
     {

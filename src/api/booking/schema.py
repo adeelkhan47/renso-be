@@ -4,8 +4,20 @@ from . import api
 from ..booking_status.schema import BookingStatus
 from ..item.schema import Item
 
+BookingExpect = api.model(
+    "BookingExpect",
+    {
+        "discount": fields.Integer(),
+        "location": fields.String(),
+        "start_time": fields.DateTime(),
+        "end_time": fields.DateTime(),
+        "booking_status_id": fields.Integer(),
+        "item": fields.Nested(Item),
+    },
+)
+
 Booking = api.model(
-    "booking",
+    "bookingExpect",
     {
         "id": fields.Integer(),
         "discount": fields.Integer(),

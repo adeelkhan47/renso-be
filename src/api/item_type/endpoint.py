@@ -15,9 +15,8 @@ class item_types_list(Resource):
         all_items, count = ItemType.filtration(args)
         return response_structure(all_items, count), 200
 
-    @api.param("name", required=True)
-    @api.param("maintenance", required=True)
-    @api.param("delivery_available", required=True, type=int)
+    @api.expect(schema.Item_type_Expect)
+    @api.marshal_with(schema.get_by_id_responseItem_type)
     def post(self):
         payload = api.payload
         name = payload.get("name")
@@ -42,9 +41,7 @@ class item_type_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem_type)
-    @api.param("name", )
-    @api.param("maintenance")
-    @api.param("delivery_available", type=int)
+    @api.expect(schema.Item_type_Expect)
     def patch(self, item_type_id):
         payload = api.payload
         data = payload.copy()

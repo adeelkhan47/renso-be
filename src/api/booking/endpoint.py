@@ -20,12 +20,7 @@ class booking_list(Resource):
         return response_structure(all_items, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseBooking, skip_none=True)
-    @api.param("discount", required=True)
-    @api.param("location", required=True)
-    @api.param("start_time", required=True)
-    @api.param("end_time", required=True)
-    @api.param("booking_status_id", required=True)
-    @api.param("item_id", required=True, type=int)
+    @api.expect(schema.BookingExpect, validate=True)
     def post(self):
         payload = api.payload
         discount = payload.get("discount")
@@ -63,12 +58,7 @@ class booking_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseBooking, skip_none=True)
-    @api.param("discount")
-    @api.param("location")
-    @api.param("start_time")
-    @api.param("end_time")
-    @api.param("booking_status_id")
-    @api.param("item_id")
+    @api.expect(schema.BookingExpect, validate=True)
     def patch(self, booking_id):
         payload = api.payload
         data = payload.copy()

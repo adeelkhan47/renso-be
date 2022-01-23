@@ -42,15 +42,7 @@ class items_list(Resource):
         return response_structure(all_items, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)
-    @api.param("name", required=True)
-    @api.param("image", required=True)
-    @api.param("tag_ids")
-    @api.param("description", required=True)
-    @api.param("price", required=True)
-    @api.param("item_status_id", required=True)
-    @api.param("person", required=True, type=int)
-    @api.param("item_type_id", required=True)
-    @api.param("tag_ids")
+    @api.expect(schema.ItemExpect)
     def post(self):
         name = request.json.get("name")
         image = request.json.get("image")
@@ -82,15 +74,7 @@ class item_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)
-    @api.param("name")
-    @api.param("image")
-    @api.param("tag_ids")
-    @api.param("description")
-    @api.param("price")
-    @api.param("item_status_id")
-    @api.param("person", type=int)
-    @api.param("item_type_id")
-    @api.param("tag_ids")
+    @api.expect(schema.ItemExpect)
     def patch(self, item_id):
         data = api.payload.copy()
         if "tag_ids" in data.keys():

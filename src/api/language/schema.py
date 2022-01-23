@@ -2,12 +2,20 @@ from flask_restx import fields
 
 from . import api
 
+LanguageExpect = api.model(
+    "languageLanguageExpect",
+    {
+        "name": fields.String(),
+        "status": fields.Boolean(),
+
+    },
+)
 Language = api.model(
     "language",
     {
         "id": fields.Integer(),
         "name": fields.String(),
-        "status": fields.String(),
+        "status": fields.Boolean(),
 
     },
 )

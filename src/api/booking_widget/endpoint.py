@@ -15,9 +15,8 @@ class BookingWidgetList(Resource):
         all_rows, count = BookingWidget.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.param("time_picker_status", required=True, type=int)
-    @api.param("day_picker_status", required=True, type=int)
-    @api.param("date_range_Picker_status", required=True, type=int)
+    @api.expect(schema.Booking_Widget_Expect)
+    @api.marshal_list_with(schema.get_by_id_responseBooking_Widget)
     def post(self):
         payload = api.payload
         time_picker_status = int(payload.get("time_picker"))
@@ -26,7 +25,7 @@ class BookingWidgetList(Resource):
         widget = BookingWidget(day_picker_status=day_picker_status, time_picker_status=time_picker_status,
                                date_range_picker_status=date_range_Picker_status)
         widget.insert()
-        return "ok", 201
+        return response_structure(widget), 201
 
 
 @api.route("/<int:booking_widget_id>")
@@ -43,9 +42,7 @@ class widget_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseBooking_Widget, skip_none=True)
-    @api.param("time_picker_status", required=True, type=int)
-    @api.param("day_picker_status", required=True, type=int)
-    @api.param("date_range_picker_status", required=True, type=int)
+    @api.expect(schema.Booking_Widget_Expect)
     def patch(self, booking_widget_id):
         data = {}
         payload = api.payload

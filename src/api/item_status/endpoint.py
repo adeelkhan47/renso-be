@@ -16,15 +16,15 @@ class ItemStatusList(Resource):
         all_rows, count = ItemStatus.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.param("name", required=True)
-    @api.param("color", required=True)
+    @api.expect(schema.ItemStatus_Expect)
+    @api.marshal_list_with(schema.get_by_id_responseItemStatus)
     def post(self):
         payload = api.payload
         name = payload.get("name")
         color = payload.get("color")
         item_status = ItemStatus(name, color)
         item_status.insert()
-        return "ok", 201
+        return response_structure(item_status), 201
 
 
 @api.route("/<int:item_status_id>")

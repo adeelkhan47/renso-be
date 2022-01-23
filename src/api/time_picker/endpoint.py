@@ -18,10 +18,7 @@ class TimePickerList(Resource):
         return response_structure(all_rows, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseTime_Picker)
-    @api.param("start_time", required=True)
-    @api.param("end_time", required=True)
-    @api.param("day", required=True)
-    @api.param("day_picker_id", required=True, type=int)
+    @api.expect(schema.Time_Picker_expect)
     def post(self):
         args = api.payload
         start_time = args["start_time"]
@@ -29,7 +26,7 @@ class TimePickerList(Resource):
         day = args["day"]
         day_picker_id = int(args["day_picker_id"])
         if DayPicker.query_by_id(day_picker_id):
-            time_picker = TimePicker(start_time, end_time, day,day_picker_id)
+            time_picker = TimePicker(start_time, end_time, day, day_picker_id)
             time_picker.insert()
             return response_structure(TimePicker.query_by_id(time_picker.id)), 201
         else:

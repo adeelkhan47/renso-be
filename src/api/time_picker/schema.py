@@ -1,8 +1,18 @@
 from flask_restx import fields
 
 from . import api
-from ..day_picker.schema import Day_Picker
 
+Time_Picker_expect = api.model(
+    "time_Picker_expect",
+    {
+
+        "start_time": fields.String(),
+        "end_time": fields.String(),
+        "day": fields.String(),
+        "day_picker_id": fields.Integer(),
+
+    },
+)
 Time_Picker = api.model(
     "booking",
     {

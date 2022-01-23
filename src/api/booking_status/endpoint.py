@@ -15,15 +15,16 @@ class BookingStatusList(Resource):
         all_rows, count = BookingStatus.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.param("name", required=True)
-    @api.param("color", required=True)
+    @api.expect(schema.BookingStatusExpect)
+    @api.marshal_list_with(schema.get_by_id_responseBookingStatus)
     def post(self):
         payload = api.payload
         name = payload.get("name")
         color = payload.get("color")
         order_status = BookingStatus(name, color)
         order_status.insert()
-        return "ok", 201
+
+        return response_structure(order_status), 201
 
 
 @api.route("/<int:booking_status_id>")

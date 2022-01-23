@@ -15,9 +15,8 @@ class TaxList(Resource):
         all_rows, count = Tax.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.param("name", required=True)
-    @api.param("percentage", required=True)
-    @api.param("description", required=True)
+    @api.expect(schema.Tax_expect)
+    @api.marshal_list_with(schema.get_by_id_responseTax)
     def post(self):
         payload = api.payload
         name = payload.get("name")
@@ -25,7 +24,7 @@ class TaxList(Resource):
         description = payload.get("description")
         tax = Tax(name, percentage, description)
         tax.insert()
-        return "ok", 201
+        return response_structure(tax), 201
 
 
 @api.route("/<int:tax_id>")
@@ -42,9 +41,7 @@ class tax_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseTax, skip_none=True)
-    @api.param("name")
-    @api.param("percentage")
-    @api.param("description")
+    @api.expect(schema.Tax_expect)
     def patch(self, tax_id):
         payload = api.payload
         data = payload.copy()

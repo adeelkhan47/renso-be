@@ -2,6 +2,15 @@ from flask_restx import fields
 
 from . import api
 
+BookingStatusExpect = api.model(
+    "bookingStatusExpect",
+    {
+        "name": fields.String(),
+        "color": fields.String(),
+
+    },
+)
+
 BookingStatus = api.model(
     "bookingStatus",
     {

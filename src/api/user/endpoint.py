@@ -16,13 +16,7 @@ class user_list(Resource):
         all_users, count = User.filtration(args)
         return response_structure(all_users, count), 200
 
-    @api.param("name", required=True)
-    @api.param("password", required=True)
-    @api.param("email", required=True)
-    @api.param("subscription", required=True)
-    @api.param("image", required=True)
-    @api.param("gender", required=True)
-    @api.param("status", required=True, type=int)
+    @api.expect(schema.userPostExpect, validate=True)
     @api.marshal_list_with(schema.get_by_id_responseUser)
     def post(self):
         payload = api.payload
@@ -32,7 +26,7 @@ class user_list(Resource):
         subscription = payload.get("subscription")
         image = payload.get("image")
         gender = payload.get("gender")
-        status = bool(payload.get("status"))
+        status = payload.get("status")
         user = User(name, email, password, subscription, image, gender, status)
         user.insert()
         return response_structure(User.query_by_id(user.id)), 201
@@ -40,9 +34,9 @@ class user_list(Resource):
 
 @api.route("/login")
 class user_by_id(Resource):
-    @api.param("password", required=True)
-    @api.param("email", required=True)
-    @api.marshal_list_with(schema.get_list_responseUser)
+
+    @api.expect(schema.userLoginPostExpect)
+    @api.marshal_list_with(schema.get_by_id_responseUser)
     def post(self):
         args = {}
         payload = api.payload
@@ -69,13 +63,7 @@ class user_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseUser, skip_none=True)
-    @api.param("name")
-    @api.param("password")
-    @api.param("email")
-    @api.param("subscription")
-    @api.param("image")
-    @api.param("gender")
-    @api.param("status", type=int)
+    @api.expect(schema.userPostExpect)
     def patch(self, user_id):
         payload = api.payload
         data = payload.copy()
