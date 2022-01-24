@@ -11,10 +11,9 @@ ItemExpect = api.model(
         "name": fields.String(),
         "image": fields.String(),
         "description": fields.String(),
-        "price": fields.Integer(),
         "item_status_id": fields.Integer(),
-        "person": fields.String(),
         "item_type_id": fields.Integer(),
+        "item_subtype_id": fields.Integer(),
         "tag_ids": fields.String()
     },
 )

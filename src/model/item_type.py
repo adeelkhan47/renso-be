@@ -12,6 +12,7 @@ class ItemType(Base, db.Model):
     delivery_available = Column(Boolean, nullable=False, unique=False)
     DayPickers = relationship("DayPicker", backref="item_type")
     items = relationship("Item", backref="item_type")
+    item_sub_type = relationship("ItemSubType", backref="item_type")
 
     def __init__(self, name, maintenance, delivery_available):
         self.name = name
@@ -20,6 +21,7 @@ class ItemType(Base, db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+
     @classmethod
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)

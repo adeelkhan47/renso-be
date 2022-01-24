@@ -55,3 +55,9 @@ class Booking(Base, db.Model):
         bookings = db.session.query(Booking).join(
             Item).filter(Item.item_type_id == item_type_id).group_by(Booking)
         return bookings
+
+    @classmethod
+    def getQuery_BookingByItemSubType(cls, item_subtype_id):
+        bookings = db.session.query(Booking).join(
+            Item).filter(Item.item_subtype_id == item_subtype_id).group_by(Booking)
+        return bookings

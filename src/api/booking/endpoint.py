@@ -75,3 +75,13 @@ class bookings_by_item_type_id(Resource):
         booking_query = Booking.getQuery_BookingByItemType(item_type_id)
         allBookings, rows = Booking.filtration(args, booking_query)
         return response_structure(allBookings, rows), 200
+
+
+@api.route("/by_item_type/<int:item_subtype_id>")
+class bookings_by_item_Subtype_id(Resource):
+    @api.marshal_list_with(schema.get_list_responseBooking)
+    def get(self, item_subtype_id):
+        args = request.args.copy()
+        booking_query = Booking.getQuery_BookingByItemSubType(item_subtype_id)
+        allBookings, rows = Booking.filtration(args, booking_query)
+        return response_structure(allBookings, rows), 200

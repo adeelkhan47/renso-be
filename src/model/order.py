@@ -47,3 +47,10 @@ class Order(Base, db.Model):
             OrderBookings.booking_id == Booking.id).join(
             Item).filter(Item.item_type_id == item_type_id).group_by(Order)
         return orders
+
+    @classmethod
+    def getQuery_OrderByItemSubType(cls, item_subtype_id):
+        orders = db.session.query(Order).join(OrderBookings).join(Booking).filter(
+            OrderBookings.booking_id == Booking.id).join(
+            Item).filter(Item.item_subtype_id == item_subtype_id).group_by(Order)
+        return orders

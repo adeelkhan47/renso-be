@@ -37,7 +37,7 @@ class order_list(Resource):
             diff = booking.end_time - booking.start_time
             days, seconds = diff.days, diff.seconds
             hours = days * 24 + seconds // 3600
-            item_price = booking.item.price * hours
+            item_price = booking.item.item_subtype.price * hours
             cost = item_price * (100 - booking.discount) / 100
             total_cost += cost
         order = Order(client_name, client_email, phone_number, order_status_id, time_period, total_cost)
@@ -79,7 +79,7 @@ class order_by_id(Resource):
                 diff = booking.end_time - booking.start_time
                 days, seconds = diff.days, diff.seconds
                 hours = days * 24 + seconds // 3600
-                item_price = float(booking.item.price) * float(hours)
+                item_price = float(booking.item.item_subtype.price) * float(hours)
                 cost = item_price * (100 - booking.discount) / 100
                 total_cost += cost
             del data["booking_ids"]
@@ -98,5 +98,14 @@ class order_by_id(Resource):
     def get(self, item_type_id):
         args = request.args
         orders_query = Order.getQuery_OrderByItemType(item_type_id)
+        allorders, rows = Order.filtration(args, orders_query)
+        return response_structure(allorders, rows), 200
+
+@api.route("/by_item_type/<int:item_subtype_id>")
+class order_by_item_subtype_id(Resource):
+    @api.marshal_list_with(schema.get_list_responseOrder)
+    def get(self, item_subtype_id):
+        args = request.args
+        orders_query = Order.getQuery_OrderByItemSubType(item_subtype_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200

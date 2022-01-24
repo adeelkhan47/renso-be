@@ -14,8 +14,9 @@ class DayPicker(Base, db.Model):
     saturday = Column(Boolean, nullable=False)
     sunday = Column(Boolean, nullable=False)
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=False, unique=True)
+    item_subtype_id = Column(Integer, ForeignKey("item_subtype.id", ondelete="CASCADE"), nullable=False)
 
-    def __init__(self, monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id):
+    def __init__(self, monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id,item_subtype_id):
         self.monday = monday
         self.tuesday = tuesday
         self.wednesday = wednesday
@@ -24,6 +25,7 @@ class DayPicker(Base, db.Model):
         self.saturday = saturday
         self.sunday = sunday
         self.item_type_id = item_type_id
+        self.item_subtype_id = item_subtype_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
