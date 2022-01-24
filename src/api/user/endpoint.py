@@ -69,6 +69,6 @@ class user_by_id(Resource):
         data = payload.copy()
         if "status" in data.keys():
             data["status"] = bool(data["status"])
-        User.update(user_id, request.args)
+        User.update(user_id, data)
         user = User.query_by_id(user_id)
         return response_structure(user), 200

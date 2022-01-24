@@ -2,6 +2,7 @@ from flask_restx import fields
 
 from . import api
 from ..item_status.schema import ItemStatus
+from ..item_subtype.schema import Item_subtype
 from ..item_type.schema import Item_type
 from ..tag.schema import Tag
 
@@ -33,6 +34,7 @@ Item = api.model(
         "item_status": fields.Nested(ItemStatus),
         "person": fields.String(),
         "item_type": fields.Nested(Item_type),
+        "item_subtype": fields.Nested(Item_subtype),
         "item_tags": fields.Nested(tags, as_list=True)
     },
 )

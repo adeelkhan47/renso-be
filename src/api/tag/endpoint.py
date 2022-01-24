@@ -16,6 +16,7 @@ class TagList(Resource):
         return response_structure(all_rows, count), 200
 
     @api.expect(schema.Tag_Expect)
+    @api.marshal_list_with(schema.get_by_id_responseTag)
     def post(self):
         payload = api.payload
         name = payload.get("name")
@@ -23,7 +24,7 @@ class TagList(Resource):
         description = payload.get("description")
         tag = Tag(name, description, color)
         tag.insert()
-        return "ok", 201
+        return response_structure(tag), 201
 
 
 @api.route("/<int:tag_id>")

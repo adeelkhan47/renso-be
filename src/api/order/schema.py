@@ -4,15 +4,27 @@ from . import api
 from ..booking.schema import Booking
 from ..order_status.schema import OrderStatus
 
+CustomDataModel = api.model(
+    "customDataModel",
+
+    {
+        "id": fields.Integer(),
+        "name": fields.String(),
+        "value": fields.String()
+    }
+)
 bookings = api.model(
     "bookings",
     {"booking": fields.Nested(Booking, as_list=True)}
+)
+customData = api.model(
+    "customData",
+    {"custom_data": fields.Nested(CustomDataModel, as_list=True)}
 )
 
 Order_Expect = api.model(
     "Order_Expect",
     {
-
         "client_name": fields.String(),
         "client_email": fields.String(),
         "phone_number": fields.String(),
@@ -32,7 +44,8 @@ Order = api.model(
         "order_status": fields.Nested(OrderStatus),
         "time_period": fields.String(),
         "total_cost": fields.Float(),
-        "order_bookings": fields.Nested(bookings, as_list=True)
+        "order_bookings": fields.Nested(bookings, as_list=True),
+        "order_custom_data": fields.Nested(customData, as_list=True)
     },
 )
 error = api.model(

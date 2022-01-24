@@ -4,8 +4,11 @@ from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure, error_message
 from model.booking import Booking
+from model.custom_data import CustomData
+from model.custom_parameter import CustomParameter
 from model.order import Order
 from model.order_bookings import OrderBookings
+from model.order_custom_data import OrderCustomData
 from model.order_status import OrderStatus
 from . import api, schema
 
@@ -23,6 +26,9 @@ class order_list(Resource):
     @api.expect(schema.Order_Expect)
     def post(self):
         payload = api.payload
+        parameters, count = CustomParameter.filtration({})
+        custom_parameters = [each.name for each in parameters]
+
         client_name = payload.get("client_name")
         client_email = payload.get("client_email")
         order_status_id = payload.get("order_status_id")
@@ -40,8 +46,14 @@ class order_list(Resource):
             item_price = booking.item.item_subtype.price * hours
             cost = item_price * (100 - booking.discount) / 100
             total_cost += cost
+
         order = Order(client_name, client_email, phone_number, order_status_id, time_period, total_cost)
         order.insert()
+        # custom fields
+        for each in payload.keys():
+            if each in custom_parameters:
+                customData = CustomData(each, payload.get(each)).insert()
+                OrderCustomData(customData.id, order.id).insert()
         for each in all_booking_ids:
             OrderBookings(each, order.id).insert()
         return response_structure(order), 201
@@ -100,6 +112,7 @@ class order_by_id(Resource):
         orders_query = Order.getQuery_OrderByItemType(item_type_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200
+
 
 @api.route("/by_item_type/<int:item_subtype_id>")
 class order_by_item_subtype_id(Resource):

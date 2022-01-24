@@ -19,6 +19,7 @@ class Order(Base, db.Model):
     order_status_id = Column(Integer, ForeignKey("order_status.id", ondelete="CASCADE"), nullable=True)
 
     order_bookings = relationship("OrderBookings", backref="order")
+    order_custom_data_list = relationship("OrderCustomData", backref="order")
 
     def __init__(self, client_name, client_email, phone_number, order_status_id, time_period, total_cost):
         self.client_name = client_name
