@@ -20,8 +20,8 @@ from .tag.endpoint import api as tag_api
 from .tax.endpoint import api as tax_api
 from .time_picker.endpoint import api as time_picker_api
 from .user.endpoint import api as user_api
-from .custom_parameter import api as custom_parameter_api
-from .item_subtype import api as item_subtype_api
+from .custom_parameter.endpoint import api as custom_parameter_api
+from .item_subtype.endpoint import api as item_subtype_api
 
 blueprint = Blueprint("api", __name__)
 api = Api(blueprint, title="Renso Api's", version="0.1", description="Renso official api's")

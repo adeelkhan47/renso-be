@@ -1,6 +1,7 @@
 from flask_restx import fields
 
 from . import api
+from ..item_type.schema import Item_type
 
 Item_subtype_Expect = api.model(
     "item_type_expect",
@@ -18,8 +19,8 @@ Item_subtype = api.model(
     {
         "id": fields.Integer(),
         "name": fields.String(),
-        "maintenance": fields.Integer(),
-        "delivery_available": fields.Boolean(),
+        "person": fields.Integer(),
+        "item_type": fields.Nested(Item_type),
 
     },
 )

@@ -13,7 +13,7 @@ class DayPicker(Base, db.Model):
     friday = Column(Boolean, nullable=False)
     saturday = Column(Boolean, nullable=False)
     sunday = Column(Boolean, nullable=False)
-    item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=False, unique=True)
+    item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=False)
     item_subtype_id = Column(Integer, ForeignKey("item_subtype.id", ondelete="CASCADE"), nullable=False)
 
     def __init__(self, monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id,item_subtype_id):
