@@ -8,12 +8,13 @@ from model.base import Base, db
 class ItemSubType(Base, db.Model):
     __tablename__ = "item_subtype"
     name = Column(String, nullable=False, unique=True)
-    price = Column(String, nullable=False, unique=False)
+    price = Column(Integer, nullable=False, unique=False)
     person = Column(Integer, nullable=False, unique=False)
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=True)
     items = relationship("Item", backref="item_subtype")
+    dayPicker = relationship("DayPicker", backref="item_subtype")
 
-    def __init__(self, name, price, person,item_type_id):
+    def __init__(self, name, price, person, item_type_id):
         self.name = name
         self.price = price
         self.person = person

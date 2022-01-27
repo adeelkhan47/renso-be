@@ -1,6 +1,7 @@
 from flask_restx import fields
 
 from . import api
+from ..item_subtype.schema import Item_subtype
 from ..item_type.schema import Item_type
 
 Day_Picker_Expect = api.model(
@@ -29,6 +30,7 @@ Day_Picker = api.model(
         "saturday": fields.Boolean(),
         "sunday": fields.Boolean(),
         "item_type": fields.Nested(Item_type),
+        "item_subtype": fields.Nested(Item_subtype)
 
     },
 )

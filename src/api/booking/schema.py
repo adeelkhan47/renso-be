@@ -12,12 +12,12 @@ BookingExpect = api.model(
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
         "booking_status_id": fields.Integer(),
-        "item": fields.Nested(Item),
+        "item_id": fields.Integer(),
     },
 )
 
 Booking = api.model(
-    "bookingExpect",
+    "booking",
     {
         "id": fields.Integer(),
         "discount": fields.Integer(),

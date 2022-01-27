@@ -39,7 +39,7 @@ class order_list(Resource):
         for booking_id in all_booking_ids:
             booking = Booking.query_by_id(booking_id)
             if not booking:
-                raise NotFound(f"Item_id {booking_id} no found.")
+                raise NotFound(f"Booking {booking_id} no found.")
             diff = booking.end_time - booking.start_time
             days, seconds = diff.days, diff.seconds
             hours = days * 24 + seconds // 3600
@@ -52,7 +52,8 @@ class order_list(Resource):
         # custom fields
         for each in payload.keys():
             if each in custom_parameters:
-                customData = CustomData(each, payload.get(each)).insert()
+                customData = CustomData(each, payload.get(each))
+                customData.insert()
                 OrderCustomData(customData.id, order.id).insert()
         for each in all_booking_ids:
             OrderBookings(each, order.id).insert()

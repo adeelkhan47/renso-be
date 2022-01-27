@@ -53,9 +53,9 @@ class item_subtype_by_id(Resource):
         return response_structure(itemSubType), 200
 
 
-@api.route("/<int:item_type_id>")
+@api.route("/by_item_id/<int:item_type_id>")
 class item_subtype_by_item_typeid(Resource):
     @api.marshal_list_with(schema.get_list_responseItem_Subtype)
     def get(self, item_type_id):
         itemSubType = ItemSubType.get_by_item_type_id(item_type_id)
-        return response_structure(itemSubType), 200
+        return response_structure(itemSubType, len(itemSubType)), 200

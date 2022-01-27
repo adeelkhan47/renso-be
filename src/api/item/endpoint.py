@@ -42,7 +42,7 @@ class items_list(Resource):
         return response_structure(all_items, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)
-    @api.expect(schema.ItemExpect)
+    @api.expect(schema.ItemExpect, validate=True)
     def post(self):
         name = request.json.get("name")
         image = request.json.get("image")

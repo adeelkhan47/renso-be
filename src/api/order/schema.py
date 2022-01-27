@@ -28,7 +28,7 @@ Order_Expect = api.model(
         "client_name": fields.String(),
         "client_email": fields.String(),
         "phone_number": fields.String(),
-        "order_status_id": fields.Nested(OrderStatus),
+        "order_status_id": fields.Integer(),
         "time_period": fields.String(),
         "booking_ids": fields.String()
     },

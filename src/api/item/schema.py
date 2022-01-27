@@ -7,7 +7,7 @@ from ..item_type.schema import Item_type
 from ..tag.schema import Tag
 
 ItemExpect = api.model(
-    "item",
+    "itemExpect",
     {
         "name": fields.String(),
         "image": fields.String(),
@@ -30,9 +30,7 @@ Item = api.model(
         "name": fields.String(),
         "image": fields.String(),
         "description": fields.String(),
-        "price": fields.Integer(),
         "item_status": fields.Nested(ItemStatus),
-        "person": fields.String(),
         "item_type": fields.Nested(Item_type),
         "item_subtype": fields.Nested(Item_subtype),
         "item_tags": fields.Nested(tags, as_list=True)

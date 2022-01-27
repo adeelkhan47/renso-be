@@ -63,7 +63,7 @@ class user_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseUser, skip_none=True)
-    @api.expect(schema.userPostExpect)
+    @api.expect(schema.userPostExpect, validate=True)
     def patch(self, user_id):
         payload = api.payload
         data = payload.copy()

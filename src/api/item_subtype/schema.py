@@ -4,7 +4,7 @@ from . import api
 from ..item_type.schema import Item_type
 
 Item_subtype_Expect = api.model(
-    "item_type_expect",
+    "item_subtype_expect",
     {
 
         "name": fields.String(),
@@ -15,9 +15,10 @@ Item_subtype_Expect = api.model(
 )
 
 Item_subtype = api.model(
-    "item_type",
+    "item_sub_type",
     {
         "id": fields.Integer(),
+        "price": fields.Integer(),
         "name": fields.String(),
         "person": fields.Integer(),
         "item_type": fields.Nested(Item_type),

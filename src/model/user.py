@@ -12,7 +12,6 @@ class User(Base, db.Model):
     subscription = Column(String, nullable=True)
     image = Column(String, nullable=True)
     gender = Column(String, nullable=True)
-
     status = Column(Boolean, nullable=True)
 
     def __init__(self, name, email, password, subscription, image, gender, status):

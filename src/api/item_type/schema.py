@@ -12,7 +12,7 @@ Item_type_Expect = api.model(
     },
 )
 Item_type = api.model(
-    "item_type",
+    "item_type_1",
     {
         "id": fields.Integer(),
         "name": fields.String(),
