@@ -34,7 +34,6 @@ class DayPicker(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
-        ø
     @classmethod
     def update(cls, day_picker_id, day_picker_data):
         db.session.query(cls).filter(cls.id == day_picker_id).update(day_picker_data)
