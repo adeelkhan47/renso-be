@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.item_type import ItemType
@@ -25,7 +26,7 @@ class item_types_list(Resource):
 
         item_type = ItemType(name, maintenance, delivery_available)
         item_type.insert()
-        return "ok", 201
+        return response_structure(item_type), 201
 
 
 @api.route("/<int:item_type_id>")
@@ -33,6 +34,8 @@ class item_type_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseItem_type)
     def get(self, item_type_id):
         item = ItemType.query_by_id(item_type_id)
+        if not item:
+            raise NotFound("Item Type ID not found")
         return response_structure(item), 200
 
     @api.doc("Delete item by id")
