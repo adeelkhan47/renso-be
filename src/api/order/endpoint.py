@@ -115,7 +115,7 @@ class order_by_id(Resource):
         return response_structure(allorders, rows), 200
 
 
-@api.route("/by_item_type/<int:item_subtype_id>")
+@api.route("/by_item_subtype/<int:item_subtype_id>")
 class order_by_item_subtype_id(Resource):
     @api.marshal_list_with(schema.get_list_responseOrder)
     def get(self, item_subtype_id):

@@ -77,7 +77,7 @@ class bookings_by_item_type_id(Resource):
         return response_structure(allBookings, rows), 200
 
 
-@api.route("/by_item_type/<int:item_subtype_id>")
+@api.route("/by_item_subtype/<int:item_subtype_id>")
 class bookings_by_item_Subtype_id(Resource):
     @api.marshal_list_with(schema.get_list_responseBooking)
     def get(self, item_subtype_id):
