@@ -8,6 +8,9 @@ Booking_Widget_Expect = api.model(
         "day_picker_status": fields.Boolean(),
         "time_picker_status": fields.Boolean(),
         "date_range_picker_status": fields.Boolean(),
+        "apply_vouchers_status": fields.Boolean(),
+        "apply_months_factor_status": fields.Boolean(),
+        "apply_location_factor_status": fields.Boolean(),
     },
 )
 Booking_Widget = api.model(
@@ -18,6 +21,9 @@ Booking_Widget = api.model(
         "day_picker_status": fields.Boolean(),
         "time_picker_status": fields.Boolean(),
         "date_range_picker_status": fields.Boolean(),
+        "apply_vouchers_status": fields.Boolean(),
+        "apply_months_factor_status": fields.Boolean(),
+        "apply_location_factor_status": fields.Boolean(),
 
     },
 )

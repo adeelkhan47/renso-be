@@ -19,11 +19,10 @@ class BookingWidgetList(Resource):
     @api.marshal_list_with(schema.get_by_id_responseBooking_Widget)
     def post(self):
         payload = api.payload
-        time_picker_status = int(payload.get("time_picker"))
-        day_picker_status = int(payload.get("day_picker_status"))
-        date_range_Picker_status = int(payload.get("date_range_Picker_status"))
-        widget = BookingWidget(day_picker_status=day_picker_status, time_picker_status=time_picker_status,
-                               date_range_picker_status=date_range_Picker_status)
+        # time_picker_status = int(payload.get("time_picker"))
+        # day_picker_status = int(payload.get("day_picker_status"))
+        # date_range_Picker_status = int(payload.get("date_range_Picker_status"))
+        widget = BookingWidget(**payload)
         widget.insert()
         return response_structure(widget), 201
 
@@ -44,11 +43,11 @@ class widget_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseBooking_Widget, skip_none=True)
     @api.expect(schema.Booking_Widget_Expect)
     def patch(self, booking_widget_id):
-        data = {}
+        # data = {}
         payload = api.payload
-        data["time_picker_status"] = int(payload.get("time_picker_status"))
-        data["day_picker_status"] = int(payload.get("day_picker_status"))
-        data["date_range_picker_status"] = int(payload.get("date_range_picker_status"))
-        BookingWidget.update(booking_widget_id, data)
+        # data["time_picker_status"] = payload.get("time_picker_status"))
+        # data["day_picker_status"] = payload.get("day_picker_status")
+        # data["date_range_picker_status"] = int(payload.get("date_range_picker_status"))
+        BookingWidget.update(booking_widget_id, **payload)
         bookingWidget = BookingWidget.query_by_id(booking_widget_id)
         return response_structure(bookingWidget), 200
