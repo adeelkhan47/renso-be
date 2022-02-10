@@ -15,6 +15,7 @@ class OrderStatusList(Resource):
         all_rows, count = OrderStatus.filtration(args)
         return response_structure(all_rows, count), 200
 
+    @api.expect(schema.OrderStatusExpect)
     @api.marshal_list_with(schema.get_by_id_responseOrderStatus)
     def post(self):
         payload = api.payload

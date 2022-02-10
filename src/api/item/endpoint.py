@@ -53,9 +53,10 @@ class items_list(Resource):
         item = Item(name, image, description, item_status_id, item_type_id, item_subtype_id)
         item.insert()
         if "tag_ids" in request.json.keys():
-            tag_ids = request.json.get("tag_ids").split(",")
-            for each in tag_ids:
-                ItemTag(item_id=item.id, tag_id=each).insert()
+            if request.json.get("tag_ids") != "":
+                tag_ids = request.json.get("tag_ids").split(",")
+                for each in tag_ids:
+                    ItemTag(item_id=item.id, tag_id=each).insert()
         return response_structure(item), 201
 
 
