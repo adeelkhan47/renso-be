@@ -47,9 +47,6 @@ class item_type_by_id(Resource):
     @api.expect(schema.Item_type_Expect)
     def patch(self, item_type_id):
         payload = api.payload
-        data = payload.copy()
-        if "delivery_available" in data.keys():
-            data["delivery_available"] = int(data["delivery_available"])
-        ItemType.update(item_type_id, data)
+        ItemType.update(item_type_id, **payload)
         itemType = ItemType.query_by_id(item_type_id)
         return response_structure(itemType), 200

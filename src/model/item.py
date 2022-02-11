@@ -17,6 +17,7 @@ class Item(Base, db.Model):
     item_subtype_id = Column(Integer, ForeignKey("item_subtype.id", ondelete="CASCADE"), nullable=False)
     bookings = relationship("Booking", backref="item")
     item_tags = relationship("ItemTag", backref="item")
+    item_locations = relationship("ItemLocation", backref="item")
 
     def __init__(self, name, image, description, item_status_id, item_type_id, item_subtype_id):
         self.name = name
