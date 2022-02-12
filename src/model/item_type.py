@@ -13,6 +13,7 @@ class ItemType(Base, db.Model):
     DayPickers = relationship("DayPicker", backref="item_type")
     items = relationship("Item", backref="item_type")
     item_sub_type = relationship("ItemSubType", backref="item_type")
+    seasonItemTypes = relationship("SeasonItemTypes", backref="item_type")
 
     def __init__(self, name, maintenance, delivery_available):
         self.name = name

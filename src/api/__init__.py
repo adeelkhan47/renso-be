@@ -19,6 +19,7 @@ from .location.endpoint import api as location_api
 from .order.endpoint import api as order_api
 from .order_status.endpoint import api as order_status_api
 from .payment_methods.endpoint import api as payment_method_api
+from .season.endpoint import api as season_api
 from .tag.endpoint import api as tag_api
 from .tax.endpoint import api as tax_api
 from .time_picker.endpoint import api as time_picker_api
@@ -47,6 +48,7 @@ api.add_namespace(custom_parameter_api)
 api.add_namespace(item_subtype_api)
 api.add_namespace(voucher_api)
 api.add_namespace(location_api)
+api.add_namespace(season_api)
 
 
 @api.errorhandler(NotFound)

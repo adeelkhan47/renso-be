@@ -6,6 +6,7 @@ from flask_restx import Resource
 from common.helper import response_structure
 from model.booking import Booking
 from model.item import Item
+from model.item_location import ItemLocation
 from model.item_tag import ItemTag
 from . import api, schema
 
@@ -57,6 +58,11 @@ class items_list(Resource):
                 tag_ids = request.json.get("tag_ids").split(",")
                 for each in tag_ids:
                     ItemTag(item_id=item.id, tag_id=each).insert()
+        if "location_ids" in request.json.keys():
+            if request.json.get("location_ids") != "":
+                location_ids = request.json.get("location_ids").split(",")
+                for each in location_ids:
+                    ItemLocation(item_id=item.id, location_id=each)
         return response_structure(item), 201
 
 
@@ -83,6 +89,12 @@ class item_by_id(Resource):
             for each in tag_ids:
                 ItemTag(item_id=item_id, tag_id=each).insert()
             del data["tag_ids"]
+        if "location_ids" in data.keys():
+            ItemLocation.delete_by_item_id(item_id)
+            location_ids = data.get("location_ids").split(",")
+            for each in location_ids:
+                ItemLocation(item_id=item_id, location_id=each)
+            del data["location_ids"]
         Item.update(item_id, data)
         item = Item.query_by_id(item_id)
         return response_structure(item), 200

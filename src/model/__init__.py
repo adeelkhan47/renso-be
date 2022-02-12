@@ -1,6 +1,6 @@
 from . import (base, user, item, item_type, order, order_bookings, booking, payment_method, tax, payment_tax, language
 , booking_widget, day_picker, time_picker, tag, item_subtype, custom_parameter, custom_data, order_custom_data,
-               location, item_location, voucher, months_prices)
+               location, item_location, voucher, season, season_item_type)
 
 __all__ = [
     "base",
@@ -24,5 +24,6 @@ __all__ = [
     "voucher",
     "location",
     "item_location",
-    "months_prices"
+    "season",
+    "season_item_type"
 ]

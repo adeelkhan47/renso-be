@@ -23,6 +23,6 @@ class ItemLocation(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def delete_by_location_id(cls, location_id):
-        cls.query.filter(cls.location_id == location_id).delete()
+    def delete_by_item_id(cls, item_id):
+        cls.query.filter(cls.item_id == item_id).delete()
         db.session.commit()
