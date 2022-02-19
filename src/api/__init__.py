@@ -25,6 +25,7 @@ from .tax.endpoint import api as tax_api
 from .time_picker.endpoint import api as time_picker_api
 from .user.endpoint import api as user_api
 from .voucher.endpoint import api as voucher_api
+from .associate_email.endpoint import api as associateEmail_api
 
 blueprint = Blueprint("api", __name__)
 api = Api(blueprint, title="Renso Api's", version="0.1", description="Renso official api's")
@@ -49,6 +50,7 @@ api.add_namespace(item_subtype_api)
 api.add_namespace(voucher_api)
 api.add_namespace(location_api)
 api.add_namespace(season_api)
+api.add_namespace(associateEmail_api)
 
 
 @api.errorhandler(NotFound)
