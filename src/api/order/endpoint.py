@@ -65,6 +65,8 @@ class order_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseOrder)
     def get(self, order_id):
         order = Order.query_by_id(order_id)
+        if not order:
+            raise NotFound("Item Not Found.")
         return response_structure(order), 200
 
     @api.doc("Delete item by id")

@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.associate_email import AssociateEmail
@@ -30,6 +31,8 @@ class voucher_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseAssociateEmail)
     def get(self, associate_email_id):
         associateEmail = AssociateEmail.query_by_id(associate_email_id)
+        if not associateEmail:
+            raise NotFound("Item Not Found.")
         return response_structure(associateEmail), 200
 
     @api.doc("Delete method by id")

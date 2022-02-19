@@ -50,6 +50,8 @@ class booking_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseBooking)
     def get(self, booking_id):
         booking = Booking.query_by_id(booking_id)
+        if not booking:
+            raise NotFound("Item Not Found.")
         return response_structure(booking), 200
 
     @api.doc("Delete booking by id")
