@@ -45,6 +45,7 @@ class items_list(Resource):
     @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)
     @api.expect(schema.ItemExpect, validate=True)
     def post(self):
+
         name = request.json.get("name")
         image = request.json.get("image")
         description = request.json.get("description")
@@ -62,7 +63,7 @@ class items_list(Resource):
             if request.json.get("location_ids") != "":
                 location_ids = request.json.get("location_ids").split(",")
                 for each in location_ids:
-                    ItemLocation(item_id=item.id, location_id=each)
+                    ItemLocation(item_id=item.id, location_id=each).insert()
         return response_structure(item), 201
 
 

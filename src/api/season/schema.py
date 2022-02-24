@@ -1,15 +1,20 @@
 from flask_restx import fields
 
 from . import api
+from ..item_type.schema import Item_type
 
 SeasonExpect = api.model(
-    "seasonExpect",
+    "seasonsExpect",
     {
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
         "price_factor": fields.Integer(),
         "season_item_types": fields.String()
     },
+)
+item_types = api.model(
+    "item_types",
+    {"item_type": fields.Nested(Item_type, as_list=True)}
 )
 
 Season = api.model(
@@ -18,7 +23,8 @@ Season = api.model(
         "id": fields.Integer(),
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
-        "price_factor": fields.Integer()
+        "price_factor": fields.Integer(),
+        "seasonItemTypes": fields.Nested(item_types,as_list=True)
     },
 )
 error = api.model(
