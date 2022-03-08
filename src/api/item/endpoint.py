@@ -94,7 +94,7 @@ class item_by_id(Resource):
             ItemLocation.delete_by_item_id(item_id)
             location_ids = data.get("location_ids").split(",")
             for each in location_ids:
-                ItemLocation(item_id=item_id, location_id=each)
+                ItemLocation(item_id=item_id, location_id=each).insert()
             del data["location_ids"]
         Item.update(item_id, data)
         item = Item.query_by_id(item_id)
