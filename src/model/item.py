@@ -12,7 +12,7 @@ class Item(Base, db.Model):
     image = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
-    item_status_id = Column(Integer, ForeignKey("item_status.id", ondelete="CASCADE"), nullable=True)
+    item_status_id = Column(Integer, ForeignKey("item_status.id", ondelete="SET NULL"), nullable=True)
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=False)
     item_subtype_id = Column(Integer, ForeignKey("item_subtype.id", ondelete="CASCADE"), nullable=False)
     bookings = relationship("Booking", backref="item")

@@ -16,8 +16,7 @@ class Order(Base, db.Model):
     phone_number = Column(String, nullable=False)
     time_period = Column(String, nullable=False)
     total_cost = Column(Float, nullable=False)
-    order_status_id = Column(Integer, ForeignKey("order_status.id", ondelete="CASCADE"), nullable=True)
-
+    order_status_id = Column(Integer, ForeignKey("order_status.id", ondelete="SET NULL"), nullable=True)
     order_bookings = relationship("OrderBookings", backref="order")
     order_custom_data = relationship("OrderCustomData", backref="order")
 

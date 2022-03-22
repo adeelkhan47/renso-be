@@ -12,7 +12,7 @@ class Booking(Base, db.Model):
     cost = Column(Float, default=0)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
-    booking_status_id = Column(Integer, ForeignKey("booking_status.id", ondelete="CASCADE"), nullable=True)
+    booking_status_id = Column(Integer, ForeignKey("booking_status.id", ondelete="SET NULL"), nullable=True)
     item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
     order_bookings = relationship("OrderBookings", backref="booking")
 

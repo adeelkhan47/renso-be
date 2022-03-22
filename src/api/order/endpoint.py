@@ -12,8 +12,9 @@ from model.order import Order
 from model.order_bookings import OrderBookings
 from model.order_custom_data import OrderCustomData
 from model.order_status import OrderStatus
+from model.payment_method import PaymentMethod
+from model.voucher import Voucher
 from service.stripe_service import Stripe
-
 from . import api, schema
 
 
@@ -39,8 +40,32 @@ class order_list(Resource):
         phone_number = payload.get("phone_number")
         time_period = payload.get("time_period")
         all_booking_ids = payload.get("booking_ids").split(",")
-        total_cost = payload.get("total_cost")
-        order = Order(client_name, client_email, phone_number, order_status_id, time_period, total_cost)
+        ##
+        price_factor = 100
+        if "voucher" in payload.keys() and payload.get("voucher"):
+            voucher = Voucher.get_voucher_by_code(payload.get("voucher"))
+            if voucher:
+                price_factor = voucher.price_factor
+        payment_method = PaymentMethod.get_payment_method_by_name("Stripe")
+        actual_total_price = 0
+        effected_total_price = 0
+        for booking_id in all_booking_ids:
+            booking = Booking.query_by_id(booking_id)
+            actual_total_price += booking.cost
+            effected_total_price += (price_factor / 100) * booking.cost
+
+        tax_amount = 0
+        if payment_method:
+            for each in payment_method.payment_tax:
+                tax = each.tax
+                tax_amount += tax.percentage / 100 * effected_total_price
+
+        actual_total_price_after_tax = effected_total_price + tax_amount
+
+        ##
+
+        order = Order(client_name, client_email, phone_number, order_status_id, time_period,
+                      actual_total_price_after_tax)
         order.insert()
         for each in payload.keys():
             if each in custom_parameters:

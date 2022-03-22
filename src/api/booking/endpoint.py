@@ -104,7 +104,7 @@ class booking_list(Resource):
         booking_ids = args.get("booking_is").split(",")
         price_factor = 100
         voucher = None
-        if "voucher" in args.keys():
+        if "voucher" in args.keys() and args["voucher"]:
             voucher = Voucher.get_voucher_by_code(args.get("voucher"))
             if voucher:
                 price_factor = voucher.price_factor

@@ -1,8 +1,8 @@
 from flask_restx import fields
 
+from . import api
 from ..booking.schema import Booking
 from ..order_status.schema import OrderStatus
-from . import api
 
 CustomDataModel = api.model(
     "customDataModel",
@@ -29,8 +29,7 @@ Order_Expect = api.model(
         "client_email": fields.String(),
         "phone_number": fields.String(),
         "time_period": fields.String(),
-        "booking_ids": fields.String(),
-        "total_cost": fields.Float()
+        "booking_ids": fields.String()
     },
 )
 
