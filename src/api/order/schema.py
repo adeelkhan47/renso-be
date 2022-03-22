@@ -1,8 +1,8 @@
 from flask_restx import fields
 
-from . import api
 from ..booking.schema import Booking
 from ..order_status.schema import OrderStatus
+from . import api
 
 CustomDataModel = api.model(
     "customDataModel",
@@ -28,9 +28,9 @@ Order_Expect = api.model(
         "client_name": fields.String(),
         "client_email": fields.String(),
         "phone_number": fields.String(),
-        "order_status_id": fields.Integer(),
         "time_period": fields.String(),
-        "booking_ids": fields.String()
+        "booking_ids": fields.String(),
+        "total_cost": fields.Float()
     },
 )
 
@@ -47,6 +47,13 @@ Order = api.model(
         "order_bookings": fields.Nested(bookings, as_list=True),
         "order_custom_data": fields.Nested(customData, as_list=True)
     },
+)
+Order_With_Session = api.model(
+    "Order_With_Session", {
+        "order": fields.Nested(Order),
+        "session_id": fields.String()
+    }
+
 )
 error = api.model(
     "Error",
@@ -65,6 +72,15 @@ get_list_responseOrder = api.model(
         "error": fields.Nested(error, allow_null=True),
     },
 )
+get_by_id_responseOrder_with_session = api.model(
+    "getById_Order_with_session",
+    {
+        "objects": fields.Nested(Order_With_Session),
+        "error": fields.Nested(error, allow_null=True),
+
+    },
+)
+
 get_by_id_responseOrder = api.model(
     "getById_Order",
     {

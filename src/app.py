@@ -1,8 +1,10 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_migrate import Migrate
+
 from api import blueprint
 from model.base import db
-from flask_cors import CORS
+
 app = Flask(__name__)
 
 app.register_blueprint(blueprint, url_prefix="/")

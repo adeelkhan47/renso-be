@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import Integer, DateTime
+from sqlalchemy.sql.sqltypes import DateTime, Integer
 
 from model.base import Base, db
 
@@ -30,3 +32,19 @@ class Season(Base, db.Model):
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)
         db.session.commit()
+
+    @classmethod
+    def current_seasons(cls):
+        current_date = datetime.today()
+        rows = db.session.query(cls).filter(cls.start_time <= current_date, cls.end_time >= current_date).all()
+        return rows
+
+    @classmethod
+    def get_price_factor_on_date(cls, date):
+        max_factor = 100
+        rows = db.session.query(cls).filter(cls.start_time <= date, cls.end_time >= date).all()
+        if rows:
+            factors = [row.price_factor for row in rows]
+            return max(factors)
+        else:
+            return max_factor

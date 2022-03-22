@@ -1,12 +1,18 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import request
 from flask_restx import Resource
-from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
 from common.helper import response_structure
 from model.booking import Booking
+from model.booking_status import BookingStatus
 from model.item import Item
+from model.item_subtype import ItemSubType
+from model.payment_method import PaymentMethod
+from model.season import Season
+from model.voucher import Voucher
+
 from . import api, schema
 
 
@@ -23,8 +29,6 @@ class booking_list(Resource):
     @api.expect(schema.BookingExpect, validate=True)
     def post(self):
         payload = api.payload
-        discount = payload.get("discount")
-        location = payload.get("location")
         start_time = payload.get("start_time")
         end_time = payload.get("end_time")
         booking_status_id = payload.get("booking_status_id")
@@ -40,7 +44,7 @@ class booking_list(Resource):
         for each in all_bookings:
             if each.start_time <= end_time and start_time <= each.end_time:
                 raise BadRequest("Item Already booked with this time.")
-        booking = Booking(discount, location, start_time, end_time, booking_status_id, item_id)
+        booking = Booking(start_time, end_time, booking_status_id, item_id)
         booking.insert()
         return response_structure(booking), 201
 
@@ -87,3 +91,105 @@ class bookings_by_item_Subtype_id(Resource):
         booking_query = Booking.getQuery_BookingByItemSubType(item_subtype_id)
         allBookings, rows = Booking.filtration(args, booking_query)
         return response_structure(allBookings, rows), 200
+
+
+@api.route("/bulk")
+class booking_list(Resource):
+
+    @api.marshal_list_with(schema.get_cart_payments)
+    @api.param("booking_is", required=True)
+    @api.param("voucher", required=False)
+    def get(self):
+        args = request.args
+        booking_ids = args.get("booking_is").split(",")
+        price_factor = 100
+        if "voucher" in args.keys():
+            voucher = Voucher.get_voucher_by_code(args.get("voucher"))
+            if voucher:
+                price_factor = voucher.price_factor
+        payment_method = PaymentMethod.get_payment_method_by_name("Stripe")
+
+        actual_total_price = 0
+        effected_total_price = 0
+        bookings = []
+        taxs = []
+        for booking_id in booking_ids:
+            booking = Booking.query_by_id(booking_id)
+            bookings.append(booking)
+            actual_total_price += booking.cost
+            effected_total_price += (price_factor / 100) * booking.cost
+
+        tax_amount = 0
+        if payment_method:
+            for each in payment_method.payment_tax:
+                tax = each.tax
+                tax_amount += tax.percentage / 100 * effected_total_price
+                taxs.append(tax)
+
+        actual_total_price_after_tax = effected_total_price + tax_amount
+
+        response_data = {
+            "bookings": bookings,
+            "taxs": taxs,
+            "actual_total_price": actual_total_price,
+            "effected_total_price": effected_total_price,
+            "actual_total_price_after_tax": actual_total_price_after_tax,
+            "voucher": voucher
+
+        }
+        return response_structure(response_data)
+
+    @api.marshal_list_with(schema.get_booking_ids_, skip_none=True)
+    @api.expect(schema.bulk_booking_expect, validate=True)
+    def post(self):
+        payload = api.payload
+        start_time = datetime.strptime(payload.get("start_time"), '%Y-%m-%d %H:%M:%S')
+        end_time = datetime.strptime(payload.get("end_time"), '%Y-%m-%d %H:%M:%S')
+        booking_ids = []
+        active_status = BookingStatus.get_id_by_name("Active")
+        booking_dictionary = {}
+        if start_time.date() == end_time.date():
+            factor = Season.get_price_factor_on_date(start_time.date())
+            for each in payload.get("bookings_details"):
+                item_sub_type = ItemSubType.query_by_id(each.get("item_sub_type_id"))
+                for item_id in each.get("item_ids"):
+                    if (item_sub_type.id, item_id) not in booking_dictionary.keys():
+                        booking_dictionary[(item_sub_type.id, item_id)] = 0
+                    diff = end_time - start_time
+                    days, seconds = diff.days, diff.seconds
+                    hours = days * 24 + seconds // 3600
+                    booking_dictionary[(item_sub_type.id, item_id)] += (hours * item_sub_type.price) * factor / 100
+        else:
+            days = (start_time.date() + timedelta(x) for x in range(0, (end_time - start_time).days + 1))
+            for day in days:
+                factor = Season.get_price_factor_on_date(day)
+                for each in payload.get("bookings_details"):
+                    item_sub_type = ItemSubType.query_by_id(each.get("item_sub_type_id"))
+                    for item_id in each.get("item_ids"):
+                        if (item_sub_type.id, item_id) not in booking_dictionary.keys():
+                            booking_dictionary[(item_sub_type.id, item_id)] = 0
+                        if day == start_time.date():
+                            temp_date_time = datetime.combine(day, datetime.max.time())
+                            diff = temp_date_time - start_time
+                            days, seconds = diff.days, diff.seconds
+                            hours = days * 24 + seconds // 3600
+                            booking_dictionary[(item_sub_type.id, item_id)] += ((
+                                                                                        hours + 1) * item_sub_type.price) * factor / 100
+                        elif day == end_time.date():
+                            temp_date_time = datetime.combine(day, datetime.min.time())
+                            diff = end_time - temp_date_time
+                            days, seconds = diff.days, diff.seconds
+                            hours = days * 24 + seconds // 3600
+                            booking_dictionary[(item_sub_type.id, item_id)] += (
+                                                                                       hours * item_sub_type.price) * factor / 100
+                        else:
+                            booking_dictionary[(item_sub_type.id, item_id)] += (24 * item_sub_type.price) * factor / 100
+
+        for each in payload.get("bookings_details"):
+            item_sub_type = each.get("item_sub_type_id")
+            for item_id in each.get("item_ids"):
+                cost = booking_dictionary[(item_sub_type, item_id)]
+                booking = Booking(start_time, end_time, active_status, item_id, cost)
+                booking.insert()
+                booking_ids.append(booking.id)
+        return response_structure({"booking_ids": booking_ids}), 201

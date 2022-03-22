@@ -3,7 +3,8 @@ from datetime import datetime
 from typing import Dict
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, DateTime, Integer, String, asc, cast, desc, inspect, or_
+from sqlalchemy import (Column, DateTime, Integer, String, asc, cast, desc,
+                        inspect, or_)
 from sqlalchemy.ext import declarative
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from werkzeug.exceptions import BadRequest

@@ -1,5 +1,5 @@
-from sqlalchemy.sql.schema import Column
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import String
 
 from model.base import Base, db

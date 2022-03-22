@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import String, Float, Integer
+from sqlalchemy.sql.sqltypes import Float, Integer, String
 
 from model.base import Base, db
 from model.booking import Booking

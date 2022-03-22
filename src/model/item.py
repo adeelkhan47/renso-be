@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import String, Integer
+from sqlalchemy.sql.sqltypes import Integer, String
 
 from model.base import Base, db
 from model.item_status import ItemStatus

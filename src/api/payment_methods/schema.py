@@ -1,7 +1,7 @@
 from flask_restx import fields
 
-from . import api
 from ..tax.schema import Tax
+from . import api
 
 Tax_nested = api.model(
     "tax",

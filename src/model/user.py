@@ -1,5 +1,5 @@
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import String, Boolean
+from sqlalchemy.sql.sqltypes import Boolean, String
 
 from model.base import Base, db
 

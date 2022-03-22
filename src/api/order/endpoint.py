@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound
 
-from common.helper import response_structure, error_message
+from common.helper import response_structure
 from model.booking import Booking
 from model.custom_data import CustomData
 from model.custom_parameter import CustomParameter
@@ -10,6 +12,8 @@ from model.order import Order
 from model.order_bookings import OrderBookings
 from model.order_custom_data import OrderCustomData
 from model.order_status import OrderStatus
+from service.stripe_service import Stripe
+
 from . import api, schema
 
 
@@ -22,7 +26,7 @@ class order_list(Resource):
         all_items, count = Order.filtration(args)
         return response_structure(all_items, count), 200
 
-    @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
+    @api.marshal_list_with(schema.get_by_id_responseOrder_with_session, skip_none=True)
     @api.expect(schema.Order_Expect)
     def post(self):
         payload = api.payload
@@ -31,25 +35,13 @@ class order_list(Resource):
 
         client_name = payload.get("client_name")
         client_email = payload.get("client_email")
-        order_status_id = payload.get("order_status_id")
+        order_status_id = OrderStatus.get_id_by_name("Payment Pending")
         phone_number = payload.get("phone_number")
         time_period = payload.get("time_period")
         all_booking_ids = payload.get("booking_ids").split(",")
-        total_cost = 0.0
-        for booking_id in all_booking_ids:
-            booking = Booking.query_by_id(booking_id)
-            if not booking:
-                raise NotFound(f"Booking {booking_id} no found.")
-            diff = booking.end_time - booking.start_time
-            days, seconds = diff.days, diff.seconds
-            hours = days * 24 + seconds // 3600
-            item_price = booking.item.item_subtype.price * hours
-            cost = item_price * (100 - booking.discount) / 100
-            total_cost += cost
-
+        total_cost = payload.get("total_cost")
         order = Order(client_name, client_email, phone_number, order_status_id, time_period, total_cost)
         order.insert()
-        # custom fields
         for each in payload.keys():
             if each in custom_parameters:
                 customData = CustomData(each, payload.get(each))
@@ -57,7 +49,13 @@ class order_list(Resource):
                 OrderCustomData(customData.id, order.id).insert()
         for each in all_booking_ids:
             OrderBookings(each, order.id).insert()
-        return response_structure(order), 201
+        # strip_part
+        product_id = Stripe.create_product(
+            f"{str(order.id)}_{client_name}_{str(total_cost)}_{str(datetime.now())}")
+        price_id = Stripe.create_price(product_id, total_cost)
+        session_id = Stripe.create_checkout_session(price_id, order.id)
+        response_data = {"order": order, "session_id": session_id}
+        return response_structure(response_data), 201
 
 
 @api.route("/<int:order_id>")

@@ -1,5 +1,5 @@
 from flask_restx import fields
-from flask_restx.fields import List, Nested, String, Float
+from flask_restx.fields import Float, List, Nested, String
 
 from . import api
 

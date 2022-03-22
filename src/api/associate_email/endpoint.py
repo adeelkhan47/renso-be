@@ -4,6 +4,7 @@ from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.associate_email import AssociateEmail
+
 from . import api, schema
 
 

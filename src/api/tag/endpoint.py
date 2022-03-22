@@ -3,6 +3,7 @@ from flask_restx import Resource
 
 from common.helper import response_structure
 from model.tag import Tag
+
 from . import api, schema
 
 

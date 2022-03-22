@@ -3,6 +3,7 @@ from flask_restx import Resource
 
 from common.helper import response_structure
 from model.location import Location
+
 from . import api, schema
 
 

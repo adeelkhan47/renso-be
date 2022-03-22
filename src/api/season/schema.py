@@ -1,7 +1,7 @@
 from flask_restx import fields
 
-from . import api
 from ..item_type.schema import Item_type
+from . import api
 
 SeasonExpect = api.model(
     "seasonsExpect",

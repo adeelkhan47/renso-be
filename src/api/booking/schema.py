@@ -1,14 +1,32 @@
 from flask_restx import fields
 
-from . import api
 from ..booking_status.schema import BookingStatus
 from ..item.schema import Item
+from ..tax.schema import Tax
+from ..voucher.schema import Voucher
+from . import api
+
+booking_count_ = api.model(
+    "booking_count_",
+    {
+        "item_sub_type_id": fields.Integer(),
+        "item_ids": fields.List(fields.Integer()),
+    },
+)
+
+bulk_booking_expect = api.model(
+    "bulk_booking_expect",
+    {
+        "start_time": fields.String(),
+        "end_time": fields.String(),
+        "bookings_details": fields.List(fields.Nested(booking_count_))
+    }
+)
 
 BookingExpect = api.model(
     "BookingExpect",
     {
         "discount": fields.Integer(),
-        "location": fields.String(),
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
         "booking_status_id": fields.Integer(),
@@ -22,10 +40,24 @@ Booking = api.model(
         "id": fields.Integer(),
         "discount": fields.Integer(),
         "location": fields.String(),
+        "cost": fields.Float(),
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
         "booking_status": fields.Nested(BookingStatus),
         "item": fields.Nested(Item),
+
+    },
+)
+
+Cart = api.model(
+    "cart",
+    {
+        "bookings": fields.Nested(Booking,skip_none=True, as_list=True),
+        "taxs": fields.Nested(Tax, skip_none=True, as_list=True),
+        "actual_total_price": fields.Float(),
+        "effected_total_price": fields.Float(),
+        "actual_total_price_after_tax": fields.Float(),
+        "voucher": fields.Nested(Voucher, skip_none=True),
 
     },
 )
@@ -50,6 +82,30 @@ get_by_id_responseBooking = api.model(
     "getById",
     {
         "objects": fields.Nested(Booking, skip_none=True, allow_null=True),
+        "error": fields.Nested(error, allow_null=True),
+
+    },
+)
+get_cart_payments = api.model(
+    "get_cart_payments",
+    {
+        "objects": fields.Nested(Cart, skip_none=True, allow_null=True),
+        "error": fields.Nested(error, allow_null=True),
+
+    },
+)
+
+booking_ids = api.model(
+    "booking_ids",
+    {
+        "booking_ids": fields.List(fields.Integer())
+    }
+)
+
+get_booking_ids_ = api.model(
+    "get_booking_ids_",
+    {
+        "objects": fields.Nested(booking_ids, skip_none=True, allow_null=True),
         "error": fields.Nested(error, allow_null=True),
 
     },

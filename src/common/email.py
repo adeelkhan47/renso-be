@@ -5,9 +5,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import NoReturn
 
-from retry import retry
-
 from conf import settings
+from retry import retry
 
 
 class SendEmailFailure(Exception):

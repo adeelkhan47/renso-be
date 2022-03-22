@@ -1,5 +1,5 @@
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import String, Integer, Boolean
+from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 
 from model.base import Base, db
 
@@ -29,3 +29,7 @@ class Voucher(Base, db.Model):
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)
         db.session.commit()
+
+    @classmethod
+    def get_voucher_by_code(cls, code):
+        return cls.query.filter(cls.code == code, cls.status == True).first()

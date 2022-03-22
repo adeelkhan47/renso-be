@@ -8,6 +8,7 @@ from model.booking import Booking
 from model.item import Item
 from model.item_location import ItemLocation
 from model.item_tag import ItemTag
+
 from . import api, schema
 
 

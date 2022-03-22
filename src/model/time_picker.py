@@ -1,5 +1,5 @@
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import Integer, Time, String
+from sqlalchemy.sql.sqltypes import Integer, String, Time
 
 from model.base import Base, db
 

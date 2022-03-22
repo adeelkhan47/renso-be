@@ -4,6 +4,7 @@ from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.user import User
+
 from . import api, schema
 
 

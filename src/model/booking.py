@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import String, Integer, DateTime
+from sqlalchemy.sql.sqltypes import DateTime, Float, Integer
 
 from model.base import Base, db
 from model.booking_status import BookingStatus
@@ -9,22 +9,19 @@ from model.item import Item
 
 class Booking(Base, db.Model):
     __tablename__ = "booking"
-    discount = Column(Integer, nullable=False)
-    location = Column(String, nullable=False)
+    cost = Column(Float, default=0)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     booking_status_id = Column(Integer, ForeignKey("booking_status.id", ondelete="CASCADE"), nullable=True)
-
     item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
     order_bookings = relationship("OrderBookings", backref="booking")
 
-    def __init__(self, discount, location, start_time, end_time, booking_status_id, item_id):
-        self.discount = discount
-        self.location = location
+    def __init__(self, start_time, end_time, booking_status_id, item_id, cost):
         self.start_time = start_time
         self.end_time = end_time
         self.booking_status_id = booking_status_id
         self.item_id = item_id
+        self.cost = cost
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

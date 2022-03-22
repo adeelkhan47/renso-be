@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import String, Boolean
+from sqlalchemy.sql.sqltypes import Boolean, String
 
 from model.base import Base, db
 
@@ -27,3 +27,7 @@ class PaymentMethod(Base, db.Model):
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)
         db.session.commit()
+
+    @classmethod
+    def get_payment_method_by_name(cls, name):
+        return cls.query.filter(cls.name == name, cls.status == True).first()

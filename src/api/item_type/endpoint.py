@@ -4,6 +4,8 @@ from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.item_type import ItemType
+from model.season import Season
+
 from . import api, schema
 
 
@@ -50,3 +52,19 @@ class item_type_by_id(Resource):
         ItemType.update(item_type_id, **payload)
         itemType = ItemType.query_by_id(item_type_id)
         return response_structure(itemType), 200
+
+
+@api.route("/for_current_season")
+class item_types_for_season_list(Resource):
+    @api.doc("Get all items for_season")
+    @api.marshal_list_with(schema.get_list_responseItem_type)
+    def get(self):
+        seasons = [each.id for each in Season.current_seasons()]
+        all_items, count = ItemType.filtration({})
+        items_to_return = []
+        for item_type in all_items:
+            for each_season in item_type.seasonItemTypes:
+                if each_season.season_id in seasons and item_type not in items_to_return and item_type.name != "Extra":
+                    items_to_return.append(item_type)
+                    break
+        return response_structure(items_to_return, len(items_to_return)), 200

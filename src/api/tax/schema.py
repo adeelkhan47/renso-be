@@ -1,6 +1,7 @@
 from flask_restx import fields
 
 from . import api
+
 Tax_expect = api.model(
     "Tax_expect",
     {

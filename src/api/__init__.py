@@ -2,12 +2,15 @@ from http import HTTPStatus
 
 from flask import Blueprint
 from flask_restx import Api
-from werkzeug.exceptions import Forbidden, Unauthorized, BadRequest, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound, Unauthorized
 
 from common.helper import error_message
+
+from .associate_email.endpoint import api as associateEmail_api
 from .booking.endpoint import api as booking_api
 from .booking_status.endpoint import api as booking_status_api
 from .booking_widget.endpoint import api as booking_widget_api
+from .checkout_session.endpoint import api as checkout_api
 from .custom_parameter.endpoint import api as custom_parameter_api
 from .day_picker.endpoint import api as day_picker_api
 from .item.endpoint import api as item_api
@@ -25,8 +28,6 @@ from .tax.endpoint import api as tax_api
 from .time_picker.endpoint import api as time_picker_api
 from .user.endpoint import api as user_api
 from .voucher.endpoint import api as voucher_api
-from .associate_email.endpoint import api as associateEmail_api
-from .checkout_session.endpoint import api as checkout_api
 
 blueprint = Blueprint("api", __name__)
 api = Api(blueprint, title="Renso Api's", version="0.1", description="Renso official api's")
