@@ -38,8 +38,6 @@ Booking = api.model(
     "booking",
     {
         "id": fields.Integer(),
-        "discount": fields.Integer(),
-        "location": fields.String(),
         "cost": fields.Float(),
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
