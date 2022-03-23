@@ -15,6 +15,7 @@ class Booking(Base, db.Model):
     booking_status_id = Column(Integer, ForeignKey("booking_status.id", ondelete="SET NULL"), nullable=True)
     item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
     order_bookings = relationship("OrderBookings", backref="booking")
+    cart_bookings = relationship("CartBookings", backref="booking")
 
     def __init__(self, start_time, end_time, booking_status_id, item_id, cost):
         self.start_time = start_time

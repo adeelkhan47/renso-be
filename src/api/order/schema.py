@@ -29,7 +29,7 @@ Order_Expect = api.model(
         "client_email": fields.String(),
         "phone_number": fields.String(),
         "time_period": fields.String(),
-        "booking_ids": fields.String()
+        "cart_id": fields.Integer()
     },
 )
 

@@ -6,6 +6,7 @@ from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.booking import Booking
+from model.cart import Cart
 from model.custom_data import CustomData
 from model.custom_parameter import CustomParameter
 from model.order import Order
@@ -39,7 +40,8 @@ class order_list(Resource):
         order_status_id = OrderStatus.get_id_by_name("Payment Pending")
         phone_number = payload.get("phone_number")
         time_period = payload.get("time_period")
-        all_booking_ids = payload.get("booking_ids").split(",")
+        cart = Cart.query_by_id(payload.get("cart_id"))
+        bookings = [each.booking for each in cart.cart_bookings]
         ##
         price_factor = 100
         if "voucher" in payload.keys() and payload.get("voucher"):
@@ -49,8 +51,7 @@ class order_list(Resource):
         payment_method = PaymentMethod.get_payment_method_by_name("Stripe")
         actual_total_price = 0
         effected_total_price = 0
-        for booking_id in all_booking_ids:
-            booking = Booking.query_by_id(booking_id)
+        for booking in bookings:
             actual_total_price += booking.cost
             effected_total_price += (price_factor / 100) * booking.cost
 
@@ -72,12 +73,12 @@ class order_list(Resource):
                 customData = CustomData(each, payload.get(each))
                 customData.insert()
                 OrderCustomData(customData.id, order.id).insert()
-        for each in all_booking_ids:
-            OrderBookings(each, order.id).insert()
+        for each in bookings:
+            OrderBookings(each.id, order.id).insert()
         # strip_part
         product_id = Stripe.create_product(
-            f"{str(order.id)}_{client_name}_{str(total_cost)}_{str(datetime.now())}")
-        price_id = Stripe.create_price(product_id, total_cost)
+            f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}")
+        price_id = Stripe.create_price(product_id, actual_total_price_after_tax)
         session_id = Stripe.create_checkout_session(price_id, order.id)
         response_data = {"order": order, "session_id": session_id}
         return response_structure(response_data), 201

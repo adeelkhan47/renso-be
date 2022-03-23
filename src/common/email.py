@@ -22,7 +22,7 @@ server = None
 
 def create_connection():
     global server
-    sender_email = settings.MAIL_USERNAME
+    sender_email = "rensoinfo@gmail.com"
     if server:
         try:
             server.quit()

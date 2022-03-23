@@ -1,10 +1,10 @@
 from flask_restx import fields
 
+from . import api
 from ..booking_status.schema import BookingStatus
 from ..item.schema import Item
 from ..tax.schema import Tax
 from ..voucher.schema import Voucher
-from . import api
 
 booking_count_ = api.model(
     "booking_count_",
@@ -19,7 +19,8 @@ bulk_booking_expect = api.model(
     {
         "start_time": fields.String(),
         "end_time": fields.String(),
-        "bookings_details": fields.List(fields.Nested(booking_count_))
+        "bookings_details": fields.List(fields.Nested(booking_count_)),
+        "cart_id": fields.Integer()
     }
 )
 
@@ -50,7 +51,7 @@ Booking = api.model(
 Cart = api.model(
     "cart",
     {
-        "bookings": fields.Nested(Booking,skip_none=True, as_list=True),
+        "bookings": fields.Nested(Booking, skip_none=True, as_list=True),
         "taxs": fields.Nested(Tax, skip_none=True, as_list=True),
         "actual_total_price": fields.Float(),
         "effected_total_price": fields.Float(),
@@ -93,17 +94,17 @@ get_cart_payments = api.model(
     },
 )
 
-booking_ids = api.model(
-    "booking_ids",
+cart_id = api.model(
+    "cart_id",
     {
-        "booking_ids": fields.List(fields.Integer())
+        "cart_id": fields.Integer()
     }
 )
 
 get_booking_ids_ = api.model(
     "get_booking_ids_",
     {
-        "objects": fields.Nested(booking_ids, skip_none=True, allow_null=True),
+        "objects": fields.Nested(cart_id, skip_none=True, allow_null=True),
         "error": fields.Nested(error, allow_null=True),
 
     },

@@ -7,12 +7,13 @@ from werkzeug.exceptions import BadRequest, NotFound
 from common.helper import response_structure
 from model.booking import Booking
 from model.booking_status import BookingStatus
+from model.cart import Cart
+from model.cart_booking import CartBookings
 from model.item import Item
 from model.item_subtype import ItemSubType
 from model.payment_method import PaymentMethod
 from model.season import Season
 from model.voucher import Voucher
-
 from . import api, schema
 
 
@@ -97,11 +98,12 @@ class bookings_by_item_Subtype_id(Resource):
 class booking_list(Resource):
 
     @api.marshal_list_with(schema.get_cart_payments)
-    @api.param("booking_is", required=True)
+    @api.param("cart_id", required=True)
     @api.param("voucher", required=False)
     def get(self):
         args = request.args
-        booking_ids = args.get("booking_is").split(",")
+        cart = Cart.query_by_id(args.get("cart_id"))
+        bookings = [each.booking for each in cart.cart_bookings]
         price_factor = 100
         voucher = None
         if "voucher" in args.keys() and args["voucher"]:
@@ -112,11 +114,8 @@ class booking_list(Resource):
 
         actual_total_price = 0
         effected_total_price = 0
-        bookings = []
         taxs = []
-        for booking_id in booking_ids:
-            booking = Booking.query_by_id(booking_id)
-            bookings.append(booking)
+        for booking in bookings:
             actual_total_price += booking.cost
             effected_total_price += (price_factor / 100) * booking.cost
 
@@ -193,4 +192,11 @@ class booking_list(Resource):
                 booking = Booking(start_time, end_time, active_status, item_id, cost)
                 booking.insert()
                 booking_ids.append(booking.id)
-        return response_structure({"booking_ids": booking_ids}), 201
+        if "cart_id" in payload.keys() and payload.get("cart_id") and Cart.query_by_id(payload.get("cart_id")):
+            cart = Cart.query_by_id(payload.get("cart_id"))
+        else:
+            cart = Cart()
+            cart.insert()
+        for each in booking_ids:
+            CartBookings(cart_id=cart.id, booking_id=each).insert()
+        return response_structure({"cart_id": cart.id}), 201

@@ -6,9 +6,11 @@ from stripe.error import (APIConnectionError, AuthenticationError,
                           SignatureVerificationError, StripeError)
 from stripe.http_client import RequestsClient
 
+from configuration import configs
+
 stripe_keys = {
-    "secret_key": "sk_test_51KK1AdInECVV2DaUnL3QHsHBY7T9rOdWXm6fTMCDjNxr004TXHOYIJxY5bXmgPfBdR5dES5gzLV1KULWqOsdClPH00ejzGhf7S",
-    "publishable_key": "pk_test_51KK1AdInECVV2DaUUVrSfXyAr5Ee0RUQdNDCH1KeO6BjvXmhLVDx7sDROv0Vb49yFMC2q0q9CVYixtLcgmfWUTPp000jv4ibaT",
+    "secret_key": configs.STRIPE_SECRET_KEY,
+    "publishable_key": configs.STRIPE_PUBLIC_KEY,
 }
 stripe.api_key = stripe_keys["secret_key"]
 stripe.default_http_client = RequestsClient()
@@ -23,7 +25,7 @@ class Stripe:
         :param price_key:
         :return:
         """
-        domain_url = "http://127.0.0.1:5001/"
+        domain_url = configs.BASE_URL
         stripe.api_key = stripe_keys["secret_key"]
         try:
             checkout_session = stripe.checkout.Session.create(

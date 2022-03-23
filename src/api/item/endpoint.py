@@ -7,6 +7,7 @@ from common.helper import response_structure
 from model.booking import Booking
 from model.item import Item
 from model.item_location import ItemLocation
+from model.item_status import ItemStatus
 from model.item_tag import ItemTag
 
 from . import api, schema
@@ -50,7 +51,7 @@ class items_list(Resource):
         name = request.json.get("name")
         image = request.json.get("image")
         description = request.json.get("description")
-        item_status_id = request.json.get("item_status_id")
+        item_status_id = ItemStatus.get_id_by_name("Available")
         item_type_id = request.json.get("item_type_id")
         item_subtype_id = request.json.get("item_subtype_id")
         item = Item(name, image, description, item_status_id, item_type_id, item_subtype_id)

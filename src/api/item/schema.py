@@ -13,7 +13,6 @@ ItemExpect = api.model(
         "name": fields.String(),
         "image": fields.String(),
         "description": fields.String(),
-        "item_status_id": fields.Integer(),
         "item_type_id": fields.Integer(),
         "item_subtype_id": fields.Integer(),
         "tag_ids": fields.String(),
