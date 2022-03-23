@@ -5,8 +5,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import NoReturn
 
-from conf import settings
 from retry import retry
+
+from configuration import configs
 
 
 class SendEmailFailure(Exception):
@@ -22,7 +23,7 @@ server = None
 
 def create_connection():
     global server
-    sender_email = "rensoinfo@gmail.com"
+    sender_email = configs.MAIL_USERNAME
     if server:
         try:
             server.quit()
@@ -30,15 +31,15 @@ def create_connection():
             pass
         server = None
     context = ssl.create_default_context()
-    if settings.MAIL_SERVER == "smtp.gmail.com":
+    if configs.MAIL_SERVER == "smtp.gmail.com":
         server = smtplib.SMTP_SSL(
-            settings.MAIL_SERVER, settings.MAIL_PORT, context=context
+            configs.MAIL_SERVER, configs.MAIL_PORT, context=context
         )
-        server.login(sender_email, settings.MAIL_PASSWORD)
+        server.login(sender_email, configs.MAIL_PASSWORD)
     else:
-        server = smtplib.SMTP(host=settings.MAIL_SERVER, port=settings.MAIL_PORT)
+        server = smtplib.SMTP(host=configs.MAIL_SERVER, port=configs.MAIL_PORT)
         server.starttls(context=context)
-        server.login(sender_email, settings.MAIL_PASSWORD)
+        server.login(sender_email, configs.MAIL_PASSWORD)
 
 
 def close_connection():
@@ -61,10 +62,10 @@ def send_email(recipient: str, subject: str, message: str) -> NoReturn:
     :param message:
     :return:
     """
-
+    global server
     try:
         logging.info(f"Send email to {recipient} with subject {subject} and message:")
-        sender_email = settings.MAIL_USERNAME
+        sender_email = configs.MAIL_USERNAME
         receiver_email = recipient
         msg = message
         message = MIMEMultipart("alternative")

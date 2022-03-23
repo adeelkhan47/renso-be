@@ -29,7 +29,8 @@ Order_Expect = api.model(
         "client_email": fields.String(),
         "phone_number": fields.String(),
         "time_period": fields.String(),
-        "cart_id": fields.Integer()
+        "cart_id": fields.Integer(),
+        "voucher": fields.String()
     },
 )
 
