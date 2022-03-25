@@ -4,7 +4,7 @@ from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from model.associate_email import AssociateEmail
-
+from model.associate_email_subtypes import AssociateEmailSubtype
 from . import api, schema
 
 
@@ -21,8 +21,11 @@ class AssociateEmailList(Resource):
     @api.marshal_list_with(schema.get_by_id_responseAssociateEmail)
     def post(self):
         payload = api.payload
-        associateEmail = AssociateEmail(**payload)
+        item_type_ids = payload.get("item_type_ids").split(",")
+        associateEmail = AssociateEmail(payload.get("email"), payload.get("status"))
         associateEmail.insert()
+        for each in item_type_ids:
+            AssociateEmailSubtype(associateEmail.id, each).insert()
         return response_structure(associateEmail), 201
 
 
@@ -44,7 +47,13 @@ class voucher_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseAssociateEmail)
     @api.expect(schema.AssociateEmail_Expect)
     def patch(self, associate_email_id):
-        payload = api.payload
-        AssociateEmail.update(associate_email_id, payload)
+        data = api.payload.copy()
+        if "item_type_ids" in data.keys():
+            AssociateEmailSubtype.delete_by_email_id(associate_email_id)
+            item_type_ids = data.get("item_type_ids").split(",")
+            for each in item_type_ids:
+                AssociateEmailSubtype(associate_email_id, each).insert()
+            del data["item_type_ids"]
+        AssociateEmail.update(associate_email_id, data)
         associateEmail = AssociateEmail.query_by_id(associate_email_id)
         return response_structure(associateEmail), 200

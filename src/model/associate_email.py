@@ -1,3 +1,4 @@
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 
@@ -7,6 +8,7 @@ from model.base import Base, db
 class AssociateEmail(Base, db.Model):
     __tablename__ = "associate_email"
     email = Column(String, nullable=False, unique=True)
+    associate_email_subtypes = relationship("AssociateEmailSubtype", backref="associate_email")
     status = Column(Boolean, default=True)
 
     def __init__(self, email, status):

@@ -50,53 +50,53 @@ class order_list(Resource):
         order_status_id = OrderStatus.get_id_by_name("Payment Pending")
         phone_number = payload.get("phone_number")
         cart = Cart.query_by_id(payload.get("cart_id"))
-        bookings = [each.booking for each in cart.cart_bookings]
+        #bookings = [each.booking for each in cart.cart_bookings]
         template = env.get_template("receipt.html")
         stuff_to_render = template.render(
             configs=configs,
 
         )
-        #send_email("mmadikhan1998@gmail.com", "Receipt_Test", stuff_to_render)
-        ##
-        price_factor = 100
-        if "voucher" in payload.keys() and payload.get("voucher"):
-            voucher = Voucher.get_voucher_by_code(payload.get("voucher"))
-            if voucher:
-                price_factor = voucher.price_factor
-        payment_method = PaymentMethod.get_payment_method_by_name("Stripe")
-        actual_total_price = 0
-        effected_total_price = 0
-        for booking in bookings:
-            actual_total_price += booking.cost
-            effected_total_price += (price_factor / 100) * booking.cost
-
-        tax_amount = 0
-        if payment_method:
-            for each in payment_method.payment_tax:
-                tax = each.tax
-                tax_amount += tax.percentage / 100 * effected_total_price
-
-        actual_total_price_after_tax = effected_total_price + tax_amount
-
-        ##
-
-        order = Order(client_name, client_email, phone_number, order_status_id,
-                      actual_total_price_after_tax,cart.id)
-        order.insert()
-        for each in payload.keys():
-            if each in custom_parameters:
-                customData = CustomData(each, payload.get(each))
-                customData.insert()
-                OrderCustomData(customData.id, order.id).insert()
-        for each in bookings:
-            OrderBookings(each.id, order.id).insert()
-        # strip_part
-        product_id = Stripe.create_product(
-            f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}")
-        price_id = Stripe.create_price(product_id, actual_total_price_after_tax)
-        session_id = Stripe.create_checkout_session(price_id, order.id)
-        response_data = {"order": order, "session_id": session_id}
-        return response_structure(response_data), 201
+        send_email("mmadikhan1998@gmail.com", "Receipt_Test", stuff_to_render)
+        # ##
+        # price_factor = 100
+        # if "voucher" in payload.keys() and payload.get("voucher"):
+        #     voucher = Voucher.get_voucher_by_code(payload.get("voucher"))
+        #     if voucher:
+        #         price_factor = voucher.price_factor
+        # payment_method = PaymentMethod.get_payment_method_by_name("Stripe")
+        # actual_total_price = 0
+        # effected_total_price = 0
+        # for booking in bookings:
+        #     actual_total_price += booking.cost
+        #     effected_total_price += (price_factor / 100) * booking.cost
+        #
+        # tax_amount = 0
+        # if payment_method:
+        #     for each in payment_method.payment_tax:
+        #         tax = each.tax
+        #         tax_amount += tax.percentage / 100 * effected_total_price
+        #
+        # actual_total_price_after_tax = effected_total_price + tax_amount
+        #
+        # ##
+        #
+        # order = Order(client_name, client_email, phone_number, order_status_id,
+        #               actual_total_price_after_tax,cart.id)
+        # order.insert()
+        # for each in payload.keys():
+        #     if each in custom_parameters:
+        #         customData = CustomData(each, payload.get(each))
+        #         customData.insert()
+        #         OrderCustomData(customData.id, order.id).insert()
+        # for each in bookings:
+        #     OrderBookings(each.id, order.id).insert()
+        # # strip_part
+        # product_id = Stripe.create_product(
+        #     f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}")
+        # price_id = Stripe.create_price(product_id, actual_total_price_after_tax)
+        # session_id = Stripe.create_checkout_session(price_id, order.id)
+        # response_data = {"order": order, "session_id": session_id}
+        # return response_structure(response_data), 201
 
 
 @api.route("/<int:order_id>")
