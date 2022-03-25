@@ -16,7 +16,7 @@ if not configs:
     configs = Config()
     project_root = str(Path(__file__).parent.parent.parent)
     try:
-        with open(os.path.join(project_root, "etc", "configs.json"), "r") as file:
+        with open(os.path.join(project_root, "etc", "config.json"), "r") as file:
             data = json.load(file)
             if "ENVIRONMENT" not in data or data["ENVIRONMENT"] not in data:
                 raise Exception("Unexpected settings file format, bad ENV")

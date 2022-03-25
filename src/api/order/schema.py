@@ -28,7 +28,6 @@ Order_Expect = api.model(
         "client_name": fields.String(),
         "client_email": fields.String(),
         "phone_number": fields.String(),
-        "time_period": fields.String(),
         "cart_id": fields.Integer(),
         "voucher": fields.String()
     },
@@ -42,7 +41,6 @@ Order = api.model(
         "client_email": fields.String(),
         "phone_number": fields.String(),
         "order_status": fields.Nested(OrderStatus),
-        "time_period": fields.String(),
         "total_cost": fields.Float(),
         "order_bookings": fields.Nested(bookings, as_list=True),
         "order_custom_data": fields.Nested(customData, as_list=True)

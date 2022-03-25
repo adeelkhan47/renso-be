@@ -25,7 +25,7 @@ class Stripe:
         :param price_key:
         :return:
         """
-        domain_url = configs.BASE_URL
+        domain_url = configs.BASE_API_URL
         stripe.api_key = stripe_keys["secret_key"]
         try:
             checkout_session = stripe.checkout.Session.create(

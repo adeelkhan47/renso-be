@@ -4,7 +4,6 @@ from sqlalchemy.sql.sqltypes import Float, Integer, String
 
 from model.base import Base, db
 from model.booking import Booking
-from model.booking_status import BookingStatus
 from model.item import Item
 from model.order_bookings import OrderBookings
 
@@ -14,19 +13,19 @@ class Order(Base, db.Model):
     client_name = Column(String, nullable=False)
     client_email = Column(String, nullable=False)
     phone_number = Column(String, nullable=False)
-    time_period = Column(String, nullable=False)
     total_cost = Column(Float, nullable=False)
+    cart_id = Column(Integer, ForeignKey("cart.id", ondelete="SET NULL"), nullable=True)
     order_status_id = Column(Integer, ForeignKey("order_status.id", ondelete="SET NULL"), nullable=True)
     order_bookings = relationship("OrderBookings", backref="order")
     order_custom_data = relationship("OrderCustomData", backref="order")
 
-    def __init__(self, client_name, client_email, phone_number, order_status_id, time_period, total_cost):
+    def __init__(self, client_name, client_email, phone_number, order_status_id, total_cost, cart_id):
         self.client_name = client_name
         self.client_email = client_email
         self.phone_number = phone_number
         self.order_status_id = order_status_id
-        self.time_period = time_period
         self.total_cost = total_cost
+        self.cart_id = cart_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

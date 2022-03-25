@@ -62,7 +62,10 @@ def send_email(recipient: str, subject: str, message: str) -> NoReturn:
     :param message:
     :return:
     """
+
     global server
+    if not server:
+        create_connection()
     try:
         logging.info(f"Send email to {recipient} with subject {subject} and message:")
         sender_email = configs.MAIL_USERNAME

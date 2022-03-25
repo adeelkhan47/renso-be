@@ -6,7 +6,7 @@ from api import blueprint
 from model.base import db
 from configuration import configs
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../static")
 
 app.register_blueprint(blueprint, url_prefix="/api/v1/")
 
