@@ -1,14 +1,24 @@
 from http import HTTPStatus
+from pathlib import Path
 
+import jinja2
 from flask import request
 from flask_restx import Resource
 
+from common.email_service import send_email
 from common.helper import error_message, response_structure
+from configuration import configs
+from model.associate_email import AssociateEmail
 from model.order import Order
 from model.order_status import OrderStatus
 from service.stripe_service import Stripe
-
 from . import api, schema
+
+TEMPLATE_PATH = str(Path(__file__).parent.parent.parent) + "/templates"
+env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader([TEMPLATE_PATH, "../templates/"]),
+    autoescape=jinja2.select_autoescape(),
+)
 
 
 @api.route("")
@@ -53,6 +63,37 @@ class CheckOutSessionSuccess(Resource):
         session_id = args["session_id"]
         order_id = args["order_id"]
         order = Order.query_by_id(order_id)
+
+        ##
+        ##
+        template = env.get_template("receipt.html")
+        stuff_to_render = template.render(
+            configs=configs,
+            actual_total_price=order.actual_total_cost,
+            effected_total_price=order.effected_total_cost,
+            order=order,
+            total=order.total_cost,
+            tax_amount=order.tax_amount
+        )
+        send_email("mmadikhan1998@gmail.com", "Receipt_Test", stuff_to_render)
+        emails, count = AssociateEmail.filtration({"status:eq": "true"})
+        bookings_to_check = [x.booking for x in order.order_bookings]
+        association_data = {}
+        for each in emails:
+            item_subtypes = [x.item_subtype for x in each.associate_email_subtypes]
+            for booking in bookings_to_check:
+                if booking.item.item_subtype in item_subtypes:
+                    if each.email not in association_data.keys():
+                        association_data[each.email] = []
+                    association_data[each.email].append(booking)
+        template2 = env.get_template("associate_receipt.html")
+        for email in association_data.keys():
+            stuff_to_render2 = template2.render(
+                configs=configs,
+                bookings=association_data[email]
+            )
+            send_email(email, "Associate_Receipt_Test", stuff_to_render2)
+
         order_status_id = OrderStatus.get_id_by_name("Paid")
         Order.update(order_id, {"order_status_id": order_status_id})
         if session_id:

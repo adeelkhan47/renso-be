@@ -14,18 +14,25 @@ class Order(Base, db.Model):
     client_email = Column(String, nullable=False)
     phone_number = Column(String, nullable=False)
     total_cost = Column(Float, nullable=False)
+    actual_total_cost = Column(Float, nullable=False)
+    effected_total_cost = Column(Float, nullable=False)
+    tax_amount = Column(Float, nullable=False)
     cart_id = Column(Integer, ForeignKey("cart.id", ondelete="SET NULL"), nullable=True)
     order_status_id = Column(Integer, ForeignKey("order_status.id", ondelete="SET NULL"), nullable=True)
     order_bookings = relationship("OrderBookings", backref="order")
     order_custom_data = relationship("OrderCustomData", backref="order")
 
-    def __init__(self, client_name, client_email, phone_number, order_status_id, total_cost, cart_id):
+    def __init__(self, client_name, client_email, phone_number, order_status_id, total_cost, cart_id, actual_total_cost,
+                 effected_total_cost, tax_amount):
         self.client_name = client_name
         self.client_email = client_email
         self.phone_number = phone_number
         self.order_status_id = order_status_id
         self.total_cost = total_cost
         self.cart_id = cart_id
+        self.actual_total_cost = actual_total_cost
+        self.effected_total_cost = effected_total_cost
+        self.tax_amount = tax_amount
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

@@ -255,10 +255,10 @@
         </div>
         <div class="description row">
             <div class="title">
-                Amount Received
+                Booking Confirmation
             </div>
             <div class="text">
-                Thank you for your purchase
+                Thank you
             </div>
         </div>
         <div class="row reverse">
@@ -290,65 +290,30 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for each in order.order_bookings %}
+                {% for each in bookings %}
 
                     <tr>
                         <td colspan="5">
-                            {{ each.booking.item.name }}
+                            {{ each.item.name }}
                         </td>
                         <td colspan="4">
-                            {{ each.booking.item.item_subtype.name }}
+                            {{ each.item.item_subtype.name }}
                         </td>
                         <td colspan="3">
-                            {{ each.booking.start_time }}
+                            {{ each.start_time }}
                         </td>
                         <td colspan="3">
-                            {{ each.booking.end_time }}
+                            {{ each.end_time }}
                         </td>
                         <td colspan="2" class="amount">
-                            € {{ each.booking.cost }}
+                            € {{ each.cost }}
                         </td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
-        <div class="row right">
-            <div class="subtitle">
-                <div class="name">
-                    Sub Total
-                </div>
-                <div class="value">
-                    € {{ actual_total_price }}
-                </div>
-            </div>
-            <div class="subtitle">
-                <div class="name">
-                    Discounted
-                </div>
-                <div class="value">
-                    € {{ effected_total_price }}
-                </div>
-            </div>
-            <div class="subtitle">
-                <div class="name">
-                    Tax
-                </div>
-                <div class="value">
-                    € {{ tax_amount }}
-                </div>
-            </div>
-        </div>
-        <div class="row right reverse">
-            <div class="subtitle">
-                <div class="name">
-                    Total
-                </div>
-                <div class="value">
-                    € {{ total }}
-                </div>
-            </div>
-        </div>
+
         <div class="footer-layout-wrapper">
             <div class="info">
                 <div class="about">
