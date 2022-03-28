@@ -63,9 +63,6 @@ class CheckOutSessionSuccess(Resource):
         session_id = args["session_id"]
         order_id = args["order_id"]
         order = Order.query_by_id(order_id)
-
-        ##
-        ##
         template = env.get_template("receipt.html")
         stuff_to_render = template.render(
             configs=configs,
@@ -75,7 +72,7 @@ class CheckOutSessionSuccess(Resource):
             total=order.total_cost,
             tax_amount=order.tax_amount
         )
-        send_email("mmadikhan1998@gmail.com", "Receipt_Test", stuff_to_render)
+        send_email(order.client_email, "Receipt_Test", stuff_to_render)
         emails, count = AssociateEmail.filtration({"status:eq": "true"})
         bookings_to_check = [x.booking for x in order.order_bookings]
         association_data = {}
