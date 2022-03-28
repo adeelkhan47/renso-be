@@ -1,0 +1,58 @@
+version: '2'
+
+# Run as
+# docker-compose build; docker-compose up -d
+# Check with
+# docker ps
+# Then check the logs with
+# docker logs --tail 50 $container_id
+# docker-compose images
+# docker-compose logs --tail 20 repo_name
+
+services:
+
+  postgres_db:
+    container_name: renso_db
+    image: postgres
+    environment:   # Set up postgres database name and password
+      POSTGRES_PASSWORD: postgres 
+      POSTGRES_USER: postgres
+      POSTGRES_DB: renso
+    ports:    # Set up ports exposed for other containers to connect to
+      - 5433:5432
+    networks:
+      - app-tier
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis
+    container_name: redis
+    # command: [ "redis-server", "--protected-mode", "no", "--bind", "0.0.0.0" ]
+    ports:
+      - 6379:6379
+    networks:
+      - app-tier
+
+
+  python_app:
+    container_name: renso_app
+    build:
+      context: src
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    depends_on:
+      - postgres_db
+      - redis
+    networks:
+      - app-tier
+    volumes:
+      - ./static:/app/static
+    command:
+      tail -f /dev/null
+
+
+networks:
+  app-tier:
+    driver: bridge
