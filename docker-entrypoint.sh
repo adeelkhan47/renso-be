@@ -12,8 +12,6 @@ do
      sleep 1
 done
 
-python create_super_user.py
-
 #exec celery -A tasks.email worker -l INFO --pool=solo &
 #exec celery -A tasks.email beat -l INFO &
 #exec celery -A tasks.queue beat -l INFO &
