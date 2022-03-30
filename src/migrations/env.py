@@ -5,6 +5,8 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from configuration import configs
+
 sys.path.append("..")
 
 import os
@@ -25,7 +27,7 @@ from model.time_picker import TimePicker
 from model.user import User
 
 config = context.config
-config.set_main_option("sqlalchemy.url", "postgresql://postgres:postgres@localhost:5432/renso")
+config.set_main_option("sqlalchemy.url", configs.SQLALCHEMY_DATABASE_URI)
 fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 target_metadata = Base.metadata
