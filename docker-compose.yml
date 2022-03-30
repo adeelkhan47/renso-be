@@ -38,7 +38,7 @@ services:
   python_app:
     container_name: renso_app
     build:
-      context: src
+      context: .
       dockerfile: Dockerfile
     ports:
       - 5000:5000
