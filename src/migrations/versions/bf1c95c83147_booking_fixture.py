@@ -1,16 +1,17 @@
-"""status_fixture_order_status
+"""booking fixture
 
-Revision ID: bc33b3809d3f
-Revises: e8bbf4c2e2b3
-Create Date: 2022-03-22 19:11:27.212781
+Revision ID: bf1c95c83147
+Revises: b0fd03ab3c63
+Create Date: 2022-03-31 00:13:46.622879
 
 """
 from alembic import op
-from sqlalchemy import MetaData, Table
 
 # revision identifiers, used by Alembic.
-revision = 'bc33b3809d3f'
-down_revision = 'e8bbf4c2e2b3'
+from sqlalchemy import MetaData, Table
+
+revision = 'bf1c95c83147'
+down_revision = 'b0fd03ab3c63'
 branch_labels = None
 depends_on = None
 
@@ -18,28 +19,24 @@ depends_on = None
 def upgrade():
     meta = MetaData(bind=op.get_bind())
 
-    meta.reflect(only=("order_status",))
+    meta.reflect(only=("booking_status",))
 
-    item_status = Table("order_status", meta)
+    item_status = Table("booking_status", meta)
     op.bulk_insert(
         item_status,
         [
             {
-                "name": "Paid",
+                "name": "Active",
                 "color": "green",
             },
             {
-                "name": "Completed",
+                "name": "Closed",
                 "color": "blue",
             },
             {
                 "name": "Cancelled",
                 "color": "red",
-            },
-            {
-                "name": "Payment Pending",
-                "color": "yellow",
-            },
+            }
 
         ],
     )
