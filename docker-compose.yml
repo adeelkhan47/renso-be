@@ -41,7 +41,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 80:5000
+      - 5000:5000
     depends_on:
       - postgres_db
       - redis
