@@ -5,6 +5,7 @@ from flask_restx import Api
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, Unauthorized
 
 from common.helper import error_message
+from model.base import db
 
 from .associate_email.endpoint import api as associateEmail_api
 from .booking.endpoint import api as booking_api
@@ -105,5 +106,5 @@ def handle_internal_server_error(exception_cause):
     :param exception_cause:
     :return objects , response Code:
     """
-
+    db.session.rollback()
     return error_message("internal server error"), HTTPStatus.INTERNAL_SERVER_ERROR
