@@ -4,7 +4,6 @@ from flask_restx import Resource
 from common.helper import response_structure
 from model.payment_method import PaymentMethod
 from model.payment_tax import PaymentTax
-
 from . import api, schema
 
 
@@ -53,5 +52,12 @@ class Payment_Method_by_id(Resource):
         if "status" in data.keys():
             data["status"] = bool(data["status"])
         PaymentMethod.update(payment_method_id, data)
+        if "tax_ids" in data.keys():
+            PaymentTax.delete_by_payment_id(payment_method_id)
+            tax_ids = data.get("tax_ids").split(",")
+            for each in tax_ids:
+                if each:
+                    PaymentTax(payment_id=payment_method_id, tax_id=each).insert()
+            del data["tax_ids"]
         payment_method = PaymentMethod.query_by_id(payment_method_id)
         return response_structure(payment_method), 200
