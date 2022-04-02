@@ -27,7 +27,8 @@ class PaymentMethodList(Resource):
         pay.insert()
         all_tax_ids = payload.get("tax_ids").split(",")
         for each in all_tax_ids:
-            PaymentTax(each, pay.id).insert()
+            if each:
+                PaymentTax(each, pay.id).insert()
         return response_structure(pay), 201
 
 
