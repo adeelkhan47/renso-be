@@ -68,11 +68,11 @@ class CheckOutSessionSuccess(Resource):
         order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
 
         if order.order_status_id == order_status_paid_id:
-            return redirect(f"{configs.FRONT_END_URL}failure", code=400)
+            return redirect(f"{configs.FRONT_END_URL}failure/", code=400)
         if order.order_status_id == order_status_completed_id:
-            return redirect(f"{configs.FRONT_END_URL}failure", code=400)
+            return redirect(f"{configs.FRONT_END_URL}failure/", code=400)
         if order.order_status_id == order_status_cancelled_id:
-            return redirect(f"{configs.FRONT_END_URL}failure", code=400)
+            return redirect(f"{configs.FRONT_END_URL}failure/", code=400)
         template = env.get_template("receipt.html")
         stuff_to_render = template.render(
             configs=configs,
@@ -102,5 +102,5 @@ class CheckOutSessionSuccess(Resource):
             send_email(email, "Order Confirmation for Associations", stuff_to_render2)
         Order.update(order_id, {"order_status_id": order_status_paid_id})
         if session_id:
-            return redirect(f"{configs.FRONT_END_URL}success", code=201)
-        return redirect(f"{configs.FRONT_END_URL}failure", code=400)
+            return redirect(f"{configs.FRONT_END_URL}success/", code=201)
+        return redirect(f"{configs.FRONT_END_URL}failure/", code=400)
