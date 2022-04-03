@@ -55,7 +55,7 @@ class CheckOutSessionFailed(Resource):
 @api.route("/success")
 class CheckOutSessionSuccess(Resource):
     @api.doc("Accept Success for checkout")
-    @api.marshal_with(schema.CheckOutSessionResponseSuccess, skip_none=True)
+    #@api.marshal_with(schema.CheckOutSessionResponseSuccess, skip_none=True)
     @api.param("session_id")
     @api.param("order_id")
     def get(self):
@@ -68,11 +68,11 @@ class CheckOutSessionSuccess(Resource):
         order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
 
         if order.order_status_id == order_status_paid_id:
-            return error_message("Order Already Placed."), HTTPStatus.BAD_REQUEST
+            return redirect(f"{configs.FRONT_END_URL}failure", code=400)
         if order.order_status_id == order_status_completed_id:
-            return error_message("Order Already Completed."), HTTPStatus.BAD_REQUEST
+            return redirect(f"{configs.FRONT_END_URL}failure", code=400)
         if order.order_status_id == order_status_cancelled_id:
-            return error_message("Order Cancelled Please Contact Support."), HTTPStatus.BAD_REQUEST
+            return redirect(f"{configs.FRONT_END_URL}failure", code=400)
         template = env.get_template("receipt.html")
         stuff_to_render = template.render(
             configs=configs,
@@ -102,6 +102,5 @@ class CheckOutSessionSuccess(Resource):
             send_email(email, "Order Confirmation for Associations", stuff_to_render2)
         Order.update(order_id, {"order_status_id": order_status_paid_id})
         if session_id:
-            return response_structure({"msg": "top success."}), 201
-
+            return redirect(f"{configs.FRONT_END_URL}success", code=201)
         return redirect(f"{configs.FRONT_END_URL}failure", code=400)

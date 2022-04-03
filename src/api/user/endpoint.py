@@ -1,10 +1,8 @@
 from flask import request
 from flask_restx import Resource
-from werkzeug.exceptions import NotFound
 
-from common.helper import response_structure,error_message
+from common.helper import response_structure, error_message
 from model.user import User
-
 from . import api, schema
 
 
@@ -46,7 +44,7 @@ class user_by_login_id(Resource):
         if count >= 1:
             return response_structure(all_users[0]), 200
         else:
-            return error_message("User not found with these credentials") , 404
+            return error_message("User not found with these credentials"), 404
 
 
 @api.route("/<int:user_id>")
