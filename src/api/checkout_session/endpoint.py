@@ -63,6 +63,16 @@ class CheckOutSessionSuccess(Resource):
         session_id = args["session_id"]
         order_id = args["order_id"]
         order = Order.query_by_id(order_id)
+        order_status_paid_id = OrderStatus.get_id_by_name("Paid")
+        order_status_completed_id = OrderStatus.get_id_by_name("Completed")
+        order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
+
+        if order.order_status_id == order_status_paid_id:
+            return error_message("Order Already Placed."), HTTPStatus.BAD_REQUEST
+        if order.order_status_id == order_status_completed_id:
+            return error_message("Order Already Completed."), HTTPStatus.BAD_REQUEST
+        if order.order_status_id == order_status_cancelled_id:
+            return error_message("Order Cancelled Please Contact Support."), HTTPStatus.BAD_REQUEST
         template = env.get_template("receipt.html")
         stuff_to_render = template.render(
             configs=configs,
@@ -90,10 +100,8 @@ class CheckOutSessionSuccess(Resource):
                 bookings=association_data[email]
             )
             send_email(email, "Order Confirmation for Associations", stuff_to_render2)
-
-        order_status_id = OrderStatus.get_id_by_name("Paid")
-        Order.update(order_id, {"order_status_id": order_status_id})
+        Order.update(order_id, {"order_status_id": order_status_paid_id})
         if session_id:
-            #return redirect(f"{configs.FRONT_END_URL}success", code=200)
-            return redirect('https://google.com')
+            return response_structure({"msg": "top success."}), 201
+
         return redirect(f"{configs.FRONT_END_URL}failure", code=400)
