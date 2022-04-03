@@ -36,7 +36,6 @@ class user_list(Resource):
 class user_by_login_id(Resource):
     @api.expect(schema.userLoginPostExpect)
     @api.marshal_list_with(schema.get_by_id_responseUser)
-    @cross_origin()
     def post(self):
         args = {}
         payload = api.payload
