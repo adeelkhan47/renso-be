@@ -2,7 +2,7 @@ from http import HTTPStatus
 from pathlib import Path
 
 import jinja2
-from flask import request
+from flask import request, redirect
 from flask_restx import Resource
 
 from common.email_service import send_email
@@ -72,7 +72,7 @@ class CheckOutSessionSuccess(Resource):
             total=order.total_cost,
             tax_amount=order.tax_amount
         )
-        send_email(order.client_email, "Receipt_Test", stuff_to_render)
+        send_email(order.client_email, "Order Confirmation", stuff_to_render)
         emails, count = AssociateEmail.filtration({"status:eq": "true"})
         bookings_to_check = [x.booking for x in order.order_bookings]
         association_data = {}
@@ -89,10 +89,10 @@ class CheckOutSessionSuccess(Resource):
                 configs=configs,
                 bookings=association_data[email]
             )
-            send_email(email, "Associate_Receipt_Test", stuff_to_render2)
+            send_email(email, "Order Confirmation for Associations", stuff_to_render2)
 
         order_status_id = OrderStatus.get_id_by_name("Paid")
         Order.update(order_id, {"order_status_id": order_status_id})
         if session_id:
-            return response_structure({"msg": "TopUp Succeeded"}), HTTPStatus.OK
-        return error_message("TopUp Failed"), HTTPStatus.BAD_REQUEST
+            return redirect(f"{configs.FRONT_END_URL}success", code=200)
+        return redirect(f"{configs.FRONT_END_URL}failure", code=400)
