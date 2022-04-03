@@ -1,4 +1,5 @@
 from flask import request
+from flask_cors import cross_origin
 from flask_restx import Resource
 
 from common.helper import response_structure, error_message
@@ -17,6 +18,7 @@ class user_list(Resource):
 
     @api.expect(schema.userPostExpect, validate=True)
     @api.marshal_list_with(schema.get_by_id_responseUser)
+    @cross_origin()
     def post(self):
         payload = api.payload
         name = payload.get("name")
@@ -35,6 +37,7 @@ class user_list(Resource):
 class user_by_login_id(Resource):
     @api.expect(schema.userLoginPostExpect)
     @api.marshal_list_with(schema.get_by_id_responseUser)
+    @cross_origin()
     def post(self):
         args = {}
         payload = api.payload
