@@ -18,7 +18,6 @@ class user_list(Resource):
 
     @api.expect(schema.userPostExpect, validate=True)
     @api.marshal_list_with(schema.get_by_id_responseUser)
-    @cross_origin()
     def post(self):
         payload = api.payload
         name = payload.get("name")
