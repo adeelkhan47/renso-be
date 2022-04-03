@@ -94,5 +94,6 @@ class CheckOutSessionSuccess(Resource):
         order_status_id = OrderStatus.get_id_by_name("Paid")
         Order.update(order_id, {"order_status_id": order_status_id})
         if session_id:
-            return redirect(f"{configs.FRONT_END_URL}success", code=200)
+            #return redirect(f"{configs.FRONT_END_URL}success", code=200)
+            return redirect('https://google.com')
         return redirect(f"{configs.FRONT_END_URL}failure", code=400)
