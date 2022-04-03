@@ -34,8 +34,7 @@ class user_list(Resource):
 
 
 @api.route("/login")
-class user_by_id(Resource):
-
+class user_by_login_id(Resource):
     @api.expect(schema.userLoginPostExpect)
     @api.marshal_list_with(schema.get_by_id_responseUser)
     def post(self):
@@ -51,7 +50,7 @@ class user_by_id(Resource):
 
 
 @api.route("/<int:user_id>")
-class user_by_id(Resource):
+class user_by_ind_id(Resource):
     @api.doc("Get user by id")
     @api.marshal_list_with(schema.get_by_id_responseUser)
     def get(self, user_id):
