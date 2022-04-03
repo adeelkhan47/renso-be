@@ -34,17 +34,28 @@ User = api.model(
     },
 )
 
+error = api.model(
+    "Error",
+    {
+
+        "msg": fields.String(),
+
+    },
+)
+
 get_list_responseUser = api.model(
     "getAll_User",
     {
         "total_rows": fields.Integer(),
         "objects": fields.Nested(User, as_list=True),
+        "error": fields.Nested(error, allow_null=True),
     },
 )
 get_by_id_responseUser = api.model(
     "getUserById_User",
     {
-        "objects": fields.Nested(User),
+        "objects": fields.Nested(User, skip_none=True),
+        "error": fields.Nested(error, allow_null=True),
 
     },
 )
