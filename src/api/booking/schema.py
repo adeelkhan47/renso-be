@@ -32,6 +32,8 @@ BookingExpect = api.model(
         "end_time": fields.DateTime(),
         "booking_status_id": fields.Integer(),
         "item_id": fields.Integer(),
+        "cost": fields.Float(),
+
     },
 )
 

@@ -32,6 +32,7 @@ class Booking(Base, db.Model):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
 
+
     @classmethod
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)

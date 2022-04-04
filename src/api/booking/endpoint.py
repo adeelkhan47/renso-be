@@ -34,6 +34,7 @@ class booking_list(Resource):
         end_time = payload.get("end_time")
         booking_status_id = payload.get("booking_status_id")
         item_id = payload.get("item_id")
+        cost = payload.get("cost")
         ##
         item = Item.query_by_id(item_id)
         if not item:
@@ -45,7 +46,7 @@ class booking_list(Resource):
         for each in all_bookings:
             if each.start_time <= end_time and start_time <= each.end_time:
                 raise BadRequest("Item Already booked with this time.")
-        booking = Booking(start_time, end_time, booking_status_id, item_id)
+        booking = Booking(start_time, end_time, booking_status_id, item_id, cost)
         booking.insert()
         return response_structure(booking), 201
 

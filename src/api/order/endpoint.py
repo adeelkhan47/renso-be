@@ -4,10 +4,7 @@ from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound
 
-from common.email_service import send_email
 from common.helper import response_structure
-from configuration import configs
-from model.associate_email import AssociateEmail
 from model.booking import Booking
 from model.cart import Cart
 from model.custom_data import CustomData
@@ -85,10 +82,7 @@ class order_list(Resource):
         session_id = Stripe.create_checkout_session(price_id, order.id)
         response_data = {"order": order, "session_id": session_id}
 
-
-
         return response_structure(response_data), 201
-
 
 
 @api.route("/<int:order_id>")
@@ -109,30 +103,13 @@ class order_by_id(Resource):
     @api.expect(schema.Order_Expect)
     def patch(self, order_id):
         data = api.payload.copy()
-
         if "order_status_id" in data.keys() and int(data["order_status_id"]) == OrderStatus.get_id_by_name("Completed"):
             order = Order.query_by_id(order_id)
             for each in order.order_bookings:
                 Booking.close_booking(each.booking.id)
-
-        if "booking_ids" in data.keys():
-            all_booking_ids = api.payload.get("booking_ids").split(",")
-            total_cost = 0.0
-            for booking_id in all_booking_ids:
-                booking = Booking.query_by_id(booking_id)
-                if not booking:
-                    raise NotFound(f"Item_id {booking_id} no found.")
-                diff = booking.end_time - booking.start_time
-                days, seconds = diff.days, diff.seconds
-                hours = days * 24 + seconds // 3600
-                item_price = float(booking.item.item_subtype.price) * float(hours)
-                cost = item_price * (100 - booking.discount) / 100
-                total_cost += cost
-            del data["booking_ids"]
-            data["total_cost"] = cost
-            OrderBookings.delete_by_order_id(order_id)
-            for each in all_booking_ids:
-                OrderBookings(each, order_id).insert()
+                OrderBookings.delete_by_order_id(order_id)
+        if "voucher" in data.keys():
+            del data["voucher"]
         Order.update(order_id, data)
         order = Order.query_by_id(order_id)
         return response_structure(order), 200
