@@ -3,8 +3,8 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 
 from api import blueprint
-from model.base import db
 from configuration import configs
+from model.base import db
 
 app = Flask(__name__, static_folder="../static")
 
@@ -16,6 +16,16 @@ app.config["SQLALCHEMY_DATABASE_URI"] = configs.SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 CORS(app)
+
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
+
+
 app.app_context().push()
 migrate = Migrate(app, db)
 

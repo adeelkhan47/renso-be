@@ -44,7 +44,7 @@ class user_by_login_id(Resource):
         if count >= 1:
             return response_structure(all_users[0]), 200
         else:
-            return error_message("User not found with these credentials"), 404, {'Access-Control-Allow-Origin': '*'}
+            return error_message("User not found with these credentials"), 404
 
 
 @api.route("/<int:user_id>")
