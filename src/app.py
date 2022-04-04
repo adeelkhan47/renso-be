@@ -15,7 +15,7 @@ app.config["CORS_HEADERS"] = "Content-Type"
 app.config["SQLALCHEMY_DATABASE_URI"] = configs.SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
-CORS(app,resources={r"/*": {"origins": "*"}})
+CORS(app)
 app.app_context().push()
 migrate = Migrate(app, db)
 

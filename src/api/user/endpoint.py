@@ -1,5 +1,4 @@
 from flask import request
-from flask_cors import cross_origin
 from flask_restx import Resource
 
 from common.helper import response_structure, error_message
@@ -45,7 +44,7 @@ class user_by_login_id(Resource):
         if count >= 1:
             return response_structure(all_users[0]), 200
         else:
-            return error_message("User not found with these credentials"), 404
+            return error_message("User not found with these credentials"), 404, {'Access-Control-Allow-Origin': '*'}
 
 
 @api.route("/<int:user_id>")
