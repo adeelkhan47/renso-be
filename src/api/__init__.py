@@ -109,10 +109,3 @@ def handle_internal_server_error(exception_cause):
     db.session.rollback()
     return error_message("internal server error"), HTTPStatus.INTERNAL_SERVER_ERROR
 
-
-@api.after_reuquest
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
