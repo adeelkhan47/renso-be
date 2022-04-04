@@ -27,10 +27,11 @@ class item_sub_types_list(Resource):
     def post(self):
         payload = api.payload
         name = payload.get("name")
+        image = payload.get("image")
         price = payload.get("price")
         item_type_id = payload.get("item_type_id")
         person = payload.get("person")
-        item_subtype = ItemSubType(name, price, person, item_type_id)
+        item_subtype = ItemSubType(name, price, person, item_type_id,image)
         item_subtype.insert()
         day_picker = DayPicker(True, True, True, True, True, True, True, item_type_id, item_subtype.id)
         day_picker.insert()

@@ -14,11 +14,13 @@ class ItemType(Base, db.Model):
     items = relationship("Item", backref="item_type")
     item_sub_type = relationship("ItemSubType", backref="item_type")
     seasonItemTypes = relationship("SeasonItemTypes", backref="item_type")
+    image = Column(String(500), nullable=False)
 
-    def __init__(self, name, maintenance, delivery_available):
+    def __init__(self, name, maintenance, delivery_available, image):
         self.name = name
         self.maintenance = maintenance
         self.delivery_available = delivery_available
+        self.image = image
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

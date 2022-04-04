@@ -24,9 +24,10 @@ class item_types_list(Resource):
         payload = api.payload
         name = payload.get("name")
         maintenance = payload.get("maintenance")
+        image = payload.get("image")
         delivery_available = int(payload.get("delivery_available"))
 
-        item_type = ItemType(name, maintenance, delivery_available)
+        item_type = ItemType(name, maintenance, delivery_available, image)
         item_type.insert()
         return response_structure(item_type), 201
 

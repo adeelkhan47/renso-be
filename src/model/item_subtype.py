@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import Boolean, Integer, String
+from sqlalchemy.sql.sqltypes import Integer, String
 
 from model.base import Base, db
 
@@ -10,16 +10,18 @@ class ItemSubType(Base, db.Model):
     name = Column(String, nullable=False, unique=True)
     price = Column(Integer, nullable=False, unique=False)
     person = Column(Integer, nullable=False, unique=False)
+    image = Column(String(500), nullable=False)
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=True)
     items = relationship("Item", backref="item_subtype")
     associate_email_subtypes = relationship("AssociateEmailSubtype", backref="item_subtype")
     dayPicker = relationship("DayPicker", backref="item_subtype")
 
-    def __init__(self, name, price, person, item_type_id):
+    def __init__(self, name, price, person, item_type_id, image):
         self.name = name
         self.price = price
         self.person = person
         self.item_type_id = item_type_id
+        self.image = image
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

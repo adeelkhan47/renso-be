@@ -9,7 +9,7 @@ from model.item_status import ItemStatus
 class Item(Base, db.Model):
     __tablename__ = "item"
     name = Column(String, nullable=False)
-    image = Column(String, nullable=False)
+    image = Column(String(500), nullable=False)
     description = Column(String, nullable=False)
 
     item_status_id = Column(Integer, ForeignKey("item_status.id", ondelete="SET NULL"), nullable=True)
