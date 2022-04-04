@@ -10,6 +10,7 @@ class Item(Base, db.Model):
     __tablename__ = "item"
     name = Column(String, nullable=False)
     image = Column(String(500), nullable=False)
+    image_key = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
     item_status_id = Column(Integer, ForeignKey("item_status.id", ondelete="SET NULL"), nullable=True)
@@ -19,9 +20,10 @@ class Item(Base, db.Model):
     item_tags = relationship("ItemTag", backref="item")
     item_locations = relationship("ItemLocation", backref="item")
 
-    def __init__(self, name, image, description, item_status_id, item_type_id, item_subtype_id):
+    def __init__(self, name, image, description, item_status_id, item_type_id, item_subtype_id, image_key):
         self.name = name
         self.image = image
+        self.image_key = image_key
         self.description = description
         self.item_status_id = item_status_id
         self.item_type_id = item_type_id

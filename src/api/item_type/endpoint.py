@@ -5,7 +5,6 @@ from werkzeug.exceptions import NotFound
 from common.helper import response_structure
 from model.item_type import ItemType
 from model.season import Season
-
 from . import api, schema
 
 
@@ -23,11 +22,12 @@ class item_types_list(Resource):
     def post(self):
         payload = api.payload
         name = payload.get("name")
+        image_key = payload.get("image_key")
         maintenance = payload.get("maintenance")
         image = payload.get("image")
         delivery_available = int(payload.get("delivery_available"))
 
-        item_type = ItemType(name, maintenance, delivery_available, image)
+        item_type = ItemType(name, maintenance, delivery_available, image, image_key)
         item_type.insert()
         return response_structure(item_type), 201
 

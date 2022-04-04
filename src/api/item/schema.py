@@ -12,6 +12,7 @@ ItemExpect = api.model(
     {
         "name": fields.String(),
         "image": fields.String(),
+        "image_key": fields.String(),
         "description": fields.String(),
         "item_type_id": fields.Integer(),
         "item_subtype_id": fields.Integer(),
@@ -36,6 +37,7 @@ Item = api.model(
         "id": fields.Integer(),
         "name": fields.String(),
         "image": fields.String(),
+        "image_key": fields.String(),
         "description": fields.String(),
         "item_status": fields.Nested(ItemStatus),
         "item_type": fields.Nested(Item_type),

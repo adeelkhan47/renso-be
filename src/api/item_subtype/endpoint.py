@@ -9,7 +9,6 @@ from model.day_picker import DayPicker
 from model.item_subtype import ItemSubType
 from model.item_type import ItemType
 from model.location import Location
-
 from . import api, schema
 
 
@@ -28,10 +27,11 @@ class item_sub_types_list(Resource):
         payload = api.payload
         name = payload.get("name")
         image = payload.get("image")
+        image_key = payload.get("image_key")
         price = payload.get("price")
         item_type_id = payload.get("item_type_id")
         person = payload.get("person")
-        item_subtype = ItemSubType(name, price, person, item_type_id,image)
+        item_subtype = ItemSubType(name, price, person, item_type_id, image, image_key)
         item_subtype.insert()
         day_picker = DayPicker(True, True, True, True, True, True, True, item_type_id, item_subtype.id)
         day_picker.insert()

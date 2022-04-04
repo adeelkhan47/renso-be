@@ -9,18 +9,21 @@ class ItemType(Base, db.Model):
     __tablename__ = "item_type"
     name = Column(String, nullable=False, unique=True)
     maintenance = Column(Integer, nullable=False)
+
     delivery_available = Column(Boolean, nullable=False, unique=False)
     DayPickers = relationship("DayPicker", backref="item_type")
     items = relationship("Item", backref="item_type")
     item_sub_type = relationship("ItemSubType", backref="item_type")
     seasonItemTypes = relationship("SeasonItemTypes", backref="item_type")
     image = Column(String(500), nullable=False)
+    image_key = Column(String, nullable=False)
 
-    def __init__(self, name, maintenance, delivery_available, image):
+    def __init__(self, name, maintenance, delivery_available, image,image_key):
         self.name = name
         self.maintenance = maintenance
         self.delivery_available = delivery_available
         self.image = image
+        self.image_key = image_key
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
