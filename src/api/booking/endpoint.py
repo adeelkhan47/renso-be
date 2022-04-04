@@ -11,6 +11,7 @@ from model.cart import Cart
 from model.cart_booking import CartBookings
 from model.item import Item
 from model.item_subtype import ItemSubType
+from model.location import Location
 from model.payment_method import PaymentMethod
 from model.season import Season
 from model.voucher import Voucher
@@ -146,11 +147,15 @@ class booking_list(Resource):
         payload = api.payload
         start_time = datetime.strptime(payload.get("start_time"), '%Y-%m-%d %H:%M:%S')
         end_time = datetime.strptime(payload.get("end_time"), '%Y-%m-%d %H:%M:%S')
+
         booking_ids = []
         active_status = BookingStatus.get_id_by_name("Active")
         booking_dictionary = {}
         if start_time.date() == end_time.date():
-            factor = Season.get_price_factor_on_date(start_time.date())
+            season_factor = Season.get_price_factor_on_date(start_time.date())
+            location_factor = Location.query_by_id(payload.get("location_id")).price_factor
+            factor = 100 + ((season_factor - 100) + (location_factor - 100))
+
             for each in payload.get("bookings_details"):
                 item_sub_type = ItemSubType.query_by_id(each.get("item_sub_type_id"))
                 for item_id in each.get("item_ids"):
@@ -163,7 +168,9 @@ class booking_list(Resource):
         else:
             days = (start_time.date() + timedelta(x) for x in range(0, (end_time - start_time).days + 1))
             for day in days:
-                factor = Season.get_price_factor_on_date(day)
+                season_factor = Season.get_price_factor_on_date(start_time.date())
+                location_factor = Location.query_by_id(payload.get("location_id")).price_factor
+                factor = 100 + ((season_factor - 100) + (location_factor - 100))
                 for each in payload.get("bookings_details"):
                     item_sub_type = ItemSubType.query_by_id(each.get("item_sub_type_id"))
                     for item_id in each.get("item_ids"):

@@ -20,7 +20,9 @@ bulk_booking_expect = api.model(
         "start_time": fields.String(),
         "end_time": fields.String(),
         "bookings_details": fields.List(fields.Nested(booking_count_)),
-        "cart_id": fields.Integer()
+        "cart_id": fields.Integer(),
+        "location_id": fields.Integer(),
+
     }
 )
 
