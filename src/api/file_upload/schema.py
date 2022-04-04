@@ -5,7 +5,7 @@ from . import api
 
 file_post_parameter = api.parser()
 file_post_parameter.add_argument(
-    "files", location="files", type=FileStorage, required=True, action="append"
+    "image", location="files", type=FileStorage, required=True, action="append"
 )
 file = api.model(
     "File",
