@@ -17,6 +17,14 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', "http://127.0.0.1:8080")
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,HEAD,OPTIONS')
+    return response
+
+
 CORS(app, resources={r'/*': {'origins': configs.ORIGINS}}, supports_credentials=True)
 
 app.app_context().push()
