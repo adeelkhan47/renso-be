@@ -16,4 +16,4 @@ def upload_image(file):
     path = f"images/{str(float(time())).replace('.', '')}.{file_type}"
     S3.upload_fileobj(file, configs.BUCKET_NAME, path)
     url = S3.generate_presigned_url('get_object', Params={'Bucket': configs.BUCKET_NAME, 'Key': path}, ExpiresIn=604799)
-    return url
+    return url,path

@@ -11,6 +11,7 @@ file = api.model(
     "File",
     {
         "url": fields.String(),
+        "key": fields.String(),
     },
 )
 

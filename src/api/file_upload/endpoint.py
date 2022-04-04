@@ -21,10 +21,10 @@ class FileList(Resource):
         :param audience_id:
         :return:
         """
-        args = schema.file_post_parameter.parse_args(strict=True)
+        args = schema.file_post_parameter.parse_args()
         files = args["files"]
         if len(files) >= 1:
-            url = upload_image(files[0])
-            return response_structure({"url": url}), HTTPStatus.OK
+            url, key = upload_image(files[0])
+            return response_structure({"url": url, "key": key}), HTTPStatus.OK
         else:
             raise BadRequest(error_message("File Upload failed."))
