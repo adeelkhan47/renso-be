@@ -9,7 +9,6 @@ class ItemType(Base, db.Model):
     __tablename__ = "item_type"
     name = Column(String, nullable=False, unique=True)
     maintenance = Column(Integer, nullable=False)
-
     delivery_available = Column(Boolean, nullable=False, unique=False)
     DayPickers = relationship("DayPicker", backref="item_type")
     items = relationship("Item", backref="item_type")

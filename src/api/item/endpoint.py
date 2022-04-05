@@ -59,12 +59,14 @@ class items_list(Resource):
             if request.json.get("tag_ids") != "":
                 tag_ids = request.json.get("tag_ids").split(",")
                 for each in tag_ids:
-                    ItemTag(item_id=item.id, tag_id=each).insert()
+                    if each:
+                        ItemTag(item_id=item.id, tag_id=each).insert()
         if "location_ids" in request.json.keys():
             if request.json.get("location_ids") != "":
                 location_ids = request.json.get("location_ids").split(",")
                 for each in location_ids:
-                    ItemLocation(item_id=item.id, location_id=each).insert()
+                    if each:
+                        ItemLocation(item_id=item.id, location_id=each).insert()
         return response_structure(item), 201
 
 
@@ -89,13 +91,15 @@ class item_by_id(Resource):
             ItemTag.delete_by_item_id(item_id)
             tag_ids = data.get("tag_ids").split(",")
             for each in tag_ids:
-                ItemTag(item_id=item_id, tag_id=each).insert()
+                if each:
+                    ItemTag(item_id=item_id, tag_id=each).insert()
             del data["tag_ids"]
         if "location_ids" in data.keys():
             ItemLocation.delete_by_item_id(item_id)
             location_ids = data.get("location_ids").split(",")
             for each in location_ids:
-                ItemLocation(item_id=item_id, location_id=each).insert()
+                if each:
+                    ItemLocation(item_id=item_id, location_id=each).insert()
             del data["location_ids"]
         Item.update(item_id, data)
         item = Item.query_by_id(item_id)
