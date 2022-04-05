@@ -24,7 +24,7 @@ class FileList(Resource):
         args = schema.file_post_parameter.parse_args()
         files = args["image"]
         if len(files) >= 1:
-            url, key = upload_image(files[0])
-            return response_structure({"url": url, "key": key}), HTTPStatus.OK
+            url = upload_image(files[0])
+            return response_structure({"url": url}), HTTPStatus.OK
         else:
             raise BadRequest(error_message("File Upload failed."))

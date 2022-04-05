@@ -10,7 +10,6 @@ Item_type_Expect = api.model(
         "maintenance": fields.Integer(),
         "delivery_available": fields.Boolean(),
         "image": fields.String(),
-        "image_key": fields.String()
     },
 )
 Item_type = api.model(
@@ -21,7 +20,6 @@ Item_type = api.model(
         "maintenance": fields.Integer(),
         "delivery_available": fields.Boolean(),
         "image": fields.String(),
-        "image_key": fields.String()
         # "items": fields.Nested(Item)
 
     },

@@ -49,12 +49,11 @@ class items_list(Resource):
 
         name = request.json.get("name")
         image = request.json.get("image")
-        image_key = request.json.get("image_key")
         description = request.json.get("description")
         item_status_id = ItemStatus.get_id_by_name("Available")
         item_type_id = request.json.get("item_type_id")
         item_subtype_id = request.json.get("item_subtype_id")
-        item = Item(name, image, description, item_status_id, item_type_id, item_subtype_id, image_key)
+        item = Item(name, image, description, item_status_id, item_type_id, item_subtype_id)
         item.insert()
         if "tag_ids" in request.json.keys():
             if request.json.get("tag_ids") != "":

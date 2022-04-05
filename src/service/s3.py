@@ -14,6 +14,7 @@ S3 = boto3.client(service_name='s3',
 def upload_image(file):
     file_type = file.content_type.split("/")[1]
     path = f"images/{str(float(time())).replace('.', '')}.{file_type}"
-    S3.upload_fileobj(file, configs.BUCKET_NAME, path)
-    url = S3.generate_presigned_url('get_object', Params={'Bucket': configs.BUCKET_NAME, 'Key': path}, ExpiresIn=604799)
-    return url,path
+    S3.upload_fileobj(Fileobj=file, Bucket=configs.BUCKET_NAME, Key=path,
+                      ExtraArgs={'ACL': 'public-read', 'ContentType': 'image/jpeg'})
+    url = f"https://rensoimages.s3.amazonaws.com/{path}"
+    return url
