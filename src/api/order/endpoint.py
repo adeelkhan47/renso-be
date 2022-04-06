@@ -66,7 +66,8 @@ class order_list(Resource):
         ##
 
         order = Order(client_name, client_email, phone_number, order_status_id,
-                      actual_total_price_after_tax, cart.id, actual_total_price, effected_total_price, tax_amount)
+                      round(actual_total_price_after_tax, 2), cart.id, round(actual_total_price, 2),
+                      round(effected_total_price, 2), round(tax_amount, 2))
         order.insert()
         for each in payload.keys():
             if each in custom_parameters:

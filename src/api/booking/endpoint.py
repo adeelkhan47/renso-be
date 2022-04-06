@@ -113,7 +113,6 @@ class booking_list(Resource):
             if voucher:
                 price_factor = voucher.price_factor
         payment_method = PaymentMethod.get_payment_method_by_name("Stripe")
-
         actual_total_price = 0
         effected_total_price = 0
         taxs = []
