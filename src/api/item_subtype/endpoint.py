@@ -6,6 +6,7 @@ from flask_restx import Resource
 from common.helper import response_structure
 from model.booking import Booking
 from model.day_picker import DayPicker
+from model.item_status import ItemStatus
 from model.item_subtype import ItemSubType
 from model.item_type import ItemType
 from model.location import Location
@@ -86,14 +87,15 @@ class items_subtype_list(Resource):
             data = {"item_sub_type_object": each}
             list_of_ids = []
             for item in each.items:
-                if location in [loc.location for loc in item.item_locations]:
-                    found = False
-                    for each_booking in Booking.get_bookings_by_item_id(item.id):
-                        if each_booking.start_time <= end_time and start_time <= each_booking.end_time:
-                            found = True
-                            break
-                    if not found:
-                        list_of_ids.append(item.id)
+                if item.item_status.name == "Available":
+                    if location in [loc.location for loc in item.item_locations]:
+                        found = False
+                        for each_booking in Booking.get_bookings_by_item_id(item.id):
+                            if each_booking.start_time <= end_time and start_time <= each_booking.end_time:
+                                found = True
+                                break
+                        if not found:
+                            list_of_ids.append(item.id)
             data["available_item_ids"] = list_of_ids
             response_data.append(data)
         return response_structure(response_data, len(response_data)), 200
