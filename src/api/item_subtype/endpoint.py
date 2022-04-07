@@ -88,10 +88,7 @@ class items_subtype_list(Resource):
             for item in each.items:
                 if location in [loc.location for loc in item.item_locations]:
                     found = False
-                    bookings = Booking.get_bookings_by_item_id(item.id)
-                    if not bookings:
-                        found = True
-                    for each_booking in bookings:
+                    for each_booking in Booking.get_bookings_by_item_id(item.id):
                         if each_booking.start_time <= end_time and start_time <= each_booking.end_time:
                             found = True
                             break
