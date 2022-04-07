@@ -132,9 +132,10 @@ class booking_list(Resource):
         response_data = {
             "bookings": bookings,
             "taxs": taxs,
-            "actual_total_price": actual_total_price,
-            "effected_total_price": effected_total_price,
-            "actual_total_price_after_tax": actual_total_price_after_tax,
+            "actual_total_price": round(actual_total_price, 2),
+            "effected_total_price": round(effected_total_price, 2),
+            "actual_total_price_after_tax": round(actual_total_price_after_tax, 2),
+            "tax_amount": round(tax_amount, 2),
             "voucher": voucher
 
         }
@@ -196,7 +197,7 @@ class booking_list(Resource):
             item_sub_type = each.get("item_sub_type_id")
             for item_id in each.get("item_ids"):
                 cost = booking_dictionary[(item_sub_type, item_id)]
-                booking = Booking(start_time, end_time, active_status, item_id, round(cost,2))
+                booking = Booking(start_time, end_time, active_status, item_id, round(cost, 2))
                 booking.insert()
                 booking_ids.append(booking.id)
         if "cart_id" in payload.keys() and payload.get("cart_id") and Cart.query_by_id(payload.get("cart_id")):

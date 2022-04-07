@@ -60,6 +60,7 @@ Cart = api.model(
         "actual_total_price": fields.Float(),
         "effected_total_price": fields.Float(),
         "actual_total_price_after_tax": fields.Float(),
+        "tax_amount": fields.Float(),
         "voucher": fields.Nested(Voucher, skip_none=True),
 
     },
