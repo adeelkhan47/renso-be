@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 
+from flask import g
 from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import BadRequest, NotFound
 
-from common.helper import response_structure
+from common.helper import response_structure, error_message
+from decorator.authorization import auth
 from model.booking import Booking
 from model.booking_status import BookingStatus
 from model.cart import Cart
@@ -22,13 +24,16 @@ from . import api, schema
 class booking_list(Resource):
     @api.doc("Get all items")
     @api.marshal_list_with(schema.get_list_responseBooking)
+    @auth
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         all_items, count = Booking.filtration(args)
         return response_structure(all_items, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseBooking, skip_none=True)
     @api.expect(schema.BookingExpect, validate=True)
+    @auth
     def post(self):
         payload = api.payload
         start_time = payload.get("start_time")
@@ -47,7 +52,7 @@ class booking_list(Resource):
         for each in all_bookings:
             if each.start_time <= end_time and start_time <= each.end_time:
                 raise BadRequest("Item Already booked with this time.")
-        booking = Booking(start_time, end_time, booking_status_id, item_id, cost)
+        booking = Booking(start_time, end_time, booking_status_id, item_id, cost, g.current_user.id)
         booking.insert()
         return response_structure(booking), 201
 
@@ -55,6 +60,7 @@ class booking_list(Resource):
 @api.route("/<int:booking_id>")
 class booking_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseBooking)
+    @auth
     def get(self, booking_id):
         booking = Booking.query_by_id(booking_id)
         if not booking:
@@ -62,12 +68,14 @@ class booking_by_id(Resource):
         return response_structure(booking), 200
 
     @api.doc("Delete booking by id")
+    @auth
     def delete(self, booking_id):
         Booking.delete(booking_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseBooking, skip_none=True)
     @api.expect(schema.BookingExpect, validate=True)
+    @auth
     def patch(self, booking_id):
         payload = api.payload
         data = payload.copy()
@@ -79,8 +87,10 @@ class booking_by_id(Resource):
 @api.route("/by_item_type/<int:item_type_id>")
 class bookings_by_item_type_id(Resource):
     @api.marshal_list_with(schema.get_list_responseBooking)
+    @auth
     def get(self, item_type_id):
         args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         booking_query = Booking.getQuery_BookingByItemType(item_type_id)
         allBookings, rows = Booking.filtration(args, booking_query)
         return response_structure(allBookings, rows), 200
@@ -89,8 +99,10 @@ class bookings_by_item_type_id(Resource):
 @api.route("/by_item_subtype/<int:item_subtype_id>")
 class bookings_by_item_Subtype_id(Resource):
     @api.marshal_list_with(schema.get_list_responseBooking)
+    @auth
     def get(self, item_subtype_id):
         args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         booking_query = Booking.getQuery_BookingByItemSubType(item_subtype_id)
         allBookings, rows = Booking.filtration(args, booking_query)
         return response_structure(allBookings, rows), 200
@@ -102,17 +114,23 @@ class booking_list(Resource):
     @api.marshal_list_with(schema.get_cart_payments)
     @api.param("cart_id", required=True)
     @api.param("voucher", required=False)
+    @auth
     def get(self):
         args = request.args
         cart = Cart.query_by_id(args.get("cart_id"))
+
+        if not cart:
+            raise NotFound(error_message("Cart not found."))
         bookings = [each.booking for each in cart.cart_bookings]
         price_factor = 100
         voucher = None
         if "voucher" in args.keys() and args["voucher"]:
-            voucher = Voucher.get_voucher_by_code(args.get("voucher"))
+            voucher = Voucher.get_voucher_by_code(args.get("voucher"), g.current_user.id)
             if voucher:
                 price_factor = voucher.price_factor
-        payment_method = PaymentMethod.get_payment_method_by_name("Stripe")
+        payment_method = PaymentMethod.get_payment_method_by_name("Stripe", g.current_user.id)
+        if not payment_method:
+            raise NotFound(error_message("Stripe Default Payment not found."))
         actual_total_price = 0
         effected_total_price = 0
         taxs = []
@@ -152,7 +170,7 @@ class booking_list(Resource):
         active_status = BookingStatus.get_id_by_name("Active")
         booking_dictionary = {}
         if start_time.date() == end_time.date():
-            season_factor = Season.get_price_factor_on_date(start_time.date())
+            season_factor = Season.get_price_factor_on_date(start_time.date(), g.current_user.id)
             location_factor = Location.query_by_id(payload.get("location_id")).price_factor
             factor = 100 + ((season_factor - 100) + (location_factor - 100))
 
@@ -168,7 +186,7 @@ class booking_list(Resource):
         else:
             days = (start_time.date() + timedelta(x) for x in range(0, (end_time - start_time).days + 1))
             for day in days:
-                season_factor = Season.get_price_factor_on_date(start_time.date())
+                season_factor = Season.get_price_factor_on_date(start_time.date(), g.current_user.id)
                 location_factor = Location.query_by_id(payload.get("location_id")).price_factor
                 factor = 100 + ((season_factor - 100) + (location_factor - 100))
                 for each in payload.get("bookings_details"):
@@ -197,7 +215,7 @@ class booking_list(Resource):
             item_sub_type = each.get("item_sub_type_id")
             for item_id in each.get("item_ids"):
                 cost = booking_dictionary[(item_sub_type, item_id)]
-                booking = Booking(start_time, end_time, active_status, item_id, round(cost, 2))
+                booking = Booking(start_time, end_time, active_status, item_id, round(cost, 2), g.current_user.id)
                 booking.insert()
                 booking_ids.append(booking.id)
         if "cart_id" in payload.keys() and payload.get("cart_id") and Cart.query_by_id(payload.get("cart_id")):

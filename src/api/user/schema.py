@@ -11,7 +11,8 @@ userPostExpect = api.model(
         "image": fields.String(),
         "gender": fields.String(),
         "status": fields.Boolean(),
-        "password": fields.String(),
+        "password": fields.String()
+
     }
 )
 userLoginPostExpect = api.model(
@@ -31,6 +32,7 @@ User = api.model(
         "image": fields.String(),
         "gender": fields.String(),
         "status": fields.Boolean(),
+        "user_key": fields.String()
     },
 )
 

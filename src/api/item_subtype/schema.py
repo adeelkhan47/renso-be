@@ -8,7 +8,7 @@ Item_subtype_Expect = api.model(
     {
 
         "name": fields.String(),
-        "price": fields.Integer(),
+        "price": fields.Float(),
         "person": fields.Integer(),
         "item_type_id": fields.Integer(),
         "image": fields.String(),
@@ -19,7 +19,7 @@ Item_subtype = api.model(
     "item_sub_type",
     {
         "id": fields.Integer(),
-        "price": fields.Integer(),
+        "price": fields.Float(),
         "name": fields.String(),
         "image": fields.String(),
         "person": fields.Integer(),

@@ -1,15 +1,17 @@
-from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.sql.schema import Column, ForeignKey
+from sqlalchemy.sql.sqltypes import String, Integer
 
 from model.base import Base, db
 
 
 class CustomParameter(Base, db.Model):
     __tablename__ = "custom_parameter"
-    name = Column(String, nullable=False,unique=True)
+    name = Column(String, nullable=False, unique=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, name):
+    def __init__(self, name, user_id):
         self.name = name
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

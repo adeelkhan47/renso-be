@@ -1,9 +1,11 @@
 from datetime import datetime
 
+from flask import g
 from flask import request
 from flask_restx import Resource
 
 from common.helper import response_structure
+from decorator.authorization import auth
 from model.booking import Booking
 from model.item import Item
 from model.item_location import ItemLocation
@@ -18,17 +20,19 @@ class items_list(Resource):
     @api.marshal_list_with(schema.get_list_responseItem)
     @api.param("start_time", required=True)
     @api.param("end_time", required=True)
+    @auth
     def get(self):
         args = request.args
         start_time = datetime.strptime(args["start_time"], '%Y-%m-%d %H:%M:%S')
         end_time = datetime.strptime(args["end_time"], '%Y-%m-%d %H:%M:%S')
         available_items_ids = []
-        for item in Item.get_all_active_items():
+
+        for item in Item.get_all_active_items(g.current_user.id):
             for each in Booking.get_bookings_by_item_id(item.id):
                 if not (each.start_time <= end_time and start_time <= each.end_time):
                     available_items_ids.append(str(item.id))
         if available_items_ids:
-            new_args = {"id:eq": ",".join(available_items_ids)}
+            new_args = {"id:eq": ",".join(available_items_ids), "user_id:eq": g.current_user.id}
             all_items, count = Item.filtration(new_args)
             return response_structure(all_items, count), 200
         return response_structure([], 0), 200
@@ -38,13 +42,16 @@ class items_list(Resource):
 class items_list(Resource):
     @api.doc("Get all items")
     @api.marshal_list_with(schema.get_list_responseItem)
+    @auth
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         all_items, count = Item.filtration(args)
         return response_structure(all_items, count), 200
 
-    @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)
+    @api.marshal_list_with(schema.get_list_responseItem, skip_none=True)
     @api.expect(schema.ItemExpect, validate=True)
+    @auth
     def post(self):
 
         name = request.json.get("name")
@@ -53,38 +60,45 @@ class items_list(Resource):
         item_status_id = ItemStatus.get_id_by_name("Available")
         item_type_id = request.json.get("item_type_id")
         item_subtype_id = request.json.get("item_subtype_id")
-        item = Item(name, image, description, item_status_id, item_type_id, item_subtype_id)
-        item.insert()
-        if "tag_ids" in request.json.keys():
-            if request.json.get("tag_ids") != "":
-                tag_ids = request.json.get("tag_ids").split(",")
-                for each in tag_ids:
-                    if each:
-                        ItemTag(item_id=item.id, tag_id=each).insert()
-        if "location_ids" in request.json.keys():
-            if request.json.get("location_ids") != "":
-                location_ids = request.json.get("location_ids").split(",")
-                for each in location_ids:
-                    if each:
-                        ItemLocation(item_id=item.id, location_id=each).insert()
-        return response_structure(item), 201
+        count = request.json.get("count")
+        items = []
+        for each in range(count):
+            item = Item(name, image, description, item_status_id, item_type_id, item_subtype_id, g.current_user.id)
+            items.append(item)
+            item.insert()
+            if "tag_ids" in request.json.keys():
+                if request.json.get("tag_ids") != "":
+                    tag_ids = request.json.get("tag_ids").split(",")
+                    for each in tag_ids:
+                        if each:
+                            ItemTag(item_id=item.id, tag_id=each).insert()
+            if "location_ids" in request.json.keys():
+                if request.json.get("location_ids") != "":
+                    location_ids = request.json.get("location_ids").split(",")
+                    for each in location_ids:
+                        if each:
+                            ItemLocation(item_id=item.id, location_id=each).insert()
+        return response_structure(items, len(items)), 201
 
 
 @api.route("/<int:item_id>")
 class item_by_id(Resource):
     @api.doc("Get all accounts")
     @api.marshal_list_with(schema.get_by_id_responseItem)
+    @auth
     def get(self, item_id):
         item = Item.query_by_id(item_id)
         return response_structure(item), 200
 
     @api.doc("Delete item by id")
+    @auth
     def delete(self, item_id):
         Item.delete(item_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)
     @api.expect(schema.ItemExpect)
+    @auth
     def patch(self, item_id):
         data = api.payload.copy()
         if "tag_ids" in data.keys():

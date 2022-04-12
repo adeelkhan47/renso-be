@@ -1,11 +1,11 @@
 from flask_restx import fields
 
+from . import api
 from ..item_status.schema import ItemStatus
 from ..item_subtype.schema import Item_subtype
 from ..item_type.schema import Item_type
 from ..location.schema import Location
 from ..tag.schema import Tag
-from . import api
 
 ItemExpect = api.model(
     "itemExpect",
@@ -16,7 +16,8 @@ ItemExpect = api.model(
         "item_type_id": fields.Integer(),
         "item_subtype_id": fields.Integer(),
         "tag_ids": fields.String(),
-        "location_ids": fields.String()
+        "location_ids": fields.String(),
+        "count": fields.Integer()
     },
 )
 

@@ -6,7 +6,6 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound, Unauthorized
 
 from common.helper import error_message
 from model.base import db
-
 from .associate_email.endpoint import api as associateEmail_api
 from .booking.endpoint import api as booking_api
 from .booking_status.endpoint import api as booking_status_api
@@ -14,6 +13,7 @@ from .booking_widget.endpoint import api as booking_widget_api
 from .checkout_session.endpoint import api as checkout_api
 from .custom_parameter.endpoint import api as custom_parameter_api
 from .day_picker.endpoint import api as day_picker_api
+from .file_upload.endpoint import api as file_upload_api
 from .item.endpoint import api as item_api
 from .item_status.endpoint import api as item_status_api
 from .item_subtype.endpoint import api as item_subtype_api
@@ -29,10 +29,18 @@ from .tax.endpoint import api as tax_api
 from .time_picker.endpoint import api as time_picker_api
 from .user.endpoint import api as user_api
 from .voucher.endpoint import api as voucher_api
-from .file_upload.endpoint import api as file_upload_api
 
 blueprint = Blueprint("api", __name__)
-api = Api(blueprint, title="Renso Api's", version="0.1", description="Renso official api's")
+authorizations = {
+    "Authorization": {
+        "description": "user_key",
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+    }
+}
+api = Api(blueprint, title="Renso Api's", version="0.1", description="Renso official api's",
+          authorizations=authorizations,security="Authorization")
 
 api.add_namespace(user_api)
 api.add_namespace(item_api)
@@ -110,4 +118,3 @@ def handle_internal_server_error(exception_cause):
     """
     db.session.rollback()
     return error_message("internal server error"), HTTPStatus.INTERNAL_SERVER_ERROR
-

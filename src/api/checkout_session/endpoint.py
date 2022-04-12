@@ -55,14 +55,14 @@ class CheckOutSessionFailed(Resource):
 @api.route("/success")
 class CheckOutSessionSuccess(Resource):
     @api.doc("Accept Success for checkout")
-    #@api.marshal_with(schema.CheckOutSessionResponseSuccess, skip_none=True)
+    # @api.marshal_with(schema.CheckOutSessionResponseSuccess, skip_none=True)
     @api.param("session_id")
     @api.param("order_id")
     def get(self):
         args = request.args
         session_id = args["session_id"]
         order_id = args["order_id"]
-        order = Order.query_by_id(order_id)
+        order = Order.query_by_id(int(order_id))
         order_status_paid_id = OrderStatus.get_id_by_name("Paid")
         order_status_completed_id = OrderStatus.get_id_by_name("Completed")
         order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
@@ -83,7 +83,7 @@ class CheckOutSessionSuccess(Resource):
             tax_amount=order.tax_amount
         )
         send_email(order.client_email, "Order Confirmation", stuff_to_render)
-        emails, count = AssociateEmail.filtration({"status:eq": "true"})
+        emails, count = AssociateEmail.filtration({"status:eq": "true", "user_id:eq": str(order.user_id)})
         bookings_to_check = [x.booking for x in order.order_bookings]
         association_data = {}
         for each in emails:

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import Boolean, String
+from sqlalchemy.sql.schema import Column, ForeignKey
+from sqlalchemy.sql.sqltypes import Boolean, String, Integer
 
 from model.base import Base, db
 
@@ -10,10 +10,12 @@ class PaymentMethod(Base, db.Model):
     name = Column(String, nullable=False, unique=True)
     status = Column(Boolean, nullable=False)
     payment_tax = relationship("PaymentTax", backref="payment_method")
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, name, status):
+    def __init__(self, name, status, user_id):
         self.name = name
         self.status = status
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -29,5 +31,5 @@ class PaymentMethod(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def get_payment_method_by_name(cls, name):
-        return cls.query.filter(cls.name == name, cls.status == True).first()
+    def get_payment_method_by_name(cls, name, user_id):
+        return cls.query.filter(cls.name == name, cls.status == True, cls.user_id == user_id).first()

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import DateTime, Float, Integer
+from sqlalchemy.sql.sqltypes import DateTime, Float, Integer, String
 
 from model.base import Base, db
 from model.booking_status import BookingStatus
@@ -16,13 +16,15 @@ class Booking(Base, db.Model):
     item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
     order_bookings = relationship("OrderBookings", backref="booking")
     cart_bookings = relationship("CartBookings", backref="booking")
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, start_time, end_time, booking_status_id, item_id, cost):
+    def __init__(self, start_time, end_time, booking_status_id, item_id, cost, user_id):
         self.start_time = start_time
         self.end_time = end_time
         self.booking_status_id = booking_status_id
         self.item_id = item_id
         self.cost = cost
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -31,7 +33,6 @@ class Booking(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
-
 
     @classmethod
     def update(cls, id, data):

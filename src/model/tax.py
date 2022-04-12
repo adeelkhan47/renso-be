@@ -10,13 +10,14 @@ class Tax(Base, db.Model):
     name = Column(String, nullable=False, unique=True)
     percentage = Column(Integer, nullable=False)
     description = Column(String, nullable=False)
-
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
     payment_tax = relationship("PaymentTax", backref="tax")
 
-    def __init__(self, name, percentage, description):
+    def __init__(self, name, percentage, description, user_id):
         self.name = name
         self.percentage = percentage
         self.description = description
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

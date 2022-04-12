@@ -15,7 +15,6 @@ Day_Picker_Expect = api.model(
         "saturday": fields.Boolean(),
         "sunday": fields.Boolean(),
         "item_type_id": fields.Integer(),
-        "item_subtype_id": fields.Integer(),
     },
 )
 Day_Picker = api.model(
@@ -30,7 +29,6 @@ Day_Picker = api.model(
         "saturday": fields.Boolean(),
         "sunday": fields.Boolean(),
         "item_type": fields.Nested(Item_type),
-        "item_subtype": fields.Nested(Item_subtype)
 
     },
 )

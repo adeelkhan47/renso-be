@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.sql.schema import Column, ForeignKey
+from sqlalchemy.sql.sqltypes import String, Integer
 
 from model.base import Base, db
 
@@ -11,11 +11,13 @@ class Tag(Base, db.Model):
     description = Column(String, nullable=True)
     color = Column(String, nullable=True)
     item_tags = relationship("ItemTag", backref="tag")
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, name, description,color):
+    def __init__(self, name, description,color,user_id):
         self.name = name
         self.description = description
         self.color = color
+        self.user_key = user_id
 
 
     def __repr__(self):

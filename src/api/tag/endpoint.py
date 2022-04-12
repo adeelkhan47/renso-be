@@ -1,9 +1,10 @@
+from flask import g
 from flask import request
 from flask_restx import Resource
 
 from common.helper import response_structure
+from decorator.authorization import auth
 from model.tag import Tag
-
 from . import api, schema
 
 
@@ -11,19 +12,22 @@ from . import api, schema
 class TagList(Resource):
     @api.doc("Get all Tag")
     @api.marshal_list_with(schema.get_list_responseTag)
+    @auth
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         all_rows, count = Tag.filtration(args)
         return response_structure(all_rows, count), 200
 
     @api.expect(schema.Tag_Expect)
     @api.marshal_list_with(schema.get_by_id_responseTag)
+    @auth
     def post(self):
         payload = api.payload
         name = payload.get("name")
         color = payload.get("color")
         description = payload.get("description")
-        tag = Tag(name, description, color)
+        tag = Tag(name, description, color, g.current_user.id)
         tag.insert()
         return response_structure(tag), 201
 
@@ -32,11 +36,13 @@ class TagList(Resource):
 class tag_by_id(Resource):
     @api.doc("Get tax by id")
     @api.marshal_list_with(schema.get_by_id_responseTag)
+    @auth
     def get(self, tag_id):
         tag = Tag.query_by_id(tag_id)
         return response_structure(tag), 200
 
     @api.doc("Delete method by id")
+    @auth
     def delete(self, tag_id):
         Tag.delete(tag_id)
         return "ok", 200

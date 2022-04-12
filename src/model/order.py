@@ -21,9 +21,10 @@ class Order(Base, db.Model):
     order_status_id = Column(Integer, ForeignKey("order_status.id", ondelete="SET NULL"), nullable=True)
     order_bookings = relationship("OrderBookings", backref="order")
     order_custom_data = relationship("OrderCustomData", backref="order")
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
     def __init__(self, client_name, client_email, phone_number, order_status_id, total_cost, cart_id, actual_total_cost,
-                 effected_total_cost, tax_amount):
+                 effected_total_cost, tax_amount,user_id):
         self.client_name = client_name
         self.client_email = client_email
         self.phone_number = phone_number
@@ -33,6 +34,7 @@ class Order(Base, db.Model):
         self.actual_total_cost = actual_total_cost
         self.effected_total_cost = effected_total_cost
         self.tax_amount = tax_amount
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

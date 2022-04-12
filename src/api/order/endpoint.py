@@ -1,10 +1,12 @@
 from datetime import datetime
 
+from flask import g
 from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
+from decorator.authorization import auth
 from model.booking import Booking
 from model.cart import Cart
 from model.custom_data import CustomData
@@ -23,15 +25,18 @@ from . import api, schema
 class order_list(Resource):
     @api.doc("Get all items")
     @api.marshal_list_with(schema.get_list_responseOrder)
+    @auth
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         all_items, count = Order.filtration(args)
         return response_structure(all_items, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseOrder_with_session, skip_none=True)
     @api.expect(schema.Order_Expect)
+    @auth
     def post(self):
-        payload = api.payload
+        payload = api.payload.copy()
         parameters, count = CustomParameter.filtration({})
         custom_parameters = [each.name for each in parameters]
 
@@ -45,10 +50,10 @@ class order_list(Resource):
         ##
         price_factor = 100
         if "voucher" in payload.keys() and payload.get("voucher"):
-            voucher = Voucher.get_voucher_by_code(payload.get("voucher"))
+            voucher = Voucher.get_voucher_by_code(payload.get("voucher"), g.current_user.id)
             if voucher:
                 price_factor = voucher.price_factor
-        payment_method = PaymentMethod.get_payment_method_by_name("Stripe")
+        payment_method = PaymentMethod.get_payment_method_by_name("Stripe", g.current_user.id)
         actual_total_price = 0
         effected_total_price = 0
         for booking in bookings:
@@ -67,7 +72,7 @@ class order_list(Resource):
 
         order = Order(client_name, client_email, phone_number, order_status_id,
                       round(actual_total_price_after_tax, 2), cart.id, round(actual_total_price, 2),
-                      round(effected_total_price, 2), round(tax_amount, 2))
+                      round(effected_total_price, 2), round(tax_amount, 2), g.current_user.id)
         order.insert()
         for each in payload.keys():
             if each in custom_parameters:
@@ -89,6 +94,7 @@ class order_list(Resource):
 @api.route("/<int:order_id>")
 class order_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseOrder)
+    @auth
     def get(self, order_id):
         order = Order.query_by_id(order_id)
         if not order:
@@ -96,19 +102,21 @@ class order_by_id(Resource):
         return response_structure(order), 200
 
     @api.doc("Delete item by id")
+    @auth
     def delete(self, order_id):
         Order.delete(order_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
     @api.expect(schema.Order_Expect)
+    @auth
     def patch(self, order_id):
         data = api.payload.copy()
         if "order_status_id" in data.keys() and int(data["order_status_id"]) == OrderStatus.get_id_by_name("Completed"):
             order = Order.query_by_id(order_id)
             for each in order.order_bookings:
                 Booking.close_booking(each.booking_id)
-                #OrderBookings.delete_by_order_id(order_id)
+                # OrderBookings.delete_by_order_id(order_id)
         if "voucher" in data.keys():
             del data["voucher"]
         Order.update(order_id, data)
@@ -119,8 +127,10 @@ class order_by_id(Resource):
 @api.route("/by_item_type/<int:item_type_id>")
 class order_by_id(Resource):
     @api.marshal_list_with(schema.get_list_responseOrder)
+    @auth
     def get(self, item_type_id):
-        args = request.args
+        args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         orders_query = Order.getQuery_OrderByItemType(item_type_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200
@@ -129,8 +139,10 @@ class order_by_id(Resource):
 @api.route("/by_item_subtype/<int:item_subtype_id>")
 class order_by_item_subtype_id(Resource):
     @api.marshal_list_with(schema.get_list_responseOrder)
+    @auth
     def get(self, item_subtype_id):
-        args = request.args
+        args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         orders_query = Order.getQuery_OrderByItemSubType(item_subtype_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200

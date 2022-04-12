@@ -1,9 +1,13 @@
+from flask import g
 from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
+from decorator.authorization import auth
+from model.day_picker import DayPicker
 from model.item_type import ItemType
+from model.location_item_type import LocationItemTypes
 from model.season import Season
 from . import api, schema
 
@@ -12,28 +16,38 @@ from . import api, schema
 class item_types_list(Resource):
     @api.doc("Get all items")
     @api.marshal_list_with(schema.get_list_responseItem_type)
+    @auth
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["user_id:eq"] = g.current_user.id
         all_items, count = ItemType.filtration(args)
         return response_structure(all_items, count), 200
 
     @api.expect(schema.Item_type_Expect)
     @api.marshal_with(schema.get_by_id_responseItem_type)
+    @auth
     def post(self):
         payload = api.payload
         name = payload.get("name")
         maintenance = payload.get("maintenance")
         image = payload.get("image")
+        location_ids = payload.get("location_ids")
         delivery_available = int(payload.get("delivery_available"))
-
-        item_type = ItemType(name, maintenance, delivery_available, image)
+        item_type = ItemType(name, maintenance, delivery_available, image, g.current_user.id)
         item_type.insert()
+        for each in location_ids:
+            if each:
+                LocationItemTypes(each, item_type.id).insert()
+        day_picker = DayPicker(True, True, True, True, True, True, True, item_type.id)
+        day_picker.insert()
+
         return response_structure(item_type), 201
 
 
 @api.route("/<int:item_type_id>")
 class item_type_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseItem_type)
+    @auth
     def get(self, item_type_id):
         item = ItemType.query_by_id(item_type_id)
         if not item:
@@ -41,14 +55,22 @@ class item_type_by_id(Resource):
         return response_structure(item), 200
 
     @api.doc("Delete item by id")
+    @auth
     def delete(self, item_type_id):
         ItemType.delete(item_type_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem_type)
     @api.expect(schema.Item_type_Expect)
+    @auth
     def patch(self, item_type_id):
-        payload = api.payload
+        payload = api.payload.copy()
+        if "location_ids" in payload.keys():
+            LocationItemTypes.delete_by_item_type_id(item_type_id)
+            for each in payload.get("location_ids"):
+                if each:
+                    LocationItemTypes(each, item_type_id).insert()
+            del payload["location_ids"]
         ItemType.update(item_type_id, payload)
         itemType = ItemType.query_by_id(item_type_id)
         return response_structure(itemType), 200
@@ -58,9 +80,10 @@ class item_type_by_id(Resource):
 class item_types_for_season_list(Resource):
     @api.doc("Get all items for_season")
     @api.marshal_list_with(schema.get_list_responseItem_type)
+    @auth
     def get(self):
-        seasons = [each.id for each in Season.current_seasons()]
-        all_items, count = ItemType.filtration({})
+        seasons = [each.id for each in Season.current_seasons_by_user_id(g.current_user.id)]
+        all_items, count = ItemType.filtration({"user_id:eq": g.current_user.id})
         items_to_return = []
         for item_type in all_items:
             for each_season in item_type.seasonItemTypes:

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import Column
+from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 
 from model.base import Base, db
@@ -14,13 +14,16 @@ class ItemType(Base, db.Model):
     items = relationship("Item", backref="item_type")
     item_sub_type = relationship("ItemSubType", backref="item_type")
     seasonItemTypes = relationship("SeasonItemTypes", backref="item_type")
+    itemTypeLocations = relationship("LocationItemTypes", backref="item_typeø")
     image = Column(String(500), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, name, maintenance, delivery_available, image):
+    def __init__(self, name, maintenance, delivery_available, image, user_id):
         self.name = name
         self.maintenance = maintenance
         self.delivery_available = delivery_available
         self.image = image
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

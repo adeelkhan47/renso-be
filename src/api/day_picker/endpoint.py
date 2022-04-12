@@ -5,7 +5,6 @@ from werkzeug.exceptions import NotFound
 from common.helper import response_structure
 from model.day_picker import DayPicker
 from model.item_type import ItemType
-
 from . import api, schema
 
 
@@ -30,10 +29,8 @@ class DayPickerList(Resource):
         saturday = args["saturday"]
         sunday = args["sunday"]
         item_type_id = args["item_type_id"]
-        item_subtype_id = args["item_subtype_id"]
         if ItemType.query_by_id(item_type_id):
-            day_picker = DayPicker(monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id,
-                                   item_subtype_id)
+            day_picker = DayPicker(monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id)
             day_picker.insert()
             return response_structure(DayPicker.query_by_id(day_picker.id)), 201
         else:

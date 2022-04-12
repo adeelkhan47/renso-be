@@ -1,7 +1,9 @@
+from flask import g
 from flask import request
 from flask_restx import Resource
 
 from common.helper import response_structure
+from decorator.authorization import auth
 from model.payment_method import PaymentMethod
 from model.payment_tax import PaymentTax
 from . import api, schema
@@ -11,18 +13,21 @@ from . import api, schema
 class PaymentMethodList(Resource):
     @api.doc("Get all payment methods")
     @api.marshal_list_with(schema.get_list_responsePaymentMethod)
+    @auth
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["user_id"] = g.current_user.id
         all_rows, count = PaymentMethod.filtration(args)
         return response_structure(all_rows, count), 200
 
     @api.expect(schema.PaymentMethodExpect)
     @api.marshal_list_with(schema.get_by_id_responsePaymentMethod)
+    @auth
     def post(self):
         payload = api.payload
         name = payload.get("name")
         status = payload.get("status")
-        pay = PaymentMethod(name, bool(status))
+        pay = PaymentMethod(name, bool(status), g.current_user.id)
         pay.insert()
         all_tax_ids = payload.get("tax_ids").split(",")
         for each in all_tax_ids:
@@ -35,17 +40,20 @@ class PaymentMethodList(Resource):
 class Payment_Method_by_id(Resource):
     @api.doc("Get Widget by id")
     @api.marshal_list_with(schema.get_by_id_responsePaymentMethod)
+    @auth
     def get(self, payment_method_id):
         lan = PaymentMethod.query_by_id(payment_method_id)
         return response_structure(lan), 200
 
     @api.doc("Delete method by id")
+    @auth
     def delete(self, payment_method_id):
         PaymentMethod.delete(payment_method_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responsePaymentMethod, skip_none=True)
     @api.expect(schema.PaymentMethodExpect)
+    @auth
     def patch(self, payment_method_id):
         payload = api.payload
         data = payload.copy()
