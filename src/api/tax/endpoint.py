@@ -4,6 +4,7 @@ from flask_restx import Resource
 
 from common.helper import response_structure
 from decorator.authorization import auth
+from model.item_subtype_taxs import ItemSubTypeTaxs
 from model.tax import Tax
 from . import api, schema
 
@@ -27,8 +28,12 @@ class TaxList(Resource):
         name = payload.get("name")
         percentage = payload.get("percentage")
         description = payload.get("description")
+        item_sub_type_ids = payload.get("item_sub_type_ids")
         tax = Tax(name, percentage, description, g.current_user.id)
         tax.insert()
+        for each in item_sub_type_ids:
+            if each:
+                ItemSubTypeTaxs(each, tax.id).insert()
         return response_structure(tax), 201
 
 
@@ -53,6 +58,13 @@ class tax_by_id(Resource):
     def patch(self, tax_id):
         payload = api.payload
         data = payload.copy()
+        if "item_sub_type_ids" in data.keys():
+            ItemSubTypeTaxs.delete_by_tax_id(tax_id)
+            item_sub_type_ids = payload.get("item_sub_type_ids")
+            for each in item_sub_type_ids:
+                if each:
+                    ItemSubTypeTaxs(each, tax_id).insert()
+            del data["item_sub_type_ids"]
         Tax.update(tax_id, data)
         tax = Tax.query_by_id(tax_id)
         return response_structure(tax), 200

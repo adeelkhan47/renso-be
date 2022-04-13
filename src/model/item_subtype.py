@@ -16,6 +16,7 @@ class ItemSubType(Base, db.Model):
     associate_email_subtypes = relationship("AssociateEmailSubtype", backref="item_subtype")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
     itemTypeExtras = relationship("ItemTypeExtra", backref="item_subtype")
+    itemSubTypeTaxs = relationship("ItemSubTypeTaxs", backref="item_subtype")
 
     def __init__(self, name, price, person, item_type_id, image, user_id):
         self.name = name
