@@ -6,6 +6,7 @@ CustomParameterExpect = api.model(
     "CustomParameterExpect",
     {
         "name": fields.String(),
+        "mandatory": fields.Boolean()
 
     },
 )
@@ -15,6 +16,7 @@ CustomParameter = api.model(
     {
         "id": fields.Integer(),
         "name": fields.String(),
+        "mandatory": fields.Boolean()
     },
 )
 

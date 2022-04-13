@@ -7,7 +7,6 @@ from flask_restx import Resource
 from common.helper import response_structure
 from decorator.authorization import auth
 from model.booking import Booking
-from model.day_picker import DayPicker
 from model.item_subtype import ItemSubType
 from model.item_type import ItemType
 from model.location import Location
@@ -75,6 +74,18 @@ class item_subtype_by_item_typeid(Resource):
         return response_structure(itemSubType, len(itemSubType)), 200
 
 
+@api.route("/extra_by_item_type_id/<int:item_type_id>")
+class item_subtype_extra_by_item_type_id(Resource):
+    @api.marshal_list_with(schema.get_list_responseItem_Subtype)
+    @auth
+    def get(self, item_type_id):
+        itemType = ItemType.query_by_id(item_type_id)
+        extra_sub_types = []
+        for each in itemType.itemTypeExtras:
+            extra_sub_types.append(each.item_subtype)
+        return response_structure(extra_sub_types, len(extra_sub_types)), 200
+
+
 @api.route("/available")
 class items_subtype_list(Resource):
     @api.doc("Get all items with date filter")
@@ -89,6 +100,40 @@ class items_subtype_list(Resource):
         start_time = datetime.strptime(args["start_time"], '%Y-%m-%d %H:%M:%S')
         end_time = datetime.strptime(args["end_time"], '%Y-%m-%d %H:%M:%S')
         item_sub_types = ItemType.query_by_id(args["item_type_id"]).item_sub_type
+        location = Location.query_by_id(args["location_id"])
+        response_data = []
+        for each in item_sub_types:
+            data = {"item_sub_type_object": each}
+            list_of_ids = []
+            for item in each.items:
+                if item.item_status.name == "Available":
+                    if location in [loc.location for loc in item.item_locations]:
+                        found = False
+                        for each_booking in Booking.get_bookings_by_item_id(item.id):
+                            if each_booking.start_time <= end_time and start_time <= each_booking.end_time:
+                                found = True
+                                break
+                        if not found:
+                            list_of_ids.append(item.id)
+            data["available_item_ids"] = list_of_ids
+            response_data.append(data)
+        return response_structure(response_data, len(response_data)), 200
+
+
+@api.route("/extra_available")
+class items_extrasubtype_list(Resource):
+    @api.doc("Get all items with date filter")
+    @api.marshal_list_with(schema.get_list_Availability_responseItem_Subtype_)
+    @api.param("start_time", required=True)
+    @api.param("end_time", required=True)
+    @api.param("item_type_id", required=True)
+    @api.param("location_id", required=True)
+    @auth
+    def get(self):
+        args = request.args
+        start_time = datetime.strptime(args["start_time"], '%Y-%m-%d %H:%M:%S')
+        end_time = datetime.strptime(args["end_time"], '%Y-%m-%d %H:%M:%S')
+        item_sub_types = ItemType.query_by_id(args["item_type_id"]).itemTypeExtras
         location = Location.query_by_id(args["location_id"])
         response_data = []
         for each in item_sub_types:

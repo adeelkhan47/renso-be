@@ -1,3 +1,4 @@
+from flask import g
 from flask import request
 from flask_restx import Resource
 
@@ -5,7 +6,6 @@ from common.helper import response_structure
 from decorator.authorization import auth
 from model.custom_parameter import CustomParameter
 from . import api, schema
-from flask import g
 
 
 @api.route("")
@@ -25,7 +25,8 @@ class CustomParameterList(Resource):
     def post(self):
         payload = api.payload
         name = payload.get("name")
-        customParameter = CustomParameter(name, g.current_user.id)
+        mandatory = payload.get("mandatory")
+        customParameter = CustomParameter(name, mandatory, g.current_user.id)
         customParameter.insert()
         return response_structure(customParameter), 201
 
@@ -44,3 +45,12 @@ class CustomParameter_by_id(Resource):
     def delete(self, custom_parameter_id):
         CustomParameter.delete(custom_parameter_id)
         return "ok", 200
+
+    @api.marshal_list_with(schema.get_by_id_CustomParameter, skip_none=True)
+    @api.expect(schema.CustomParameterExpect)
+    @auth
+    def patch(self, custom_parameter_id):
+        data = api.payload.copy()
+        CustomParameter.update(custom_parameter_id, data)
+        custom_parameter = CustomParameter.query_by_id(custom_parameter_id)
+        return response_structure(custom_parameter), 200

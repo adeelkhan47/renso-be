@@ -1,6 +1,7 @@
 from flask_restx import fields
 
 from . import api
+# from ..item_subtype.schema import Item_subtype
 from ..location.schema import Location
 
 Item_type_Expect = api.model(
@@ -14,10 +15,21 @@ Item_type_Expect = api.model(
         "location_ids": fields.String()
     },
 )
+Item_type_extra_Expect = api.model(
+    "Item_type_extra_Expect",
+    {
+        "item_type_id": fields.String(),
+        "item_sub_type_ids": fields.Integer()
+    },
+)
 locations = api.model(
     "locations",
     {"location": fields.Nested(Location, as_list=True)}
 )
+# item_sub_types = api.model(
+#     "item_sub_types_for_extra",
+#     {"item_sub_type": fields.Nested(Item_subtype, as_list=True)}
+# )
 
 Item_type = api.model(
     "item_type_1",
@@ -28,6 +40,7 @@ Item_type = api.model(
         "delivery_available": fields.Boolean(),
         "image": fields.String(),
         "itemTypeLocations": fields.Nested(locations, as_list=True),
+        #"itemTypeExtras": fields.Nested(item_sub_types, as_list=True)
         # "items": fields.Nested(Item)
 
     },

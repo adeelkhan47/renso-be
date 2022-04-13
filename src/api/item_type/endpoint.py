@@ -7,6 +7,7 @@ from common.helper import response_structure
 from decorator.authorization import auth
 from model.day_picker import DayPicker
 from model.item_type import ItemType
+from model.item_type_extra import ItemTypeExtra
 from model.location_item_type import LocationItemTypes
 from model.season import Season
 from . import api, schema
@@ -91,3 +92,33 @@ class item_types_for_season_list(Resource):
                     items_to_return.append(item_type)
                     break
         return response_structure(items_to_return, len(items_to_return)), 200
+
+
+@api.route("/extras")
+class item_type_for_extras(Resource):
+    @api.expect(schema.Item_type_extra_Expect)
+    @api.marshal_list_with(schema.get_by_id_responseItem_type)
+    @auth
+    def post(self):
+        payload = api.payload
+        item_type_id = payload.get("item_type_id")
+        item_subtype_ids = payload.get("item_sub_type_ids").split(",")
+        for each in item_subtype_ids:
+            if each:
+                ItemTypeExtra(each, item_type_id).insert()
+        item_type = ItemType.query_by_id(item_type_id)
+        return response_structure(item_type), 200
+
+    @api.expect(schema.Item_type_extra_Expect)
+    @api.marshal_list_with(schema.get_by_id_responseItem_type)
+    @auth
+    def patch(self):
+        payload = api.payload
+        item_type_id = payload.get("item_type_id")
+        item_subtype_ids = payload.get("item_sub_type_ids").split(",")
+        ItemTypeExtra.delete_by_item_type_id(item_type_id)
+        for each in item_subtype_ids:
+            if each:
+                ItemTypeExtra(each, item_type_id).insert()
+        item_type = ItemType.query_by_id(item_type_id)
+        return response_structure(item_type), 200

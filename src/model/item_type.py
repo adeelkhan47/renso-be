@@ -14,7 +14,9 @@ class ItemType(Base, db.Model):
     items = relationship("Item", backref="item_type")
     item_sub_type = relationship("ItemSubType", backref="item_type")
     seasonItemTypes = relationship("SeasonItemTypes", backref="item_type")
-    itemTypeLocations = relationship("LocationItemTypes", backref="item_typeø")
+    itemTypeLocations = relationship("LocationItemTypes", backref="item_type")
+    itemTypeExtras = relationship("ItemTypeExtra", backref="item_type")
+
     image = Column(String(500), nullable=False)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 

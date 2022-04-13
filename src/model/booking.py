@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import DateTime, Float, Integer, String
+from sqlalchemy.sql.sqltypes import DateTime, Float, Integer
 
 from model.base import Base, db
 from model.booking_status import BookingStatus
@@ -47,6 +47,12 @@ class Booking(Base, db.Model):
     @classmethod
     def close_booking(cls, booking_id):
         closed_id = BookingStatus.get_id_by_name("Closed")
+        cls.query.filter(cls.id == booking_id).update({"booking_status_id": closed_id})
+        db.session.commit()
+
+    @classmethod
+    def cancel_booking(cls, booking_id):
+        closed_id = BookingStatus.get_id_by_name("Cancelled")
         cls.query.filter(cls.id == booking_id).update({"booking_status_id": closed_id})
         db.session.commit()
 

@@ -104,6 +104,9 @@ class order_by_id(Resource):
     @api.doc("Delete item by id")
     @auth
     def delete(self, order_id):
+        order = Order.query_by_id(order_id)
+        for each in order.order_bookings:
+            Booking.cancel_booking(each.booking_id)
         Order.delete(order_id)
         return "ok", 200
 
