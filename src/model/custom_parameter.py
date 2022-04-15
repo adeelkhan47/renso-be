@@ -22,3 +22,8 @@ class CustomParameter(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
+    @classmethod
+    def update(cls, id, data):
+        db.session.query(cls).filter(cls.id == id).update(data)
+        db.session.commit()

@@ -4,7 +4,7 @@ from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
 from decorator.authorization import auth
-from model.logo import Logo
+from model.front_end_configs import FrontEndCofigs
 from . import api, schema
 
 
@@ -13,17 +13,16 @@ class fetch_logo_by_user_id(Resource):
     @api.marshal_list_with(schema.get_by_id_FE_LOGO)
     @auth
     def get(self):
-        logo = Logo.get_by_user_id(g.current_user.id)
+        logo = FrontEndCofigs.get_by_user_id(g.current_user.id)
         if not logo:
-            raise NotFound("logo Not Found.")
+            raise NotFound("front_end_configs Not Found.")
         return response_structure(logo), 200
-        ø
 
     @api.marshal_list_with(schema.get_by_id_FE_LOGO)
-    @api.expect(schema.Logo_Expect)
+    @api.expect(schema.FrontEndExpect)
     @auth
     def patch(self):
         data = api.payload.copy()
-        logo = Logo.get_by_user_id(g.current_user.id)
-        Logo.update(logo.id, data)
-        return response_structure(Logo.query_by_id(logo.id)), 200
+        logo = FrontEndCofigs.get_by_user_id(g.current_user.id)
+        FrontEndCofigs.update(logo.id, data)
+        return response_structure(FrontEndCofigs.query_by_id(logo.id)), 200

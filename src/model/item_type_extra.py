@@ -27,6 +27,11 @@ class ItemTypeExtra(Base, db.Model):
         db.session.commit()
 
     @classmethod
+    def get_by_item_type_id(cls, item_type_id):
+        row = cls.query.filter(cls.item_type_id == item_type_id).first()
+        return row
+
+    @classmethod
     def delete_by_item_sub_type_id(cls, item_sub_type_id):
         cls.query.filter(cls.item_sub_type_id == item_sub_type_id).delete()
         db.session.commit()

@@ -32,7 +32,7 @@ class item_types_list(Resource):
         name = payload.get("name")
         maintenance = payload.get("maintenance")
         image = payload.get("image")
-        location_ids = payload.get("location_ids")
+        location_ids = payload.get("location_ids").split(",")
         delivery_available = int(payload.get("delivery_available"))
         item_type = ItemType(name, maintenance, delivery_available, image, g.current_user.id)
         item_type.insert()
@@ -84,7 +84,7 @@ class item_types_for_season_list(Resource):
     @auth
     def get(self):
         seasons = [each.id for each in Season.current_seasons_by_user_id(g.current_user.id)]
-        all_items, count = ItemType.filtration({"user_id:eq": g.current_user.id})
+        all_items, count = ItemType.filtration({"user_id:eq": str(g.current_user.id)})
         items_to_return = []
         for item_type in all_items:
             for each_season in item_type.seasonItemTypes:
@@ -102,6 +102,9 @@ class item_type_for_extras(Resource):
     def post(self):
         payload = api.payload
         item_type_id = payload.get("item_type_id")
+        old_record = ItemTypeExtra.get_by_item_type_id(item_type_id)
+        if old_record:
+            return response_structure("Record Already Exist."), 400
         item_subtype_ids = payload.get("item_sub_type_ids").split(",")
         for each in item_subtype_ids:
             if each:

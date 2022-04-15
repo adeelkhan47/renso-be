@@ -4,14 +4,16 @@ from sqlalchemy.sql.sqltypes import Integer, String
 from model.base import Base, db
 
 
-class Logo(Base, db.Model):
-    __tablename__ = "logo"
-    url = Column(String, nullable=False)
+class FrontEndCofigs(Base, db.Model):
+    __tablename__ = "front_end_configs"
+    logo = Column(String, nullable=False)
+    front_end_url = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, url, user_id):
+    def __init__(self, url,front_end_url, user_id):
         self.url = url
         self.user_id = user_id
+        self.front_end_url = front_end_url
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

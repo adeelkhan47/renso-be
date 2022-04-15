@@ -24,7 +24,7 @@ class ItemSubType(Base, db.Model):
         self.person = person
         self.item_type_id = item_type_id
         self.image = image
-        self.user_key = user_id
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

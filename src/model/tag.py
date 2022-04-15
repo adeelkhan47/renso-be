@@ -13,12 +13,11 @@ class Tag(Base, db.Model):
     item_tags = relationship("ItemTag", backref="tag")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, name, description,color,user_id):
+    def __init__(self, name, description, color, user_id):
         self.name = name
         self.description = description
         self.color = color
-        self.user_key = user_id
-
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

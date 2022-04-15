@@ -134,6 +134,7 @@ class items_extrasubtype_list(Resource):
         start_time = datetime.strptime(args["start_time"], '%Y-%m-%d %H:%M:%S')
         end_time = datetime.strptime(args["end_time"], '%Y-%m-%d %H:%M:%S')
         item_sub_types = ItemType.query_by_id(args["item_type_id"]).itemTypeExtras
+        item_sub_types = [x.item_subtype for x in item_sub_types]
         location = Location.query_by_id(args["location_id"])
         response_data = []
         for each in item_sub_types:

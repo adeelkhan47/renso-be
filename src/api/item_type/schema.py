@@ -19,17 +19,29 @@ Item_type_extra_Expect = api.model(
     "Item_type_extra_Expect",
     {
         "item_type_id": fields.String(),
-        "item_sub_type_ids": fields.Integer()
+        "item_sub_type_ids": fields.String()
+    },
+)
+
+Item_subtype_temp = api.model(
+    "Item_subtype_temp",
+    {
+        "id": fields.Integer(),
+        "price": fields.Float(),
+        "name": fields.String(),
+        "image": fields.String(),
+        "person": fields.Integer()
+
     },
 )
 locations = api.model(
     "locations",
     {"location": fields.Nested(Location, as_list=True)}
 )
-# item_sub_types = api.model(
-#     "item_sub_types_for_extra",
-#     {"item_sub_type": fields.Nested(Item_subtype, as_list=True)}
-# )
+item_sub_types = api.model(
+    "item_sub_types_for_extra",
+    {"item_subtype": fields.Nested(Item_subtype_temp, as_list=True)}
+)
 
 Item_type = api.model(
     "item_type_1",
@@ -40,7 +52,7 @@ Item_type = api.model(
         "delivery_available": fields.Boolean(),
         "image": fields.String(),
         "itemTypeLocations": fields.Nested(locations, as_list=True),
-        #"itemTypeExtras": fields.Nested(item_sub_types, as_list=True)
+        "itemTypeExtras": fields.Nested(item_sub_types, as_list=True)
         # "items": fields.Nested(Item)
 
     },

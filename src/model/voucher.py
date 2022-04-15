@@ -17,7 +17,7 @@ class Voucher(Base, db.Model):
         self.description = description
         self.price_factor = price_factor
         self.status = status
-        self.user_key = user_id
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

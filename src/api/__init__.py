@@ -20,7 +20,7 @@ from .item_subtype.endpoint import api as item_subtype_api
 from .item_type.endpoint import api as item_type_api
 from .language.endpoint import api as language_api
 from .location.endpoint import api as location_api
-from .logo.endpoint import api as logo_api
+from .front_end_configs.endpoint import api as front_end_configs_api
 from .order.endpoint import api as order_api
 from .order_status.endpoint import api as order_status_api
 from .payment_methods.endpoint import api as payment_method_api
@@ -66,7 +66,7 @@ api.add_namespace(season_api)
 api.add_namespace(associateEmail_api)
 api.add_namespace(checkout_api)
 api.add_namespace(file_upload_api)
-api.add_namespace(logo_api)
+api.add_namespace(front_end_configs_api)
 
 
 @api.errorhandler(NotFound)
