@@ -16,7 +16,7 @@ class Season_list(Resource):
     @auth
     def get(self):
         args = request.args.copy()
-        args["user_id:eq"] = g.current_user.id
+        args["user_id:eq"] = str(g.current_user.id)
         all_items, count = Season.filtration(args)
         return response_structure(all_items, count), 200
 

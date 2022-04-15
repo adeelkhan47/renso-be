@@ -28,7 +28,7 @@ class order_list(Resource):
     @auth
     def get(self):
         args = request.args.copy()
-        args["user_id:eq"] = g.current_user.id
+        args["user_id:eq"] = str(g.current_user.id)
         all_items, count = Order.filtration(args)
         return response_structure(all_items, count), 200
 
@@ -133,7 +133,7 @@ class order_by_id(Resource):
     @auth
     def get(self, item_type_id):
         args = request.args.copy()
-        args["user_id:eq"] = g.current_user.id
+        args["user_id:eq"] = str(g.current_user.id)
         orders_query = Order.getQuery_OrderByItemType(item_type_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200
@@ -145,7 +145,7 @@ class order_by_item_subtype_id(Resource):
     @auth
     def get(self, item_subtype_id):
         args = request.args.copy()
-        args["user_id:eq"] = g.current_user.id
+        args["user_id:eq"] = str(g.current_user.id)
         orders_query = Order.getQuery_OrderByItemSubType(item_subtype_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200

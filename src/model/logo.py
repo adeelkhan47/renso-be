@@ -6,7 +6,7 @@ from model.base import Base, db
 
 class Logo(Base, db.Model):
     __tablename__ = "logo"
-    url = Column(String, nullable=False, unique=True)
+    url = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
     def __init__(self, url, user_id):

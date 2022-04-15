@@ -16,7 +16,7 @@ class PaymentMethodList(Resource):
     @auth
     def get(self):
         args = request.args.copy()
-        args["user_id"] = g.current_user.id
+        args["user_id"] = str(g.current_user.id)
         all_rows, count = PaymentMethod.filtration(args)
         return response_structure(all_rows, count), 200
 

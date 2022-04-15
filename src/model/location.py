@@ -18,7 +18,7 @@ class Location(Base, db.Model):
         self.name = name
         self.description = description
         self.price_factor = price_factor
-        self.user_key = user_id
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
