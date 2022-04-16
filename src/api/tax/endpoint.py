@@ -28,7 +28,7 @@ class TaxList(Resource):
         name = payload.get("name")
         percentage = payload.get("percentage")
         description = payload.get("description")
-        item_sub_type_ids = payload.get("item_sub_type_ids")
+        item_sub_type_ids = payload.get("item_sub_type_ids").split(",")
         tax = Tax(name, percentage, description, g.current_user.id)
         tax.insert()
         for each in item_sub_type_ids:
@@ -60,7 +60,7 @@ class tax_by_id(Resource):
         data = payload.copy()
         if "item_sub_type_ids" in data.keys():
             ItemSubTypeTaxs.delete_by_tax_id(tax_id)
-            item_sub_type_ids = payload.get("item_sub_type_ids")
+            item_sub_type_ids = payload.get("item_sub_type_ids").split(",")
             for each in item_sub_type_ids:
                 if each:
                     ItemSubTypeTaxs(each, tax_id).insert()

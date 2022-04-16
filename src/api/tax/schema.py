@@ -9,7 +9,7 @@ Tax_expect = api.model(
         "name": fields.String(),
         "percentage": fields.Integer(),
         "description": fields.String(),
-        "item_sub_type_ids": fields.Integer()
+        "item_sub_type_ids": fields.String()
     },
 )
 Item_SubTypes_in = api.model(

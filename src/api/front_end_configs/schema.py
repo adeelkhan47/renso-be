@@ -5,7 +5,7 @@ from . import api
 FrontEndExpect = api.model(
     "Logo_Expect",
     {
-        "front_end_configs": fields.String(),
+        "logo": fields.String(),
         "front_end_url": fields.String(),
     },
 )
@@ -13,7 +13,7 @@ FrontEnd = api.model(
     "front_end_configs",
     {
         "id": fields.Integer(),
-        "url": fields.String(),
+        "logo": fields.String(),
         "front_end_url": fields.String(),
 
     },
