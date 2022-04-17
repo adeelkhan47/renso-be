@@ -108,6 +108,7 @@ class bookings_by_item_Subtype_id(Resource):
         return response_structure(allBookings, rows), 200
 
 
+
 @api.route("/bulk")
 class booking_list(Resource):
 
@@ -134,16 +135,18 @@ class booking_list(Resource):
         actual_total_price = 0
         effected_total_price = 0
         taxs = []
+        tax_amount = 0
         for booking in bookings:
             actual_total_price += booking.cost
-            effected_total_price += (price_factor / 100) * booking.cost
-
-        tax_amount = 0
-        if payment_method:
+            temp_tax_amount = 0
             for each in payment_method.payment_tax:
-                tax = each.tax
-                tax_amount += tax.percentage / 100 * effected_total_price
-                taxs.append(tax)
+                if booking.item.item_subtype_id in [x.item_sub_type_id for x in each.tax.itemSubTypeTaxs]:
+                    temp_tax_amount += (each.tax.percentage / 100) * booking.cost
+                    if each.tax not in taxs:
+                        taxs.append(each.tax)
+
+            tax_amount += temp_tax_amount
+            effected_total_price += (price_factor / 100) * booking.cost
 
         actual_total_price_after_tax = effected_total_price + tax_amount
 
@@ -187,7 +190,7 @@ class booking_list(Resource):
         else:
             days = (start_time.date() + timedelta(x) for x in range(0, (end_time - start_time).days + 1))
             for day in days:
-                season_factor = Season.get_price_factor_on_date(start_time.date(), g.current_user.id)
+                season_factor = Season.get_price_factor_on_date(day, g.current_user.id)
                 location_factor = Location.query_by_id(payload.get("location_id")).price_factor
                 factor = 100 + ((season_factor - 100) + (location_factor - 100))
                 for each in payload.get("bookings_details"):
