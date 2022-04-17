@@ -99,22 +99,6 @@ class item_type_for_extras(Resource):
     @api.expect(schema.Item_type_extra_Expect)
     @api.marshal_list_with(schema.get_by_id_responseItem_type)
     @auth
-    def post(self):
-        payload = api.payload
-        item_type_id = payload.get("item_type_id")
-        old_record = ItemTypeExtra.get_by_item_type_id(item_type_id)
-        if old_record:
-            return response_structure("Record Already Exist."), 400
-        item_subtype_ids = payload.get("item_sub_type_ids").split(",")
-        for each in item_subtype_ids:
-            if each:
-                ItemTypeExtra(each, item_type_id).insert()
-        item_type = ItemType.query_by_id(item_type_id)
-        return response_structure(item_type), 200
-
-    @api.expect(schema.Item_type_extra_Expect)
-    @api.marshal_list_with(schema.get_by_id_responseItem_type)
-    @auth
     def patch(self):
         payload = api.payload
         item_type_id = payload.get("item_type_id")

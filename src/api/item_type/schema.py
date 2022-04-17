@@ -52,8 +52,9 @@ Item_type = api.model(
         "delivery_available": fields.Boolean(),
         "image": fields.String(),
         "itemTypeLocations": fields.Nested(locations, as_list=True),
-        "itemTypeExtras": fields.Nested(item_sub_types, as_list=True)
-        # "items": fields.Nested(Item)
+        "itemTypeExtras": fields.Nested(item_sub_types, as_list=True),
+        "item_sub_type": fields.Nested(Item_subtype_temp, as_list=True)
+
 
     },
 )

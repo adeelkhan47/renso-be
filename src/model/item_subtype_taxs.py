@@ -22,8 +22,8 @@ class ItemSubTypeTaxs(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def delete_by_tax_id(cls, item_type_id):
-        cls.query.filter(cls.item_type_id == item_type_id).delete()
+    def delete_by_tax_id(cls, tax_id):
+        cls.query.filter(cls.tax_id == tax_id).delete()
         db.session.commit()
 
     @classmethod

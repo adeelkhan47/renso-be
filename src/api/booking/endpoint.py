@@ -161,6 +161,7 @@ class booking_list(Resource):
 
     @api.marshal_list_with(schema.get_booking_ids_, skip_none=True)
     @api.expect(schema.bulk_booking_expect, validate=True)
+    @auth
     def post(self):
         payload = api.payload
         start_time = datetime.strptime(payload.get("start_time"), '%Y-%m-%d %H:%M:%S')
