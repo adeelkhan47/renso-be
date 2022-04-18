@@ -28,7 +28,7 @@ def after_request(response):
     return response
 
 
-#CORS(app, resources={r'/*': {'origins': configs.ORIGINS}}, supports_credentials=True)
+CORS(app, resources={r'/*': {'origins': configs.ORIGINS}}, supports_credentials=True)
 CORS(app)
 
 app.app_context().push()

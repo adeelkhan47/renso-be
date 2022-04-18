@@ -32,13 +32,16 @@ class item_types_list(Resource):
         name = payload.get("name")
         maintenance = payload.get("maintenance")
         image = payload.get("image")
-        location_ids = payload.get("location_ids").split(",")
+        location_ids = None
+        if payload.get("location_ids"):
+            location_ids = payload.get("location_ids").split(",")
         delivery_available = int(payload.get("delivery_available"))
         item_type = ItemType(name, maintenance, delivery_available, image, g.current_user.id)
         item_type.insert()
-        for each in location_ids:
-            if each:
-                LocationItemTypes(each, item_type.id).insert()
+        if location_ids:
+            for each in location_ids:
+                if each:
+                    LocationItemTypes(each, item_type.id).insert()
         day_picker = DayPicker(True, True, True, True, True, True, True, item_type.id)
         day_picker.insert()
 
