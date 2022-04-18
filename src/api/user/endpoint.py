@@ -7,6 +7,7 @@ from flask_restx import Resource
 from common.helper import response_structure, error_message
 from decorator.authorization import auth
 from model.front_end_configs import FrontEndCofigs
+from model.item_type import ItemType
 from model.user import User
 from . import api, schema
 
@@ -39,6 +40,8 @@ class user_list(Resource):
         user = User(name, email, password, subscription, image, gender, status, user_key)
         user.insert()
         FrontEndCofigs("", "", user.id).insert()
+        item_type = ItemType("Extra", 1, True, "", user.id)
+        item_type.insert()
         return response_structure(User.query_by_id(user.id)), 201
 
 
