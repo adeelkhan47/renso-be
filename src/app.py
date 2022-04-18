@@ -27,7 +27,7 @@ def after_request(response):
     return response
 
 
-CORS(app)
+CORS(app, resources={r'/*': {'origins': configs.ORIGINS}}, supports_credentials=True)
 
 app.app_context().push()
 migrate = Migrate(app, db)
