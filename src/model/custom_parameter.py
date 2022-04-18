@@ -6,7 +6,7 @@ from model.base import Base, db
 
 class CustomParameter(Base, db.Model):
     __tablename__ = "custom_parameter"
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     mandatory = Column(Boolean, nullable=False, default=True)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 

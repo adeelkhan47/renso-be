@@ -6,7 +6,7 @@ from model.base import Base, db
 
 class Voucher(Base, db.Model):
     __tablename__ = "voucher"
-    code = Column(String, nullable=False, unique=True)
+    code = Column(String, nullable=False)
     description = Column(String, nullable=True)
     price_factor = Column(Integer, nullable=False, default=100)
     status = Column(Boolean, default=True)

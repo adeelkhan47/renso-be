@@ -7,7 +7,7 @@ from model.base import Base, db
 
 class Location(Base, db.Model):
     __tablename__ = "location"
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     price_factor = Column(Integer, nullable=False, default=100)
     item_locations = relationship("ItemLocation", backref="location")

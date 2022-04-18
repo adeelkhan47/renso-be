@@ -7,7 +7,7 @@ from model.base import Base, db
 
 class PaymentMethod(Base, db.Model):
     __tablename__ = "payment_method"
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     status = Column(Boolean, nullable=False)
     payment_tax = relationship("PaymentTax", backref="payment_method")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)

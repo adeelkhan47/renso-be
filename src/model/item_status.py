@@ -7,7 +7,7 @@ from model.base import Base, db
 
 class ItemStatus(Base, db.Model):
     __tablename__ = "item_status"
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     color = Column(String, nullable=False)
     item_status = relationship("Item", backref="item_status")
 

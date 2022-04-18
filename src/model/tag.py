@@ -7,7 +7,7 @@ from model.base import Base, db
 
 class Tag(Base, db.Model):
     __tablename__ = "tag"
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     color = Column(String, nullable=True)
     item_tags = relationship("ItemTag", backref="tag")

@@ -7,7 +7,7 @@ from model.base import Base, db
 
 class Tax(Base, db.Model):
     __tablename__ = "tax"
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     percentage = Column(Integer, nullable=False)
     description = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)

@@ -7,7 +7,7 @@ from model.base import Base, db
 
 class ItemSubType(Base, db.Model):
     __tablename__ = "item_subtype"
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     price = Column(Float, nullable=False, unique=False)
     person = Column(Integer, nullable=False, unique=False)
     image = Column(String(500), nullable=False)

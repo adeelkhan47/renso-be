@@ -7,7 +7,7 @@ from model.base import Base, db
 
 class AssociateEmail(Base, db.Model):
     __tablename__ = "associate_email"
-    email = Column(String, nullable=False, unique=True)
+    email = Column(String, nullable=False)
     associate_email_subtypes = relationship("AssociateEmailSubtype", backref="associate_email")
     status = Column(Boolean, default=True)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), index=True)
