@@ -21,6 +21,7 @@ db.init_app(app)
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', ["http://rensofe.s3-website-us-east-1.amazonaws.com",
                                                          "http://rensositefe.s3-website-us-east-1.amazonaws.com",
+                                                         "http://renso.de",
                                                          "http://localhost:8080/", "http://localhost:8081/"])
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,HEAD,OPTIONS')
