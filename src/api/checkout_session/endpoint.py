@@ -9,6 +9,7 @@ from common.email_service import send_email
 from common.helper import error_message, response_structure
 from configuration import configs
 from model.associate_email import AssociateEmail
+from model.booking_status import BookingStatus
 from model.order import Order
 from model.order_status import OrderStatus
 from service.stripe_service import Stripe
@@ -101,6 +102,9 @@ class CheckOutSessionSuccess(Resource):
             )
             send_email(email, "Order Confirmation for Associations", stuff_to_render2)
         Order.update(order_id, {"order_status_id": order_status_paid_id})
+        active_booking_status = BookingStatus.get_id_by_name("Active")
+        for each in Order.order_bookings:
+            each.booking.update(each.booking.id, {"booking_status_id": active_booking_status})
         if session_id:
             return redirect(f"{configs.FRONT_END_URL}success")
         return redirect(f"{configs.FRONT_END_URL}failure")

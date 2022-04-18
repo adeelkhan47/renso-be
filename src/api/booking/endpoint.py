@@ -171,7 +171,7 @@ class booking_list(Resource):
         end_time = datetime.strptime(payload.get("end_time"), '%Y-%m-%d %H:%M:%S')
 
         booking_ids = []
-        active_status = BookingStatus.get_id_by_name("Active")
+        pending_status = BookingStatus.get_id_by_name("Pending")
         booking_dictionary = {}
         if start_time.date() == end_time.date():
             season_factor = Season.get_price_factor_on_date(start_time.date(), g.current_user.id)
@@ -219,7 +219,7 @@ class booking_list(Resource):
             item_sub_type = each.get("item_sub_type_id")
             for item_id in each.get("item_ids"):
                 cost = booking_dictionary[(item_sub_type, item_id)]
-                booking = Booking(start_time, end_time, active_status, item_id, round(cost, 2), g.current_user.id)
+                booking = Booking(start_time, end_time, pending_status, item_id, round(cost, 2), g.current_user.id)
                 booking.insert()
                 booking_ids.append(booking.id)
         if "cart_id" in payload.keys() and payload.get("cart_id") and Cart.query_by_id(payload.get("cart_id")):
