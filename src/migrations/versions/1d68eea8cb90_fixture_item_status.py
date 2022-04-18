@@ -1,17 +1,18 @@
-"""item fixture
+"""fixture-item_status
 
-Revision ID: 8b65320cce0b
-Revises: bf1c95c83147
-Create Date: 2022-03-31 00:19:56.797841
+Revision ID: 1d68eea8cb90
+Revises: caf3affe6c1a
+Create Date: 2022-04-19 00:16:20.543504
 
 """
 from alembic import op
+import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 from sqlalchemy import MetaData, Table
 
-revision = '8b65320cce0b'
-down_revision = 'bf1c95c83147'
+revision = '1d68eea8cb90'
+down_revision = 'caf3affe6c1a'
 branch_labels = None
 depends_on = None
 
