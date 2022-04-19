@@ -42,7 +42,7 @@ class item_types_list(Resource):
             for each in location_ids:
                 if each:
                     LocationItemTypes(each, item_type.id).insert()
-        day_picker = DayPicker(True, True, True, True, True, True, True, item_type.id)
+        day_picker = DayPicker(True, True, True, True, True, True, True, item_type.id, g.current_user.id)
         day_picker.insert()
 
         return response_structure(item_type), 201
