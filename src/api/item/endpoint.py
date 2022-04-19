@@ -63,7 +63,7 @@ class items_list(Resource):
         count = request.json.get("count")
         items = []
         for each in range(count):
-            item = Item(name, image, description, item_status_id, item_type_id, item_subtype_id, g.current_user.id)
+            item = Item(f'{name}-{each}', image, description, item_status_id, item_type_id, item_subtype_id, g.current_user.id)
             items.append(item)
             item.insert()
             if "tag_ids" in request.json.keys():
