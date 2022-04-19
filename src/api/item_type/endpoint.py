@@ -32,9 +32,7 @@ class item_types_list(Resource):
         name = payload.get("name")
         maintenance = payload.get("maintenance")
         image = payload.get("image")
-        location_ids = None
-        if payload.get("location_ids"):
-            location_ids = payload.get("location_ids").split(",")
+        location_ids = payload.get("location_ids").split(",")
         delivery_available = int(payload.get("delivery_available"))
         item_type = ItemType(name, maintenance, delivery_available, image, g.current_user.id)
         item_type.insert()
@@ -72,7 +70,7 @@ class item_type_by_id(Resource):
         payload = api.payload.copy()
         if "location_ids" in payload.keys():
             LocationItemTypes.delete_by_item_type_id(item_type_id)
-            for each in payload.get("location_ids"):
+            for each in payload.get("location_ids").split(","):
                 if each:
                     LocationItemTypes(each, item_type_id).insert()
             del payload["location_ids"]
