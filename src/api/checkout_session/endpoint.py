@@ -6,10 +6,11 @@ from flask import request, redirect
 from flask_restx import Resource
 
 from common.email_service import send_email
-from common.helper import error_message, response_structure
+from common.helper import response_structure
 from configuration import configs
 from model.associate_email import AssociateEmail
 from model.booking_status import BookingStatus
+from model.front_end_configs import FrontEndCofigs
 from model.order import Order
 from model.order_status import OrderStatus
 from service.stripe_service import Stripe
@@ -48,9 +49,17 @@ class CheckOutSessionFailed(Resource):
         """
         Stripe Payment Failed
 
+
         :return:
         """
-        return error_message("TopUp Failed"), HTTPStatus.BAD_REQUEST
+        args = request.args
+        order_id = args["order_id"]
+        order = Order.query_by_id(int(order_id))
+        app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
+
+        FE_URL = app_configs.front_end_url
+        return redirect(f"{FE_URL}failure")
+        # return error_message("TopUp Failed"), HTTPStatus.BAD_REQUEST
 
 
 @api.route("/success")
@@ -67,13 +76,15 @@ class CheckOutSessionSuccess(Resource):
         order_status_paid_id = OrderStatus.get_id_by_name("Paid")
         order_status_completed_id = OrderStatus.get_id_by_name("Completed")
         order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
+        app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
 
+        FE_URL = app_configs.front_end_url
         if order.order_status_id == order_status_paid_id:
-            return redirect(f"{configs.FRONT_END_URL}failure")
+            return redirect(f"{FE_URL}failure")
         if order.order_status_id == order_status_completed_id:
-            return redirect(f"{configs.FRONT_END_URL}failure")
+            return redirect(f"{FE_URL}failure")
         if order.order_status_id == order_status_cancelled_id:
-            return redirect(f"{configs.FRONT_END_URL}failure")
+            return redirect(f"{FE_URL}failure")
         template = env.get_template("receipt.html")
         stuff_to_render = template.render(
             configs=configs,
@@ -106,5 +117,5 @@ class CheckOutSessionSuccess(Resource):
         for each in Order.order_bookings:
             each.booking.update(each.booking.id, {"booking_status_id": active_booking_status})
         if session_id:
-            return redirect(f"{configs.FRONT_END_URL}success")
-        return redirect(f"{configs.FRONT_END_URL}failure")
+            return redirect(f"{FE_URL}success")
+        return redirect(f"{FE_URL}failure")
