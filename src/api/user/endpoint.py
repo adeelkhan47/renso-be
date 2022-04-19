@@ -8,6 +8,7 @@ from common.helper import response_structure, error_message
 from decorator.authorization import auth
 from model.front_end_configs import FrontEndCofigs
 from model.item_type import ItemType
+from model.tag import Tag
 from model.user import User
 from . import api, schema
 
@@ -42,6 +43,10 @@ class user_list(Resource):
         FrontEndCofigs("", "", user.id).insert()
         item_type = ItemType("Extra", 1, True, "", user.id)
         item_type.insert()
+        Tag("Cheap", "", "blue", user.id).insert()
+        Tag("Luxury", "", "green", user.id).insert()
+        Tag("Old", "", "orange", user.id).insert()
+        Tag("New", "", "red", user.id).insert()
         return response_structure(User.query_by_id(user.id)), 201
 
 
