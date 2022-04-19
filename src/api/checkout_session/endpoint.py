@@ -114,7 +114,7 @@ class CheckOutSessionSuccess(Resource):
             send_email(email, "Order Confirmation for Associations", stuff_to_render2)
         Order.update(order_id, {"order_status_id": order_status_paid_id})
         active_booking_status = BookingStatus.get_id_by_name("Active")
-        for each in Order.order_bookings:
+        for each in order.order_bookings:
             each.booking.update(each.booking.id, {"booking_status_id": active_booking_status})
         if session_id:
             return redirect(f"{FE_URL}success")
