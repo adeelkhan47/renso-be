@@ -9,13 +9,15 @@ class TimePicker(Base, db.Model):
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
     day = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
     day_picker_id = Column(Integer, ForeignKey("day_picker.id", ondelete="CASCADE"), nullable=False)
 
-    def __init__(self, start_time, end_time, day, day_picker_id):
+    def __init__(self, start_time, end_time, day, day_picker_id, user_id):
         self.start_time = start_time
         self.end_time = end_time
         self.day = day
         self.day_picker_id = day_picker_id
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

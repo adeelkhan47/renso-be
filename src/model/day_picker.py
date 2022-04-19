@@ -13,9 +13,10 @@ class DayPicker(Base, db.Model):
     friday = Column(Boolean, nullable=False)
     saturday = Column(Boolean, nullable=False)
     sunday = Column(Boolean, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=False)
 
-    def __init__(self, monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id):
+    def __init__(self, monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id, user_id):
         self.monday = monday
         self.tuesday = tuesday
         self.wednesday = wednesday
@@ -24,6 +25,7 @@ class DayPicker(Base, db.Model):
         self.saturday = saturday
         self.sunday = sunday
         self.item_type_id = item_type_id
+        self.user_id = user_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -32,6 +34,7 @@ class DayPicker(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
     @classmethod
     def update(cls, day_picker_id, day_picker_data):
         db.session.query(cls).filter(cls.id == day_picker_id).update(day_picker_data)

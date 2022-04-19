@@ -1,8 +1,10 @@
+from flask import g
 from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound
 
 from common.helper import response_structure
+from decorator.authorization import auth
 from model.day_picker import DayPicker
 from model.item_type import ItemType
 from . import api, schema
@@ -12,13 +14,16 @@ from . import api, schema
 class DayPickerList(Resource):
     @api.doc("Get all Date Pickers")
     @api.marshal_list_with(schema.get_list_responseDay_Picker)
+    @auth
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["user_id:eq"] = str(g.current_user.id)
         all_rows, count = DayPicker.filtration(args)
         return response_structure(all_rows, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseDay_Picker)
     @api.expect(schema.Day_Picker_Expect)
+    @auth
     def post(self):
         args = api.payload
         monday = args["monday"]
@@ -30,7 +35,8 @@ class DayPickerList(Resource):
         sunday = args["sunday"]
         item_type_id = args["item_type_id"]
         if ItemType.query_by_id(item_type_id):
-            day_picker = DayPicker(monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id)
+            day_picker = DayPicker(monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id,
+                                   g.current_user.id)
             day_picker.insert()
             return response_structure(DayPicker.query_by_id(day_picker.id)), 201
         else:
@@ -40,17 +46,20 @@ class DayPickerList(Resource):
 @api.route("/<int:day_picker_id>")
 class day_picker_by_id(Resource):
     @api.marshal_list_with(schema.get_by_id_responseDay_Picker)
+    @auth
     def get(self, day_picker_id):
         widget = DayPicker.query_by_id(day_picker_id)
         return response_structure(widget), 200
 
     @api.doc("Delete Date Picker by id")
+    @auth
     def delete(self, day_picker_id):
         DayPicker.delete(day_picker_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseDay_Picker, skip_none=True)
     @api.expect(schema.Day_Picker_Expect)
+    @auth
     def patch(self, day_picker_id):
         args = api.payload
         data = {}
@@ -65,7 +74,6 @@ class day_picker_by_id(Resource):
 
         if ItemType.query_by_id(data["item_type_id"]):
             DayPicker.update(day_picker_id, data)
-
             return response_structure(DayPicker.query_by_id(day_picker_id)), 201
         else:
             raise NotFound("item_type_id not exist")
