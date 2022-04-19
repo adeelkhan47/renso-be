@@ -39,6 +39,7 @@ class item_types_list(Resource):
         item_type = ItemType(name, maintenance, delivery_available, image, g.current_user.id)
         item_type.insert()
         if location_ids:
+
             for each in location_ids:
                 if each:
                     LocationItemTypes(each, item_type.id).insert()
