@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import g
+from flask import g, redirect
 from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound
@@ -11,6 +11,7 @@ from model.booking import Booking
 from model.cart import Cart
 from model.custom_data import CustomData
 from model.custom_parameter import CustomParameter
+from model.front_end_configs import FrontEndCofigs
 from model.order import Order
 from model.order_bookings import OrderBookings
 from model.order_custom_data import OrderCustomData
@@ -91,6 +92,9 @@ class order_list(Resource):
             response_data = {"order": order, "session_id": session_id}
         else:
             process_order_completion(order)
+            app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
+            FE_URL = app_configs.front_end_url
+            return redirect(f"{FE_URL}success")
         return response_structure(response_data), 201
 
 
