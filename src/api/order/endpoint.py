@@ -19,6 +19,7 @@ from model.payment_method import PaymentMethod
 from model.voucher import Voucher
 from service.stripe_service import Stripe
 from . import api, schema
+from ..checkout_session.endpoint import process_order_completion
 
 
 @api.route("")
@@ -82,12 +83,14 @@ class order_list(Resource):
         for each in bookings:
             OrderBookings(each.id, order.id).insert()
         # strip_part
-        product_id = Stripe.create_product(
-            f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}")
-        price_id = Stripe.create_price(product_id, actual_total_price_after_tax)
-        session_id = Stripe.create_checkout_session(price_id, order.id)
-        response_data = {"order": order, "session_id": session_id}
-
+        if actual_total_price_after_tax > 0:
+            product_id = Stripe.create_product(
+                f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}")
+            price_id = Stripe.create_price(product_id, actual_total_price_after_tax)
+            session_id = Stripe.create_checkout_session(price_id, order.id)
+            response_data = {"order": order, "session_id": session_id}
+        else:
+            process_order_completion(order)
         return response_structure(response_data), 201
 
 
