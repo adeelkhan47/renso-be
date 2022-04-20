@@ -34,7 +34,7 @@ class order_list(Resource):
         all_items, count = Order.filtration(args)
         return response_structure(all_items, count), 200
 
-    @api.marshal_list_with(schema.get_by_id_responseOrder_with_session, skip_none=True)
+    @api.marshal_with(schema.get_by_id_responseOrder_with_session, 201, skip_none=True)
     @api.expect(schema.Order_Expect)
     @auth
     def post(self):
