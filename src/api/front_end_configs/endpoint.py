@@ -23,6 +23,6 @@ class fetch_logo_by_user_id(Resource):
     @auth
     def patch(self):
         data = api.payload.copy()
-        logo = FrontEndCofigs.get_by_user_id(g.current_user.id)
-        FrontEndCofigs.update(logo.id, data)
-        return response_structure(FrontEndCofigs.query_by_id(logo.id)), 200
+        config = FrontEndCofigs.get_by_user_id(g.current_user.id)
+        FrontEndCofigs.update(config.id, data)
+        return response_structure(FrontEndCofigs.query_by_id(config.id)), 200

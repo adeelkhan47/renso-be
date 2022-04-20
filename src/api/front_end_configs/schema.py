@@ -7,6 +7,9 @@ FrontEndExpect = api.model(
     {
         "logo": fields.String(),
         "front_end_url": fields.String(),
+        "email": fields.String(),
+        "email_password": fields.String(),
+        "privacy_policy_link": fields.String(),
     },
 )
 FrontEnd = api.model(
@@ -15,6 +18,9 @@ FrontEnd = api.model(
         "id": fields.Integer(),
         "logo": fields.String(),
         "front_end_url": fields.String(),
+        "email": fields.String(),
+        "email_password": fields.String(),
+        "privacy_policy_link": fields.String(),
 
     },
 )
