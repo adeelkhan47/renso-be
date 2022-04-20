@@ -41,7 +41,8 @@ class user_list(Resource):
         user_key = hashlib.md5((email + subscription).encode()).hexdigest()
         user = User(name, email, password, subscription, image, gender, status, user_key)
         user.insert()
-        FrontEndCofigs("", "", "", "", "", user.id).insert()
+        FrontEndCofigs("", "http://www.front_end.com/", "dummy@strato.de", "EmailPassword",
+                       "http://www.privacy_polcy.com/", user.id).insert()
         item_type = ItemType("Extra", 1, True, "", user.id)
         item_type.insert()
         Tag("Cheap", "", "blue", user.id).insert()

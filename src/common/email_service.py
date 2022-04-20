@@ -21,9 +21,9 @@ class SendEmailFailure(Exception):
 server = None
 
 
-def create_connection():
+def create_connection(from_email, from_email_password):
     global server
-    sender_email = configs.MAIL_USERNAME
+    sender_email = from_email
     if server:
         try:
             server.quit()
@@ -35,11 +35,11 @@ def create_connection():
         server = smtplib.SMTP_SSL(
             configs.MAIL_SERVER, configs.MAIL_PORT, context=context
         )
-        server.login(sender_email, configs.MAIL_PASSWORD)
+        server.login(sender_email, from_email_password)
     else:
         server = smtplib.SMTP(host=configs.MAIL_SERVER, port=configs.MAIL_PORT)
         server.starttls(context=context)
-        server.login(sender_email, configs.MAIL_PASSWORD)
+        server.login(sender_email, from_email_password)
 
 
 def close_connection():
@@ -53,7 +53,7 @@ def close_connection():
 
 
 @retry(Exception, tries=3)
-def send_email(recipient: str, subject: str, message: str) -> NoReturn:
+def send_email(recipient: str, subject: str, message: str, from_email: str, from_email_password: str) -> NoReturn:
     """
     Send email with okta credentials to recipient
 
@@ -65,22 +65,22 @@ def send_email(recipient: str, subject: str, message: str) -> NoReturn:
 
     global server
     if not server:
-        create_connection()
+        create_connection(from_email, from_email_password)
     try:
         logging.info(f"Send email to {recipient} with subject {subject} and message:")
-        sender_email = configs.MAIL_USERNAME
+
         receiver_email = recipient
         msg = message
         message = MIMEMultipart("alternative")
         message["Subject"] = subject
-        message["From"] = sender_email
+        message["From"] = from_email
         message["To"] = receiver_email
         part2 = MIMEText(msg, "html")
         message.attach(part2)
-        server.sendmail(sender_email, receiver_email, message.as_string())
+        server.sendmail(from_email, receiver_email, message.as_string())
     except Exception as ex:
         logging.error(str(ex))
         logging.error(f"Send email to {recipient} failure.")
         # Could be a connection error, retry!
-        create_connection()
+        create_connection(from_email, from_email_password)
         raise SendEmailFailure
