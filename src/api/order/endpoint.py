@@ -92,9 +92,7 @@ class order_list(Resource):
             response_data = {"order": order, "session_id": session_id}
         else:
             process_order_completion(order)
-            app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
-            FE_URL = app_configs.front_end_url
-            return redirect(f"{FE_URL}success")
+            response_data = {"order": order, "session_id": None}
         return response_structure(response_data), 201
 
 
