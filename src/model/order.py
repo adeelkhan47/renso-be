@@ -24,7 +24,7 @@ class Order(Base, db.Model):
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
     def __init__(self, client_name, client_email, phone_number, order_status_id, total_cost, cart_id, actual_total_cost,
-                 effected_total_cost, tax_amount,user_id):
+                 effected_total_cost, tax_amount, user_id):
         self.client_name = client_name
         self.client_email = client_email
         self.phone_number = phone_number

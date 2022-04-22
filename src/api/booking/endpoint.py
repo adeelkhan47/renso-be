@@ -11,6 +11,7 @@ from model.booking import Booking
 from model.booking_status import BookingStatus
 from model.cart import Cart
 from model.cart_booking import CartBookings
+from model.front_end_configs import FrontEndCofigs
 from model.item import Item
 from model.item_subtype import ItemSubType
 from model.location import Location
@@ -108,7 +109,6 @@ class bookings_by_item_Subtype_id(Resource):
         return response_structure(allBookings, rows), 200
 
 
-
 @api.route("/bulk")
 class booking_list(Resource):
 
@@ -150,6 +150,8 @@ class booking_list(Resource):
 
         actual_total_price_after_tax = effected_total_price + tax_amount
 
+        app_configs = FrontEndCofigs.get_by_user_id(g.current_user.id)
+        privacy_link = app_configs.privacy_policy_link
         response_data = {
             "bookings": bookings,
             "taxs": taxs,
@@ -157,7 +159,8 @@ class booking_list(Resource):
             "effected_total_price": round(effected_total_price, 2),
             "actual_total_price_after_tax": round(actual_total_price_after_tax, 2),
             "tax_amount": round(tax_amount, 2),
-            "voucher": voucher
+            "voucher": voucher,
+            "privacy_policy_link": privacy_link
 
         }
         return response_structure(response_data)
