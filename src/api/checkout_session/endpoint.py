@@ -44,7 +44,7 @@ def process_order_completion(order):
         total=order.total_cost,
         tax_amount=order.tax_amount
     )
-    #send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)
+    send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)
     emails, count = AssociateEmail.filtration({"status:eq": "true", "user_id:eq": str(order.user_id)})
     bookings_to_check = [x.booking for x in order.order_bookings]
     association_data = {}
@@ -61,8 +61,8 @@ def process_order_completion(order):
             configs=configs,
             bookings=association_data[email]
         )
-        #send_email(email, "Order Confirmation for Associations", stuff_to_render2, app_configs.email,
-                  # app_configs.email_password)
+        send_email(email, "Order Confirmation for Associations", stuff_to_render2, app_configs.email,
+                   app_configs.email_password)
     Order.update(order.id, {"order_status_id": order_status_paid_id})
     active_booking_status = BookingStatus.get_id_by_name("Active")
     for each in order.order_bookings:
