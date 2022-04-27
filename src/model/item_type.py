@@ -10,6 +10,7 @@ class ItemType(Base, db.Model):
     name = Column(String, nullable=False)
     maintenance = Column(Integer, nullable=False)
     delivery_available = Column(Boolean, nullable=False, unique=False)
+    show_time_picker = Column(Boolean, nullable=True, unique=False, default=False)
     DayPickers = relationship("DayPicker", backref="item_type")
     items = relationship("Item", backref="item_type")
     item_sub_type = relationship("ItemSubType", backref="item_type")
@@ -20,12 +21,13 @@ class ItemType(Base, db.Model):
     image = Column(String(500), nullable=False)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, name, maintenance, delivery_available, image, user_id):
+    def __init__(self, name, maintenance, delivery_available, image, user_id, show_time_picker):
         self.name = name
         self.maintenance = maintenance
         self.delivery_available = delivery_available
         self.image = image
         self.user_id = user_id
+        self.show_time_picker = show_time_picker
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

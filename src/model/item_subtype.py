@@ -12,19 +12,27 @@ class ItemSubType(Base, db.Model):
     person = Column(Integer, nullable=False, unique=False)
     image = Column(String(500), nullable=False)
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=True)
-    items = relationship("Item", backref="item_subtype")
+    least_price = Column(Float, nullable=True, unique=False, default=1)
+    discount_after_higher_price = Column(Integer, nullable=True, unique=False, default=10)
+    same_price_days = Column(Integer, nullable=True, unique=False, default=1)
+
+    items = relationship("Item", backref="item_subotype")
     associate_email_subtypes = relationship("AssociateEmailSubtype", backref="item_subtype")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
     itemTypeExtras = relationship("ItemTypeExtra", backref="item_subtype")
     itemSubTypeTaxs = relationship("ItemSubTypeTaxs", backref="item_subtype")
 
-    def __init__(self, name, price, person, item_type_id, image, user_id):
+    def __init__(self, name, price, person, item_type_id, image, user_id, least_price, discount_after_higher_price,
+                 same_price_days):
         self.name = name
         self.price = price
         self.person = person
         self.item_type_id = item_type_id
         self.image = image
         self.user_id = user_id
+        self.least_price = least_price
+        self.discount_after_higher_price = discount_after_higher_price
+        self.same_price_days = same_price_days
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

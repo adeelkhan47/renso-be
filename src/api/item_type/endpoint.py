@@ -34,7 +34,8 @@ class item_types_list(Resource):
         image = payload.get("image")
         location_ids = payload.get("location_ids").split(",")
         delivery_available = int(payload.get("delivery_available"))
-        item_type = ItemType(name, maintenance, delivery_available, image, g.current_user.id)
+        show_time_picker = int(payload.get("show_time_picker"))
+        item_type = ItemType(name, maintenance, delivery_available, image, g.current_user.id, show_time_picker)
         item_type.insert()
         if location_ids:
 
