@@ -11,6 +11,7 @@ Item_type_Expect = api.model(
         "name": fields.String(),
         "maintenance": fields.Integer(),
         "delivery_available": fields.Boolean(),
+        "show_time_picker": fields.Boolean(),
         "image": fields.String(),
         "location_ids": fields.String()
     },

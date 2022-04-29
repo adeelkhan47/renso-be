@@ -192,12 +192,15 @@ class booking_list(Resource):
                     booking_dictionary[(item_sub_type.id, item_id)] += (hours * item_sub_type.price) * factor / 100
         else:
             days = (start_time.date() + timedelta(x) for x in range(0, (end_time - start_time).days + 1))
-            for day in days:
+            for day_number, day in enumerate(days):
                 season_factor = Season.get_price_factor_on_date(day, g.current_user.id)
                 location_factor = Location.query_by_id(payload.get("location_id")).price_factor
                 factor = 100 + ((season_factor - 100) + (location_factor - 100))
                 for each in payload.get("bookings_details"):
                     item_sub_type = ItemSubType.query_by_id(each.get("item_sub_type_id"))
+                    least_price = item_sub_type.least_price
+                    discount_after_higher_price = item_sub_type.discount_after_higher_price
+                    same_price_days = item_sub_type.same_price_days
                     for item_id in each.get("item_ids"):
                         if (item_sub_type.id, item_id) not in booking_dictionary.keys():
                             booking_dictionary[(item_sub_type.id, item_id)] = 0
@@ -206,17 +209,39 @@ class booking_list(Resource):
                             diff = temp_date_time - start_time
                             days, seconds = diff.days, diff.seconds
                             hours = days * 24 + seconds // 3600
-                            booking_dictionary[(item_sub_type.id, item_id)] += ((
-                                                                                        hours + 1) * item_sub_type.price) * factor / 100
+                            price = ((hours + 1) * item_sub_type.price) * factor / 100
+                            final_price = price
+                            if day_number > same_price_days - 1:
+                                internal_factor = (day_number - (same_price_days - 1)) * discount_after_higher_price
+                                internal_factor = 100 - internal_factor
+                                final_price = final_price * internal_factor / 100
+                            if least_price > final_price:
+                                final_price = least_price
+                            booking_dictionary[(item_sub_type.id, item_id)] += final_price
                         elif day == end_time.date():
                             temp_date_time = datetime.combine(day, datetime.min.time())
                             diff = end_time - temp_date_time
                             days, seconds = diff.days, diff.seconds
                             hours = days * 24 + seconds // 3600
-                            booking_dictionary[(item_sub_type.id, item_id)] += (
-                                                                                       hours * item_sub_type.price) * factor / 100
+                            price = (hours * item_sub_type.price) * factor / 100
+                            final_price = price
+                            if day_number > same_price_days - 1:
+                                internal_factor = (day_number - (same_price_days - 1)) * discount_after_higher_price
+                                internal_factor = 100 - internal_factor
+                                final_price = final_price * internal_factor / 100
+                            if least_price > final_price:
+                                final_price = least_price
+                            booking_dictionary[(item_sub_type.id, item_id)] += final_price
                         else:
-                            booking_dictionary[(item_sub_type.id, item_id)] += (24 * item_sub_type.price) * factor / 100
+                            price = (24 * item_sub_type.price) * factor / 100
+                            final_price = price
+                            if day_number > same_price_days - 1:
+                                internal_factor = (day_number - (same_price_days - 1)) * discount_after_higher_price
+                                internal_factor = 100 - internal_factor
+                                final_price = final_price * internal_factor / 100
+                            if least_price > final_price:
+                                final_price = least_price
+                            booking_dictionary[(item_sub_type.id, item_id)] += final_price
 
         for each in payload.get("bookings_details"):
             item_sub_type = each.get("item_sub_type_id")
