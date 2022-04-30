@@ -17,7 +17,7 @@ class ItemSubType(Base, db.Model):
     same_price_days = Column(Integer, nullable=True, unique=False, default=1)
 
 
-    items = relationship("Item", backref="item_subotype")
+    items = relationship("Item", backref="item_subtype")
     associate_email_subtypes = relationship("AssociateEmailSubtype", backref="item_subtype")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
     itemTypeExtras = relationship("ItemTypeExtra", backref="item_subtype")
