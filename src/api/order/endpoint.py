@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import g, redirect
+from flask import g
 from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound
@@ -11,7 +11,6 @@ from model.booking import Booking
 from model.cart import Cart
 from model.custom_data import CustomData
 from model.custom_parameter import CustomParameter
-from model.front_end_configs import FrontEndCofigs
 from model.order import Order
 from model.order_bookings import OrderBookings
 from model.order_custom_data import OrderCustomData
@@ -58,16 +57,19 @@ class order_list(Resource):
         payment_method = PaymentMethod.get_payment_method_by_name("Stripe", g.current_user.id)
         actual_total_price = 0
         effected_total_price = 0
+        taxs = []
+        tax_amount = 0
         for booking in bookings:
             actual_total_price += booking.cost
-            effected_total_price += (price_factor / 100) * booking.cost
-
-        tax_amount = 0
-        if payment_method:
+            temp_tax_amount = 0
             for each in payment_method.payment_tax:
-                tax = each.tax
-                tax_amount += tax.percentage / 100 * effected_total_price
+                if booking.item.item_subtype_id in [x.item_sub_type_id for x in each.tax.itemSubTypeTaxs]:
+                    temp_tax_amount += (each.tax.percentage / 100) * booking.cost
+                    if each.tax not in taxs:
+                        taxs.append(each.tax)
 
+            tax_amount += temp_tax_amount
+            effected_total_price += (price_factor / 100) * booking.cost
         actual_total_price_after_tax = effected_total_price + tax_amount
 
         ##
