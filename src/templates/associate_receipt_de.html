@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700&display=swap" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet"
+        type="text/css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0px;
+            padding: 0px;
+            font-family: Montserrat, Lato, Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            text-align: center;
+            background: white;
+        }
+
+        .wrapper {
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 650px;
+            width: 100%;
+            height: auto;
+            background: white;
+            border: 1px solid #eee;
+            margin: 50px 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .row {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .row>* {
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        .logo {
+            width: 70%;
+            height: auto;
+            object-fit: contain;
+            left: 0px;
+            transform: translateX(0px);
+        }
+
+        .description {
+            background: #eee;
+        }
+
+        .title {
+            font-size: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .reverse {
+            color: white;
+            background: black;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .reverse.shade {
+            background: #222;
+        }
+
+        .text {
+            font-size: 15px;
+            text-align: center;
+            margin: 5px;
+        }
+
+        .table {
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #eee;
+        }
+
+        .table th,
+        .table td {
+            text-align: left;
+            padding: 5px 10px;
+            vertical-align: text-top;
+        }
+
+        .table th.amount,
+        .table td.amount {
+            text-align: right;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            margin: 10px;
+        }
+
+        .name {
+            position: relative;
+            text-align: left;
+            width: auto;
+            display: inline;
+        }
+
+        .value {
+            position: relative;
+            text-align: right;
+            width: 150px;
+            font-size: 16px;
+            display: inline-block;
+        }
+
+        .footer-layout-wrapper {
+            position: relative;
+            width: 100%;
+            height: auto;
+            background: #333333;
+            color: white;
+        }
+
+        .footer-main-body {
+            padding: 20px;
+            width: 100%;
+            height: auto;
+            text-align: center;
+        }
+
+        .footer-main-body p {
+            color: white !important;
+            text-decoration: none;
+            margin: 10px;
+        }
+
+        .links {
+            list-style-type: none;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .link {
+            margin: 10px;
+            font-size: 20px;
+            display: inline;
+        }
+
+        .footer-bottom-line {
+            width: 100%;
+            height: auto;
+            padding: 10px;
+            background: #222222;
+            color: white;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .info {
+            width: 100%;
+            text-align: center;
+            color: white;
+            height: auto;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .about {
+            position: relative;
+            padding: 5px;
+            width: 150px;
+            display: inline-block;
+            vertical-align: middle;
+            border-right: 2px solid lightgray;
+            font-size: 14px;
+        }
+
+        .about p {
+            margin: 5px;
+        }
+
+        .details {
+            position: relative;
+            width: 340px;
+            padding: 5px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .detail-item {
+            margin: 5px;
+            text-align: left;
+        }
+
+        .detail-item .key {
+            font-weight: bold;
+            width: 135px;
+            display: inline-block;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        .detail-item .value {
+            text-align: left;
+            width: 180px;
+            display: inline-block;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        @media (max-width: 560px) {
+            .about {
+                border: none
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="logo-wrapper row">
+            <img src="{{ configs.BASE_URL }}static/images/logo.png" alt="Logo" class="logo">
+        </div>
+        <div class="description row">
+            <div class="title">
+                Buchungsbestätigung
+            </div>
+            <div class="text">
+                Danke
+            </div>
+        </div>
+        <div class="row reverse">
+            <div class="title reverse">
+                Einzelheiten
+            </div>
+        </div>
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+
+                        <th colspan="5">
+                            Artikelname
+                        </th>
+                        <th colspan="4">
+                            Artikelkategorie
+                        </th>
+                        <th colspan="3">
+                            Startzeit
+                        </th>
+
+                        <th colspan="3">
+                            Endzeit
+                        </th>
+                        <th colspan="2" class="amount">
+                            Menge
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for each in bookings %}
+
+                    <tr>
+                        <td colspan="5">
+                            {{ each.item.name }}
+                        </td>
+                        <td colspan="4">
+                            {{ each.item.item_subtype.name }}
+                        </td>
+                        <td colspan="3">
+                            {{ each.start_time }}
+                        </td>
+                        <td colspan="3">
+                            {{ each.end_time }}
+                        </td>
+                        <td colspan="2" class="amount">
+                            € {{ each.cost }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-layout-wrapper">
+            <div class="info">
+                <div class="about">
+                    <p>
+                        GCMentz GmbH
+                    </p>
+                    <p>
+                        Teichstraße 2
+                    </p>
+                    <p>
+                        24864 Goltoft
+                    </p>
+                </div>
+                <div class="details">
+                    <div class="detail-item">
+                        <span class="key"> Handelsregister: </span>
+                        <span class="value"> HRB 15504 FL </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="key"> Registergericht: </span>
+                        <span class="value"> Amtsgericht Flensburg </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="key"> Steuernummer: </span>
+                        <span class="value"> 1529333818 </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="key"> USt-ID: </span>
+                        <span class="value"> DE350035392 </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="key"> Vertreten durch: </span>
+                        <span class="value"> Georg Mentz </span>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-main-body">
+                <a href="">Privacy Policy</a>
+                <p>rensoinfo@gmail.com</p>
+            </div>
+            <div class="footer-bottom-line">Renso ©2022 Erstellt von Renso Corp.</div>
+
+        </div>
+    </div>
+</body>
+
+</html>

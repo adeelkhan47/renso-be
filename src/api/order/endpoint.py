@@ -34,7 +34,7 @@ class order_list(Resource):
         return response_structure(all_items, count), 200
 
     @api.marshal_with(schema.get_by_id_responseOrder_with_session, 201, skip_none=True)
-    @api.expect(schema.Order_Expect)
+    @api.expect(schema.Order_WithLanguage_Expect)
     @auth
     def post(self):
         payload = api.payload.copy()
@@ -45,6 +45,9 @@ class order_list(Resource):
         client_email = payload.get("client_email")
         order_status_id = OrderStatus.get_id_by_name("Payment Pending")
         phone_number = payload.get("phone_number")
+        language = "en"
+        if "language" in payload.keys():
+            language = payload.get("language")
         cart = Cart.query_by_id(payload.get("cart_id"))
         bookings = [each.booking for each in cart.cart_bookings]
 
@@ -90,10 +93,10 @@ class order_list(Resource):
             product_id = Stripe.create_product(
                 f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}")
             price_id = Stripe.create_price(product_id, actual_total_price_after_tax)
-            session_id = Stripe.create_checkout_session(price_id, order.id)
+            session_id = Stripe.create_checkout_session(price_id, order.id, language)
             response_data = {"order": order, "session_id": session_id}
         else:
-            process_order_completion(order)
+            process_order_completion(order, language)
             response_data = {"order": order, "session_id": None}
         return response_structure(response_data), 201
 

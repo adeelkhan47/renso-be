@@ -32,6 +32,18 @@ Order_Expect = api.model(
         "voucher": fields.String()
     },
 )
+Order_WithLanguage_Expect = api.model(
+    "Order_WithLanguage_Expect",
+    {
+        "client_name": fields.String(),
+        "client_email": fields.String(),
+        "phone_number": fields.String(),
+        "cart_id": fields.Integer(),
+        "voucher": fields.String(),
+        "language": fields.String(),
+
+    },
+)
 
 Order = api.model(
     "Order",
