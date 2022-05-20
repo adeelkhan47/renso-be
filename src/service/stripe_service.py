@@ -33,7 +33,7 @@ class Stripe:
             checkout_session = stripe.checkout.Session.create(
                 success_url=domain_url + "checkout_session/success?session_id={CHECKOUT_SESSION_ID}&order_id=" + str(
                     order_id) + "&language=" + str(language),
-                cancel_url=domain_url + "checkout_session/failed?session_id={CHECKOUT_SESSION_ID}" + str(
+                cancel_url=domain_url + "checkout_session/failed?session_id={CHECKOUT_SESSION_ID}&order_id=" + str(
                     order_id) + "&language=" + str(language),
                 payment_method_types=["card"],
                 mode="payment",

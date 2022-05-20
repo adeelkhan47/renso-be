@@ -101,7 +101,7 @@ class CheckOutSession(Resource):
 @api.route("/failed")
 class CheckOutSessionFailed(Resource):
     @api.doc("Accept Success for checkout")
-    @api.marshal_with(schema.CheckOutSessionResponse, skip_none=True)
+    #@api.marshal_with(schema.CheckOutSessionResponse, skip_none=True)
     @api.param("session_id")
     @api.param("order_id")
     def get(self):
@@ -137,7 +137,6 @@ class CheckOutSessionSuccess(Resource):
         process_order_completion(order, language)
         app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
         FE_URL = app_configs.front_end_url
-
         if session_id:
             return redirect(f"{FE_URL}success")
         return redirect(f"{FE_URL}failure")
