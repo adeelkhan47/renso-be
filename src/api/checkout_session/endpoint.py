@@ -117,7 +117,7 @@ class CheckOutSessionFailed(Resource):
         app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
 
         FE_URL = app_configs.front_end_url
-        return redirect(f"{FE_URL}failure")
+        return redirect(f"{FE_URL}cart")
         # return error_message("TopUp Failed"), HTTPStatus.BAD_REQUEST
 
 
