@@ -109,12 +109,14 @@ class CheckOutSessionFailed(Resource):
 
         :return:
         """
+        order_status_Cancelled_id = OrderStatus.get_id_by_name("Cancelled")
         args = request.args
         order_id = args["order_id"]
         order = Order.query_by_id(int(order_id))
         app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
 
         FE_URL = app_configs.front_end_url
+        Order.update(order.id, {"order_status_id": order_status_Cancelled_id})
         return redirect(f"{FE_URL}checkout")
         # return error_message("TopUp Failed"), HTTPStatus.BAD_REQUEST
 
