@@ -27,8 +27,6 @@ def process_order_completion(order, language):
     order_status_paid_id = OrderStatus.get_id_by_name("Paid")
     order_status_completed_id = OrderStatus.get_id_by_name("Completed")
     order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
-    associate_receipt_template = ""
-    receipt_template = ""
     if language == "de":
         associate_receipt_template = "associate_receipt_de.html"
         receipt_template = "receipt_de.html"

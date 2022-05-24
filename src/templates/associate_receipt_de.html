@@ -9,7 +9,7 @@
 
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700&display=swap" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet"
-        type="text/css">
+          type="text/css">
 
     <style>
         * {
@@ -44,7 +44,7 @@
             padding: 20px;
         }
 
-        .row>* {
+        .row > * {
             position: relative;
             left: 50%;
             transform: translateX(-50%);
@@ -249,115 +249,121 @@
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="logo-wrapper row">
-            <img src="{{ configs.BASE_URL }}static/images/logo.png" alt="Logo" class="logo">
+<div class="wrapper">
+    <div class="logo-wrapper row">
+        <img src="{{ configs.BASE_URL }}static/images/logo.png" alt="Logo" class="logo">
+    </div>
+    <div class="description row">
+        <div class="title">
+            Buchungsbestätigung
         </div>
-        <div class="description row">
-            <div class="title">
-                Buchungsbestätigung
-            </div>
-            <div class="text">
-                Danke
-            </div>
-        </div>
-        <div class="row reverse">
-            <div class="title reverse">
-                Einzelheiten
-            </div>
-        </div>
-        <div class="row">
-            <table class="table">
-                <thead>
-                    <tr>
-
-                        <th colspan="5">
-                            Artikelname
-                        </th>
-                        <th colspan="4">
-                            Artikelkategorie
-                        </th>
-                        <th colspan="3">
-                            Startzeit
-                        </th>
-
-                        <th colspan="3">
-                            Endzeit
-                        </th>
-                        <th colspan="2" class="amount">
-                            Menge
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for each in bookings %}
-
-                    <tr>
-                        <td colspan="5">
-                            {{ each.item.name }}
-                        </td>
-                        <td colspan="4">
-                            {{ each.item.item_subtype.name }}
-                        </td>
-                        <td colspan="3">
-                            {{ each.start_time }}
-                        </td>
-                        <td colspan="3">
-                            {{ each.end_time }}
-                        </td>
-                        <td colspan="2" class="amount">
-                            € {{ each.cost }}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="footer-layout-wrapper">
-            <div class="info">
-                <div class="about">
-                    <p>
-                        GCMentz GmbH
-                    </p>
-                    <p>
-                        Teichstraße 2
-                    </p>
-                    <p>
-                        24864 Goltoft
-                    </p>
-                </div>
-                <div class="details">
-                    <div class="detail-item">
-                        <span class="key"> Handelsregister: </span>
-                        <span class="value"> HRB 15504 FL </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="key"> Registergericht: </span>
-                        <span class="value"> Amtsgericht Flensburg </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="key"> Steuernummer: </span>
-                        <span class="value"> 1529333818 </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="key"> USt-ID: </span>
-                        <span class="value"> DE350035392 </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="key"> Vertreten durch: </span>
-                        <span class="value"> Georg Mentz </span>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-main-body">
-                <a href="">Privacy Policy</a>
-                <p>rensoinfo@gmail.com</p>
-            </div>
-            <div class="footer-bottom-line">Renso ©2022 Erstellt von Renso Corp.</div>
-
+        <div class="text">
+            Danke
         </div>
     </div>
+    <div class="row reverse">
+        <div class="title reverse">
+            Einzelheiten
+        </div>
+    </div>
+    <div class="row">
+        <table class="table">
+            <thead>
+            <tr>
+
+                <th colspan="7">
+                    Artikelname
+                </th>
+                <th colspan="6">
+                    Artikelkategorie
+                </th>
+                <th colspan="5">
+                    Lage
+                </th>
+                <th colspan="4">
+                    Startzeit
+                </th>
+
+                <th colspan="3">
+                    Endzeit
+                </th>
+                <th colspan="2" class="amount">
+                    Menge
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for each in bookings %}
+
+                <tr>
+                    <td colspan="7">
+                        {{ each.item.name }}
+                    </td>
+                    <td colspan="6">
+                        {{ each.item.item_subtype.name }}
+                    </td>
+                    <td colspan="5">
+                        {{ each.location.name }}
+                    </td>
+                    <td colspan="4">
+                        {{ each.start_time }}
+                    </td>
+                    <td colspan="3">
+                        {{ each.end_time }}
+                    </td>
+                    <td colspan="2" class="amount">
+                        € {{ each.cost }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-layout-wrapper">
+        <div class="info">
+            <div class="about">
+                <p>
+                    GCMentz GmbH
+                </p>
+                <p>
+                    Teichstraße 2
+                </p>
+                <p>
+                    24864 Goltoft
+                </p>
+            </div>
+            <div class="details">
+                <div class="detail-item">
+                    <span class="key"> Handelsregister: </span>
+                    <span class="value"> HRB 15504 FL </span>
+                </div>
+                <div class="detail-item">
+                    <span class="key"> Registergericht: </span>
+                    <span class="value"> Amtsgericht Flensburg </span>
+                </div>
+                <div class="detail-item">
+                    <span class="key"> Steuernummer: </span>
+                    <span class="value"> 1529333818 </span>
+                </div>
+                <div class="detail-item">
+                    <span class="key"> USt-ID: </span>
+                    <span class="value"> DE350035392 </span>
+                </div>
+                <div class="detail-item">
+                    <span class="key"> Vertreten durch: </span>
+                    <span class="value"> Georg Mentz </span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-main-body">
+            <a href="">Privacy Policy</a>
+            <p>rensoinfo@gmail.com</p>
+        </div>
+        <div class="footer-bottom-line">Renso ©2022 Erstellt von Renso Corp.</div>
+
+    </div>
+</div>
 </body>
 
 </html>

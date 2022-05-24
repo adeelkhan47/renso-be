@@ -43,7 +43,7 @@ class user_list(Resource):
         user.insert()
         FrontEndCofigs("", "http://www.front_end.com/", "dummy@strato.de", "EmailPassword",
                        "http://www.privacy_polcy.com/", user.id).insert()
-        item_type = ItemType("Extra", 1, True, "", user.id)
+        item_type = ItemType("Extra", 1, True, "", user.id, False)
         item_type.insert()
         Tag("Cheap", "", "blue", user.id).insert()
         Tag("Luxury", "", "green", user.id).insert()

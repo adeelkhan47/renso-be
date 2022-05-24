@@ -3,6 +3,7 @@ from flask_restx import fields
 from . import api
 from ..booking_status.schema import BookingStatus
 from ..item.schema import Item
+from ..location.schema import Location
 from ..tax.schema import Tax
 from ..voucher.schema import Voucher
 
@@ -34,6 +35,7 @@ BookingExpect = api.model(
         "end_time": fields.DateTime(),
         "booking_status_id": fields.Integer(),
         "item_id": fields.Integer(),
+        "location_id": fields.Integer(),
         "cost": fields.Float(),
 
     },
@@ -48,6 +50,7 @@ Booking = api.model(
         "end_time": fields.DateTime(),
         "booking_status": fields.Nested(BookingStatus),
         "item": fields.Nested(Item),
+        "location": fields.Nested(Location),
 
     },
 )

@@ -13,7 +13,7 @@ class FrontEndCofigs(Base, db.Model):
     privacy_policy_link = Column(String, default="")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, url, front_end_url, user_id, email, email_password, privacy_policy_link):
+    def __init__(self, url, front_end_url, email, email_password, privacy_policy_link,user_id):
         self.url = url
         self.user_id = user_id
         self.front_end_url = front_end_url

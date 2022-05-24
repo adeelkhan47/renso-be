@@ -41,7 +41,9 @@ class booking_list(Resource):
         end_time = payload.get("end_time")
         booking_status_id = payload.get("booking_status_id")
         item_id = payload.get("item_id")
+        location_id = payload.get("location_id")
         cost = payload.get("cost")
+
         ##
         item = Item.query_by_id(item_id)
         if not item:
@@ -53,7 +55,7 @@ class booking_list(Resource):
         for each in all_bookings:
             if each.start_time <= end_time and start_time <= each.end_time:
                 raise BadRequest("Item Already booked with this time.")
-        booking = Booking(start_time, end_time, booking_status_id, item_id, cost, g.current_user.id)
+        booking = Booking(start_time, end_time, booking_status_id, item_id, cost, g.current_user.id, location_id)
         booking.insert()
         return response_structure(booking), 201
 
@@ -172,13 +174,15 @@ class booking_list(Resource):
         payload = api.payload
         start_time = datetime.strptime(payload.get("start_time"), '%Y-%m-%d %H:%M:%S')
         end_time = datetime.strptime(payload.get("end_time"), '%Y-%m-%d %H:%M:%S')
+        location_id = payload.get("location_id")
+        location = Location.query_by_id(location_id)
 
         booking_ids = []
         pending_status = BookingStatus.get_id_by_name("Pending")
         booking_dictionary = {}
         if start_time.date() == end_time.date():
             season_factor = Season.get_price_factor_on_date(start_time.date(), g.current_user.id)
-            location_factor = Location.query_by_id(payload.get("location_id")).price_factor
+            location_factor = location.price_factor
             factor = 100 + ((season_factor - 100) + (location_factor - 100))
 
             for each in payload.get("bookings_details"):
@@ -199,7 +203,7 @@ class booking_list(Resource):
             days = (start_time.date() + timedelta(x) for x in range(0, (end_time - start_time).days + 1))
             for day_number, day in enumerate(days):
                 season_factor = Season.get_price_factor_on_date(day, g.current_user.id)
-                location_factor = Location.query_by_id(payload.get("location_id")).price_factor
+                location_factor = location.price_factor
                 factor = 100 + ((season_factor - 100) + (location_factor - 100))
                 for each in payload.get("bookings_details"):
                     item_sub_type = ItemSubType.query_by_id(each.get("item_sub_type_id"))
@@ -242,6 +246,7 @@ class booking_list(Resource):
                             if least_price > final_price / hours:
                                 final_price = least_price * hours
                             booking_dictionary[(item_sub_type.id, item_id)] += final_price
+
                         else:
                             price = (24 * item_sub_type.price) * factor / 100
                             final_price = price
@@ -257,7 +262,9 @@ class booking_list(Resource):
             item_sub_type = each.get("item_sub_type_id")
             for item_id in each.get("item_ids"):
                 cost = booking_dictionary[(item_sub_type, item_id)]
-                booking = Booking(start_time, end_time, pending_status, item_id, round(cost, 2), g.current_user.id)
+                self.booking = Booking(start_time, end_time, pending_status, item_id, round(cost, 2), g.current_user.id,
+                                       location.id)
+                booking = self.booking
                 booking.insert()
                 booking_ids.append(booking.id)
         if "cart_id" in payload.keys() and payload.get("cart_id") and Cart.query_by_id(payload.get("cart_id")):

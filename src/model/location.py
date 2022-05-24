@@ -13,6 +13,7 @@ class Location(Base, db.Model):
     item_locations = relationship("ItemLocation", backref="location")
     itemTypeLocations = relationship("LocationItemTypes", backref="location")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    booking_location = relationship("Booking", backref="location")
 
     def __init__(self, name, description, price_factor, user_id):
         self.name = name

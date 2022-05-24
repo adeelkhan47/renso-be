@@ -271,13 +271,16 @@
                 <thead>
                     <tr>
 
-                        <th colspan="5">
+                        <th colspan="7">
                             Item Name
                         </th>
-                        <th colspan="4">
+                        <th colspan="6">
                             Item Category
                         </th>
-                        <th colspan="3">
+                        <th colspan="5">
+                            Location
+                        </th>
+                        <th colspan="4">
                             Start Time
                         </th>
 
@@ -293,13 +296,16 @@
                 {% for each in bookings %}
 
                     <tr>
-                        <td colspan="5">
+                        <td colspan="7">
                             {{ each.item.name }}
                         </td>
-                        <td colspan="4">
+                        <td colspan="6">
                             {{ each.item.item_subtype.name }}
                         </td>
-                        <td colspan="3">
+                        <td colspan="5">
+                            {{ each.location.name }}
+                        </td>
+                        <td colspan="4">
                             {{ each.start_time }}
                         </td>
                         <td colspan="3">

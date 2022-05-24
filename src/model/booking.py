@@ -17,14 +17,16 @@ class Booking(Base, db.Model):
     order_bookings = relationship("OrderBookings", backref="booking")
     cart_bookings = relationship("CartBookings", backref="booking")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    location_id = Column(Integer, ForeignKey("location.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, start_time, end_time, booking_status_id, item_id, cost, user_id):
+    def __init__(self, start_time, end_time, booking_status_id, item_id, cost, user_id, location_id):
         self.start_time = start_time
         self.end_time = end_time
         self.booking_status_id = booking_status_id
         self.item_id = item_id
         self.cost = cost
         self.user_id = user_id
+        self.location_id = location_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
