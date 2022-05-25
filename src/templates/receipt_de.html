@@ -305,12 +305,21 @@
                     <td colspan="5">
                         {{ each.booking.location.name }}
                     </td>
-                    <td colspan="4">
-                        {{ each.booking.start_time }}
-                    </td>
-                    <td colspan="3">
-                        {{ each.booking.end_time }}
-                    </td>
+                    {% if each.booking.item.item_subtype.show_time_picker == True %}
+                        <td colspan="4">
+                            {{ each.booking.start_time }}
+                        </td>
+                        <td colspan="3">
+                            {{ each.booking.end_time }}
+                        </td>
+                    {% else %}
+                        <td colspan="4">
+                            {{ each.booking.start_time.date() }}
+                        </td>
+                        <td colspan="3">
+                        {{ each.booking.end_time.date() }}
+
+                    {% endif %}
                     <td colspan="2" class="amount">
                         € {{ each.booking.cost }}
                     </td>

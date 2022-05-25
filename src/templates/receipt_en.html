@@ -9,7 +9,7 @@
 
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700&display=swap" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet"
-        type="text/css">
+          type="text/css">
 
     <style>
         * {
@@ -44,7 +44,7 @@
             padding: 20px;
         }
 
-        .row>* {
+        .row > * {
             position: relative;
             left: 50%;
             transform: translateX(-50%);
@@ -249,156 +249,165 @@
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="logo-wrapper row">
-            <img src="{{ configs.BASE_URL }}static/images/logo.png" alt="Logo" class="logo">
+<div class="wrapper">
+    <div class="logo-wrapper row">
+        <img src="{{ configs.BASE_URL }}static/images/logo.png" alt="Logo" class="logo">
+    </div>
+    <div class="description row">
+        <div class="title">
+            Amount Received
         </div>
-        <div class="description row">
-            <div class="title">
-                Amount Received
-            </div>
-            <div class="text">
-                Thank you for your purchase
-            </div>
+        <div class="text">
+            Thank you for your purchase
         </div>
-        <div class="row reverse">
-            <div class="title reverse">
-                Details
-            </div>
+    </div>
+    <div class="row reverse">
+        <div class="title reverse">
+            Details
         </div>
-        <div class="row">
-            <table class="table">
-                <thead>
-                    <tr>
+    </div>
+    <div class="row">
+        <table class="table">
+            <thead>
+            <tr>
 
-                        <th colspan="7">
-                            Item Name
-                        </th>
-                        <th colspan="6">
-                            Item Category
-                        </th>
-                        <th colspan="5">
-                            Location
-                        </th>
-                        <th colspan="4">
-                            Start Time
-                        </th>
+                <th colspan="7">
+                    Item Name
+                </th>
+                <th colspan="6">
+                    Item Category
+                </th>
+                <th colspan="5">
+                    Location
+                </th>
+                <th colspan="4">
+                    Start Time
+                </th>
 
-                        <th colspan="3">
-                            End Time
-                        </th>
-                        <th colspan="2" class="amount">
-                            Amount
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for each in order.order_bookings %}
+                <th colspan="3">
+                    End Time
+                </th>
+                <th colspan="2" class="amount">
+                    Amount
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for each in order.order_bookings %}
 
-                    <tr>
-                        <td colspan="7">
-                            {{ each.booking.item.name }}
-                        </td>
-                        <td colspan="6">
-                            {{ each.booking.item.item_subtype.name }}
-                        </td>
-                        <td colspan="5">
-                            {{ each.booking.location.name }}
-                        </td>
+                <tr>
+                    <td colspan="7">
+                        {{ each.booking.item.name }}
+                    </td>
+                    <td colspan="6">
+                        {{ each.booking.item.item_subtype.name }}
+                    </td>
+                    <td colspan="5">
+                        {{ each.booking.location.name }}
+                    </td>
+                    {% if each.booking.item.item_subtype.show_time_picker == True %}
                         <td colspan="4">
                             {{ each.booking.start_time }}
                         </td>
                         <td colspan="3">
                             {{ each.booking.end_time }}
                         </td>
-                        <td colspan="2" class="amount">
-                            € {{ each.booking.cost }}
+                    {% else %}
+                        <td colspan="4">
+                            {{ each.booking.start_time.date() }}
                         </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="row right">
-            <div class="subtitle">
-                <div class="name">
-                    Sub Total
-                </div>
-                <div class="value">
-                    € {{ actual_total_price }}
-                </div>
-            </div>
-            <div class="subtitle">
-                <div class="name">
-                    Discounted
-                </div>
-                <div class="value">
-                    € {{ effected_total_price }}
-                </div>
-            </div>
-            <div class="subtitle">
-                <div class="name">
-                    Tax
-                </div>
-                <div class="value">
-                    € {{ tax_amount }}
-                </div>
-            </div>
-        </div>
-        <div class="row right reverse">
-            <div class="subtitle">
-                <div class="name">
-                    Total
-                </div>
-                <div class="value">
-                    € {{ total }}
-                </div>
-            </div>
-        </div>
-        <div class="footer-layout-wrapper">
-            <div class="info">
-                <div class="about">
-                    <p>
-                        GCMentz GmbH
-                    </p>
-                    <p>
-                        Teichstraße 2
-                    </p>
-                    <p>
-                        24864 Goltoft
-                    </p>
-                </div>
-                <div class="details">
-                    <div class="detail-item">
-                        <span class="key"> Handelsregister: </span>
-                        <span class="value"> HRB 15504 FL </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="key"> Registergericht: </span>
-                        <span class="value"> Amtsgericht Flensburg </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="key"> Steuernummer: </span>
-                        <span class="value"> 1529333818 </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="key"> USt-ID: </span>
-                        <span class="value"> DE350035392 </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="key"> Vertreten durch: </span>
-                        <span class="value"> Georg Mentz </span>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-main-body">
-                <a href="">Privacy Policy</a>
-                <p>rensoinfo@gmail.com</p>
-            </div>
-            <div class="footer-bottom-line">Renso ©2022 Created by Renso Corp.</div>
+                        <td colspan="3">
+                        {{ each.booking.end_time.date() }}
 
+                    {% endif %}
+                    <td colspan="2" class="amount">
+                        € {{ each.booking.cost }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="row right">
+        <div class="subtitle">
+            <div class="name">
+                Sub Total
+            </div>
+            <div class="value">
+                € {{ actual_total_price }}
+            </div>
+        </div>
+        <div class="subtitle">
+            <div class="name">
+                Discounted
+            </div>
+            <div class="value">
+                € {{ effected_total_price }}
+            </div>
+        </div>
+        <div class="subtitle">
+            <div class="name">
+                Tax
+            </div>
+            <div class="value">
+                € {{ tax_amount }}
+            </div>
         </div>
     </div>
+    <div class="row right reverse">
+        <div class="subtitle">
+            <div class="name">
+                Total
+            </div>
+            <div class="value">
+                € {{ total }}
+            </div>
+        </div>
+    </div>
+    <div class="footer-layout-wrapper">
+        <div class="info">
+            <div class="about">
+                <p>
+                    GCMentz GmbH
+                </p>
+                <p>
+                    Teichstraße 2
+                </p>
+                <p>
+                    24864 Goltoft
+                </p>
+            </div>
+            <div class="details">
+                <div class="detail-item">
+                    <span class="key"> Handelsregister: </span>
+                    <span class="value"> HRB 15504 FL </span>
+                </div>
+                <div class="detail-item">
+                    <span class="key"> Registergericht: </span>
+                    <span class="value"> Amtsgericht Flensburg </span>
+                </div>
+                <div class="detail-item">
+                    <span class="key"> Steuernummer: </span>
+                    <span class="value"> 1529333818 </span>
+                </div>
+                <div class="detail-item">
+                    <span class="key"> USt-ID: </span>
+                    <span class="value"> DE350035392 </span>
+                </div>
+                <div class="detail-item">
+                    <span class="key"> Vertreten durch: </span>
+                    <span class="value"> Georg Mentz </span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-main-body">
+            <a href="">Privacy Policy</a>
+            <p>rensoinfo@gmail.com</p>
+        </div>
+        <div class="footer-bottom-line">Renso ©2022 Created by Renso Corp.</div>
+
+    </div>
+</div>
 </body>
 
 </html>

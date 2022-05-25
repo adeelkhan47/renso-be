@@ -305,12 +305,21 @@
                     <td colspan="5">
                         {{ each.location.name }}
                     </td>
-                    <td colspan="4">
-                        {{ each.start_time }}
-                    </td>
-                    <td colspan="3">
-                        {{ each.end_time }}
-                    </td>
+                    {% if each.item.item_subtype.show_time_picker == True %}
+                        <td colspan="4">
+                            {{ each.start_time }}
+                        </td>
+                        <td colspan="3">
+                            {{ each.end_time }}
+                        </td>
+                    {% else %}
+                        <td colspan="4">
+                            {{ each.start_time.date() }}
+                        </td>
+                        <td colspan="3">
+                        {{ each.end_time.date() }}
+
+                    {% endif %}
                     <td colspan="2" class="amount">
                         € {{ each.cost }}
                     </td>
