@@ -49,9 +49,9 @@ class user_list(Resource):
         Tag("Luxury", "", "green", user.id).insert()
         Tag("Old", "", "orange", user.id).insert()
         Tag("New", "", "red", user.id).insert()
-        PaymentMethod("Stripe", True, user.id).insert()
+        PaymentMethod("Stripe", "description", True, user.id).insert()
+        PaymentMethod("Paypal", "description", True, user.id).insert()
         return response_structure(User.query_by_id(user.id)), 201
-
 
 @api.route("/login")
 class user_by_login_id(Resource):

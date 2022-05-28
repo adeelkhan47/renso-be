@@ -88,7 +88,6 @@ class Stripe:
     def create_product(cls, name):
         try:
             product = stripe.Product.create(name=name)
-
             return product["id"]
         except (
                 RateLimitError,

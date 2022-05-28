@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import g
 from flask import request
 from flask_restx import Resource
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 
 from common.helper import response_structure
 from decorator.authorization import auth
@@ -17,6 +17,7 @@ from model.order_custom_data import OrderCustomData
 from model.order_status import OrderStatus
 from model.payment_method import PaymentMethod
 from model.voucher import Voucher
+from service.paypal import PayPal
 from service.stripe_service import Stripe
 from . import api, schema
 from ..checkout_session.endpoint import process_order_completion
@@ -40,10 +41,10 @@ class order_list(Resource):
         payload = api.payload.copy()
         parameters, count = CustomParameter.filtration({})
         custom_parameters = [each.name for each in parameters]
-
+        payment_method_id = payload.get("payment_method_id")
         client_name = payload.get("client_name")
         client_email = payload.get("client_email")
-        order_status_id = OrderStatus.get_id_by_name("Payment Pending")
+        order_status_payment_pending_id = OrderStatus.get_id_by_name("Payment Pending")
         phone_number = payload.get("phone_number")
         language = "en"
         if "language" in payload.keys():
@@ -57,7 +58,7 @@ class order_list(Resource):
             voucher = Voucher.get_voucher_by_code(payload.get("voucher"), g.current_user.id)
             if voucher:
                 price_factor = voucher.price_factor
-        payment_method = PaymentMethod.get_payment_method_by_name("Stripe", g.current_user.id)
+        payment_method = PaymentMethod.query_by_id(payment_method_id)
         actual_total_price = 0
         effected_total_price = 0
         taxs = []
@@ -77,7 +78,7 @@ class order_list(Resource):
 
         ##
 
-        order = Order(client_name, client_email, phone_number, order_status_id,
+        order = Order(client_name, client_email, phone_number, order_status_payment_pending_id,
                       round(actual_total_price_after_tax, 2), cart.id, round(actual_total_price, 2),
                       round(effected_total_price, 2), round(tax_amount, 2), g.current_user.id)
         order.insert()
@@ -89,15 +90,33 @@ class order_list(Resource):
         for each in bookings:
             OrderBookings(each.id, order.id).insert()
         # strip_part
-        if actual_total_price_after_tax > 0:
-            product_id = Stripe.create_product(
-                f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}")
-            price_id = Stripe.create_price(product_id, actual_total_price_after_tax)
-            session_id = Stripe.create_checkout_session(price_id, order.id, language)
-            response_data = {"order": order, "session_id": session_id}
+
+        if payment_method.name == "Stripe":
+            if actual_total_price_after_tax > 0:
+
+                product_id = Stripe.create_product(
+                    f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}")
+
+                price_id = Stripe.create_price(product_id, actual_total_price_after_tax)
+                session_id = Stripe.create_checkout_session(price_id, order.id, language)
+                response_data = {"order": order, "session_id": session_id, "paypal_url": None}
+            else:
+                process_order_completion(order, language)
+                response_data = {"order": order, "session_id": None, "paypal_url": None}
+        elif payment_method.name == "Paypal":
+            if actual_total_price_after_tax > 0:
+                paypal_url = PayPal.create_paypal_session(
+                    f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}",
+                    order.id, language)
+                if not paypal_url:
+                    raise BadRequest("Paypal not working.")
+                response_data = {"order": order, "session_id": None, "paypal_url": paypal_url}
+            else:
+                process_order_completion(order, language)
+                response_data = {"order": order, "session_id": None}
+
         else:
-            process_order_completion(order, language)
-            response_data = {"order": order, "session_id": None}
+            raise NotFound("Payment_Method not Found.")
         return response_structure(response_data), 201
 
 

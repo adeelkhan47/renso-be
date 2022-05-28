@@ -26,8 +26,9 @@ class PaymentMethodList(Resource):
     def post(self):
         payload = api.payload
         name = payload.get("name")
+        description = payload.get("description")
         status = payload.get("status")
-        pay = PaymentMethod(name, bool(status), g.current_user.id)
+        pay = PaymentMethod(name, description, bool(status), g.current_user.id)
         pay.insert()
         all_tax_ids = payload.get("tax_ids").split(",")
         for each in all_tax_ids:

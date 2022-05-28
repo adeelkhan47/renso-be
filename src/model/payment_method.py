@@ -8,12 +8,14 @@ from model.base import Base, db
 class PaymentMethod(Base, db.Model):
     __tablename__ = "payment_method"
     name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
     status = Column(Boolean, nullable=False)
     payment_tax = relationship("PaymentTax", backref="payment_method")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, name, status, user_id):
+    def __init__(self, name, description, status, user_id):
         self.name = name
+        self.description = description
         self.status = status
         self.user_id = user_id
 

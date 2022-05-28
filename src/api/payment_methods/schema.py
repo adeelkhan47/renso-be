@@ -12,6 +12,7 @@ PaymentMethodExpect = api.model(
     "PaymentMethodExpect",
     {
         "name": fields.String(),
+        "description": fields.String(),
         "status": fields.Boolean(),
         "tax_ids": fields.String(),
 
@@ -22,6 +23,7 @@ PaymentMethod = api.model(
     {
         "id": fields.Integer(),
         "name": fields.String(),
+        "description": fields.String(),
         "status": fields.Boolean(),
         "payment_tax": fields.Nested(Tax_nested, as_list=True),
 

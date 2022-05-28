@@ -99,7 +99,7 @@ class CheckOutSession(Resource):
 @api.route("/failed")
 class CheckOutSessionFailed(Resource):
     @api.doc("Accept Success for checkout")
-    #@api.marshal_with(schema.CheckOutSessionResponse, skip_none=True)
+    # @api.marshal_with(schema.CheckOutSessionResponse, skip_none=True)
     @api.param("session_id")
     @api.param("order_id")
     def get(self):
@@ -125,7 +125,7 @@ class CheckOutSessionFailed(Resource):
 class CheckOutSessionSuccess(Resource):
     @api.doc("Accept Success for checkout")
     # @api.marshal_with(schema.CheckOutSessionResponseSuccess, skip_none=True)
-    @api.param("session_id")
+    @api.param("session_id", required=False)
     @api.param("order_id")
     @api.param("language")
     def get(self):

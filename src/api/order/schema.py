@@ -41,7 +41,7 @@ Order_WithLanguage_Expect = api.model(
         "cart_id": fields.Integer(),
         "voucher": fields.String(),
         "language": fields.String(),
-
+        "payment_method_id": fields.Integer()
     },
 )
 
@@ -61,7 +61,8 @@ Order = api.model(
 Order_With_Session = api.model(
     "Order_With_Session", {
         "order": fields.Nested(Order),
-        "session_id": fields.String()
+        "session_id": fields.String(),
+        "paypal_url": fields.String(),
     }
 
 )
