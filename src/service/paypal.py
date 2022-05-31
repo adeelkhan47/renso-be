@@ -13,7 +13,7 @@ domain_url = configs.BASE_API_URL
 
 class PayPal:
     @classmethod
-    def create_paypal_session(cls, name, order_id, language):
+    def create_paypal_session(cls, name, order_id, language, voucher_code):
         order = Order.query_by_id(order_id)
         payment = paypalrestsdk.Payment({
             "intent": "sale",
@@ -21,9 +21,9 @@ class PayPal:
                 "payment_method": "paypal"},
             "redirect_urls": {
                 "return_url": domain_url + "checkout_session/success?session_id=notStripe&order_id=" + str(
-                    order_id) + "&language=" + str(language),
+                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}",
                 "cancel_url": domain_url + "checkout_session/failed?session_id=notStripe&order_id=" + str(
-                    order_id) + "&language=" + str(language)},
+                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}"},
             "transactions": [{
                 "item_list": {
                     "items": [{

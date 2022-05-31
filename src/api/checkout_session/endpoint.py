@@ -1,3 +1,4 @@
+import uuid
 from http import HTTPStatus
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from model.associate_email import AssociateEmail
 from model.booking_status import BookingStatus
 from model.front_end_configs import FrontEndCofigs
 from model.order import Order
+from model.order_backup import OrderBackUp
 from model.order_status import OrderStatus
 from service.stripe_service import Stripe
 from . import api, schema
@@ -23,7 +25,8 @@ env = jinja2.Environment(
 )
 
 
-def process_order_completion(order, language):
+def process_order_completion(order, language, order_backup_id):
+    order_backup = OrderBackUp.query_by_id(order_backup_id)
     order_status_paid_id = OrderStatus.get_id_by_name("Paid")
     order_status_completed_id = OrderStatus.get_id_by_name("Completed")
     order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
@@ -52,7 +55,8 @@ def process_order_completion(order, language):
         effected_total_price=order.effected_total_cost,
         order=order,
         total=order.total_cost,
-        tax_amount=order.tax_amount
+        tax_amount=order.tax_amount,
+        edit_unique_key=order_backup.unique_key
     )
 
     send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)
@@ -127,16 +131,31 @@ class CheckOutSessionSuccess(Resource):
     # @api.marshal_with(schema.CheckOutSessionResponseSuccess, skip_none=True)
     @api.param("session_id", required=False)
     @api.param("order_id")
+    @api.param("paymentId", required=False)
+    @api.param("voucher_code")
     @api.param("language")
     def get(self):
+        payment_method = "Stripe"
         args = request.args
         session_id = args["session_id"]
+        voucher_code = args["voucher_code"]
+        payment_reference = session_id
+        if session_id == "notStripe":
+            payment_method = "Paypal"
+            payment_reference = args["paymentId"]
+
         order_id = args["order_id"]
         language = args["language"]
         order = Order.query_by_id(int(order_id))
-        process_order_completion(order, language)
+
+        unique_key = uuid.uuid4()
+        order_backup = OrderBackUp(order.cart_id, str(unique_key), payment_method, payment_reference, voucher_code,
+                                   str(order.total_cost))
+        order_backup.insert()
+        process_order_completion(order, language, order_backup.id)
         app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
         FE_URL = app_configs.front_end_url
+
         if session_id:
             return redirect(f"{FE_URL}success")
         return redirect(f"{FE_URL}failure")

@@ -15,6 +15,7 @@ from model.front_end_configs import FrontEndCofigs
 from model.item import Item
 from model.item_subtype import ItemSubType
 from model.location import Location
+from model.order_backup import OrderBackUp
 from model.payment_method import PaymentMethod
 from model.season import Season
 from model.voucher import Voucher
@@ -117,18 +118,33 @@ class booking_list(Resource):
     @api.marshal_list_with(schema.get_cart_payments)
     @api.param("cart_id", required=True)
     @api.param("voucher", required=False)
+    @api.param("backup_unique_key", required=False)
     @auth
     def get(self):
+
         args = request.args
         cart = Cart.query_by_id(args.get("cart_id"))
+        edit = False
+        order_backup = None
+        if "backup_unique_key" in args.keys() and args["backup_unique_key"]:
+            order_backup = OrderBackUp.get_order_backUp_by_unique_key(args["backup_unique_key"])
+            if order_backup:
+                edit = True
+            else:
+                raise BadRequest("Invalid Request")
 
         if not cart:
             raise NotFound(error_message("Cart not found."))
         bookings = [each.booking for each in cart.cart_bookings]
         price_factor = 100
         voucher = None
-        if "voucher" in args.keys() and args["voucher"]:
-            voucher = Voucher.get_voucher_by_code(args.get("voucher"), g.current_user.id)
+        if not edit:
+            if "voucher" in args.keys() and args["voucher"]:
+                voucher = Voucher.get_voucher_by_code(args.get("voucher"), g.current_user.id)
+                if voucher:
+                    price_factor = voucher.price_factor
+        else:
+            voucher = Voucher.get_voucher_by_code(order_backup.voucher, g.current_user.id)
             if voucher:
                 price_factor = voucher.price_factor
         payment_method = PaymentMethod.get_payment_method_by_name("Stripe", g.current_user.id)
@@ -154,6 +170,12 @@ class booking_list(Resource):
 
         app_configs = FrontEndCofigs.get_by_user_id(g.current_user.id)
         privacy_link = app_configs.privacy_policy_link
+        updated_amount = 0
+        price_already_paid = 0
+        if edit:
+            updated_amount = actual_total_price_after_tax - round(float(order_backup.price_paid), 2)
+            price_already_paid = round(float(order_backup.price_paid), 2)
+
         response_data = {
             "bookings": bookings,
             "taxs": taxs,
@@ -162,7 +184,10 @@ class booking_list(Resource):
             "actual_total_price_after_tax": round(actual_total_price_after_tax, 2),
             "tax_amount": round(tax_amount, 2),
             "voucher": voucher,
-            "privacy_policy_link": privacy_link
+            "privacy_policy_link": privacy_link,
+            "isEdited": edit,
+            "price_already_paid": round(price_already_paid, 2),
+            "updated_amount": round(updated_amount, 2)
 
         }
         return response_structure(response_data)

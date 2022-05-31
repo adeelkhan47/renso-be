@@ -7,6 +7,7 @@ class Cart(Base, db.Model):
     __tablename__ = "cart"
     cart_bookings = relationship("CartBookings", backref="cart")
     cart_order = relationship("Order", backref="cart")
+    cart_backups = relationship("OrderBackUp", backref="cart")
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

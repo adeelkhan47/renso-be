@@ -41,7 +41,8 @@ Order_WithLanguage_Expect = api.model(
         "cart_id": fields.Integer(),
         "voucher": fields.String(),
         "language": fields.String(),
-        "payment_method_id": fields.Integer()
+        "payment_method_id": fields.Integer(),
+        "backup_unique_key": fields.String(required=False),
     },
 )
 

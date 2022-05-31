@@ -18,10 +18,11 @@ stripe.default_http_client = RequestsClient()
 
 class Stripe:
     @classmethod
-    def create_checkout_session(cls, price_key, order_id, language):
+    def create_checkout_session(cls, price_key, order_id, language, voucher_code):
         """
         create checkout session for given price
 
+        :param voucher_code:
         :param order_id:
         :param language:
         :param price_key:
@@ -32,9 +33,9 @@ class Stripe:
         try:
             checkout_session = stripe.checkout.Session.create(
                 success_url=domain_url + "checkout_session/success?session_id={CHECKOUT_SESSION_ID}&order_id=" + str(
-                    order_id) + "&language=" + str(language),
+                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}",
                 cancel_url=domain_url + "checkout_session/failed?session_id={CHECKOUT_SESSION_ID}&order_id=" + str(
-                    order_id) + "&language=" + str(language),
+                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}",
                 payment_method_types=["card"],
                 mode="payment",
                 line_items=[{"quantity": 1, "price": price_key}],

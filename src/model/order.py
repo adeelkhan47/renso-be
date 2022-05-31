@@ -57,6 +57,10 @@ class Order(Base, db.Model):
         return orders
 
     @classmethod
+    def get_order_by_cart_id(cls, cart_id):
+        return cls.query.filter(cls.cart_id == cart_id).all()
+
+    @classmethod
     def getQuery_OrderByItemSubType(cls, item_subtype_id):
         orders = db.session.query(Order).join(OrderBookings).join(Booking).filter(
             OrderBookings.booking_id == Booking.id).join(
