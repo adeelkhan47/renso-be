@@ -56,7 +56,8 @@ def process_order_completion(order, language, order_backup_id):
         order=order,
         total=order.total_cost,
         tax_amount=order.tax_amount,
-        edit_unique_key=order_backup.unique_key
+        edit_unique_key=order_backup.unique_key,
+        fe_url=FE_URL
     )
 
     send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)
