@@ -9,7 +9,6 @@ from werkzeug.exceptions import NotFound, BadRequest
 from common.helper import response_structure
 from decorator.authorization import auth
 from model.booking import Booking
-from model.booking_status import BookingStatus
 from model.cart import Cart
 from model.custom_data import CustomData
 from model.custom_parameter import CustomParameter
@@ -89,7 +88,7 @@ class order_list(Resource):
             temp_tax_amount = 0
             for each in payment_method.payment_tax:
                 if booking.item.item_subtype_id in [x.item_sub_type_id for x in each.tax.itemSubTypeTaxs]:
-                    temp_tax_amount += (each.tax.percentage / 100) * booking.cost
+                    temp_tax_amount += (price_factor / 100) * ((each.tax.percentage / 100) * booking.cost)
                     if each.tax not in taxs:
                         taxs.append(each.tax)
 
