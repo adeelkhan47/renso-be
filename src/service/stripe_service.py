@@ -36,7 +36,8 @@ class Stripe:
                     order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}",
                 cancel_url=domain_url + "checkout_session/failed?session_id={CHECKOUT_SESSION_ID}&order_id=" + str(
                     order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}",
-                payment_method_types=["card"],
+                payment_method_types=["card", "klarna", "eps", "ideal", "alipay", "bancontact", "p24", "sepa_debit",
+                                      "sofort", "giropay"],
                 mode="payment",
                 line_items=[{"quantity": 1, "price": price_key}],
             )
