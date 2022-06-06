@@ -4,12 +4,13 @@ from flask import g
 from flask import request
 from flask_restx import Resource
 
-from common.helper import response_structure
+from common.helper import response_structure, error_message
 from decorator.authorization import auth
 from model.booking import Booking
 from model.item_subtype import ItemSubType
 from model.item_type import ItemType
 from model.location import Location
+from model.restricted_dates import RestrictedDates
 from . import api, schema
 
 
@@ -106,6 +107,14 @@ class items_subtype_list(Resource):
         item_sub_types = ItemType.query_by_id(args["item_type_id"]).item_sub_type
         location = Location.query_by_id(args["location_id"])
         response_data = []
+        # VALIDATE RESTRICTED DATES
+        start_date = start_time.date()
+        end_date = end_time.date()
+        first = RestrictedDates.validate_booking_date(args["item_type_id"], start_date)
+        second = RestrictedDates.validate_booking_date(args["item_type_id"], end_date)
+        if not first or not second:
+            return error_message("This Item_type is not available on these dates Temporary."), 400
+        #
         for each in item_sub_types:
             data = {"item_sub_type_object": each}
             list_of_ids = []

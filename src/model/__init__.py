@@ -4,7 +4,7 @@ from . import (associate_email, base, booking, booking_widget, custom_data,
                order_custom_data, payment_method, payment_tax, season,
                season_item_type, tag, tax, time_picker, user, voucher, front_end_configs, cart, cart_booking,
                associate_email_subtypes,
-               location_item_type, item_type_extra, item_subtype_taxs,order_backup)
+               location_item_type, item_type_extra, item_subtype_taxs, order_backup, restricted_dates)
 
 __all__ = [
     "base",
@@ -38,6 +38,7 @@ __all__ = [
     "item_type_extra",
     "item_subtype_taxs",
     "front_end_configs",
-    "order_backup"
+    "order_backup",
+    "restricted_dates"
 
 ]

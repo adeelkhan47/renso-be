@@ -14,7 +14,7 @@ Time_Picker_expect = api.model(
     },
 )
 Time_Picker = api.model(
-    "booking",
+    "time_picker",
     {
         "id": fields.Integer(),
         "start_time": fields.String(),
