@@ -16,6 +16,7 @@ class ItemType(Base, db.Model):
     item_sub_type = relationship("ItemSubType", backref="item_type")
     seasonItemTypes = relationship("SeasonItemTypes", backref="item_type")
     itemTypeLocations = relationship("LocationItemTypes", backref="item_type")
+    itemTypeExtras = relationship("ItemTypeExtra", backref="item_type")
     itemType_restricted_dates = relationship("RestrictedDates", backref="item_type")
 
     image = Column(String(500), nullable=False)
