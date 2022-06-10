@@ -13,6 +13,7 @@ from .booking_widget.endpoint import api as booking_widget_api
 from .checkout_session.endpoint import api as checkout_api
 from .custom_parameter.endpoint import api as custom_parameter_api
 from .day_picker.endpoint import api as day_picker_api
+from .email_text.endpoint import api as email_text_api
 from .file_upload.endpoint import api as file_upload_api
 from .front_end_configs.endpoint import api as front_end_configs_api
 from .item.endpoint import api as item_api
@@ -71,6 +72,7 @@ api.add_namespace(file_upload_api)
 api.add_namespace(front_end_configs_api)
 api.add_namespace(restricted_date_api)
 api.add_namespace(item_type_text_api)
+api.add_namespace(email_text_api)
 
 
 @api.errorhandler(NotFound)
