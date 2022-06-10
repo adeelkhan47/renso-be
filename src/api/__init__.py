@@ -19,6 +19,7 @@ from .item.endpoint import api as item_api
 from .item_status.endpoint import api as item_status_api
 from .item_subtype.endpoint import api as item_subtype_api
 from .item_type.endpoint import api as item_type_api
+from .item_type_text.endpoint import api as item_type_text_api
 from .language.endpoint import api as language_api
 from .location.endpoint import api as location_api
 from .order.endpoint import api as order_api
@@ -69,6 +70,7 @@ api.add_namespace(checkout_api)
 api.add_namespace(file_upload_api)
 api.add_namespace(front_end_configs_api)
 api.add_namespace(restricted_date_api)
+api.add_namespace(item_type_text_api)
 
 
 @api.errorhandler(NotFound)

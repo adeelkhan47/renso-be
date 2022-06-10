@@ -13,6 +13,7 @@ class ItemType(Base, db.Model):
     show_time_picker = Column(Boolean, nullable=True, unique=False, default=False)
     DayPickers = relationship("DayPicker", backref="item_type")
     items = relationship("Item", backref="item_type")
+    itemTypeTexts = relationship("ItemTypeText", backref="item_type")
     item_sub_type = relationship("ItemSubType", backref="item_type")
     seasonItemTypes = relationship("SeasonItemTypes", backref="item_type")
     itemTypeLocations = relationship("LocationItemTypes", backref="item_type")

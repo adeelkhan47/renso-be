@@ -15,6 +15,7 @@ RestrictedDates_Expect = api.model(
 RestrictedDates = api.model(
     "RestrictedDates",
     {
+        "id": fields.Integer(),
         "start_date": fields.Date(),
         "end_date": fields.Date(),
         #"item_type": fields.Nested(Item_type),
