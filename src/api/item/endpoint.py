@@ -14,6 +14,36 @@ from model.item_tag import ItemTag
 from . import api, schema
 
 
+@api.route("/filter_location")
+class items_list_locationFilter(Resource):
+    @api.doc("Get all filtered items")
+    @api.marshal_list_with(schema.get_list_responseItem)
+    @api.param("item_type_id", required=True)
+    @api.param("location_ids", required=True)
+    @auth
+    def get(self):
+        args = request.args.copy()
+        args["user_id:eq"] = str(g.current_user.id)
+        if ("item_type_id" in args.keys() and args["item_type_id"]) and (
+                "location_ids" in args.keys() and args["location_ids"]):
+            dummy_args = {'item_type_id:eq': args["item_type_id"]}
+            location_ids = [int(x) for x in args["location_ids"].split(",")]
+            all_items, total = Item.filtration(dummy_args)
+            required_items_id = []
+            for each in all_items:
+                for item_location in each.item_locations:
+                    if item_location.location.id in location_ids:
+                        required_items_id.append(each.id)
+                        break
+            all_filtered_id = ','.join((str(n) for n in required_items_id))
+            del args["location_ids"]
+            del args["item_type_id"]
+            args["id:eq"] = all_filtered_id
+            all_items, count = Item.filtration(args)
+            return response_structure(all_items, count), 200
+        return response_structure([], 0), 400
+
+
 @api.route("/available")
 class items_list(Resource):
     @api.doc("Get all items with date filter")

@@ -18,6 +18,7 @@ class Item(Base, db.Model):
     bookings = relationship("Booking", backref="item")
     item_tags = relationship("ItemTag", backref="item")
     item_locations = relationship("ItemLocation", backref="item")
+
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
     def __init__(self, name, image, description, item_status_id, item_type_id, item_subtype_id, user_id):
