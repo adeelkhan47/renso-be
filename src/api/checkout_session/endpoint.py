@@ -17,6 +17,7 @@ from model.item_type import ItemType
 from model.order import Order
 from model.order_backup import OrderBackUp
 from model.order_status import OrderStatus
+from service.paypal import PayPal
 from service.stripe_service import Stripe
 from . import api, schema
 
@@ -175,6 +176,7 @@ class CheckOutSessionSuccess(Resource):
         if session_id == "notStripe":
             payment_method = "Paypal"
             payment_reference = args["paymentId"]
+            PayPal.execute_payment(args["paymentId"], args["PayerID"])
 
         order_id = args["order_id"]
         language = args["language"]
