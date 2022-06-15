@@ -42,6 +42,14 @@ Availability_Response = api.model(
     }
 
 )
+error = api.model(
+    "Error",
+    {
+
+        "msg": fields.String(),
+
+    },
+)
 
 get_list_responseItem_Subtype = api.model(
     "getAll_item_type",
@@ -56,6 +64,7 @@ get_list_Availability_responseItem_Subtype_ = api.model(
     {
         "total_rows": fields.Integer(),
         "objects": fields.List(fields.Nested(Availability_Response, as_list=True)),
+        "error": fields.Nested(error, allow_null=True),
     },
 )
 get_by_id_responseItem_Subtype = api.model(

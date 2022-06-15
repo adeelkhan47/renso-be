@@ -13,10 +13,12 @@ class ItemType(Base, db.Model):
     show_time_picker = Column(Boolean, nullable=True, unique=False, default=False)
     DayPickers = relationship("DayPicker", backref="item_type")
     items = relationship("Item", backref="item_type")
+    itemTypeTexts = relationship("ItemTypeText", backref="item_type")
     item_sub_type = relationship("ItemSubType", backref="item_type")
     seasonItemTypes = relationship("SeasonItemTypes", backref="item_type")
     itemTypeLocations = relationship("LocationItemTypes", backref="item_type")
     itemTypeExtras = relationship("ItemTypeExtra", backref="item_type")
+    itemType_restricted_dates = relationship("RestrictedDates", backref="item_type")
 
     image = Column(String(500), nullable=False)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -41,3 +43,7 @@ class ItemType(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
+    @classmethod
+    def get_by_item_type_name(cls, name):
+        return cls.query.filter(cls.name == name).first()

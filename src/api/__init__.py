@@ -13,17 +13,20 @@ from .booking_widget.endpoint import api as booking_widget_api
 from .checkout_session.endpoint import api as checkout_api
 from .custom_parameter.endpoint import api as custom_parameter_api
 from .day_picker.endpoint import api as day_picker_api
+from .email_text.endpoint import api as email_text_api
 from .file_upload.endpoint import api as file_upload_api
+from .front_end_configs.endpoint import api as front_end_configs_api
 from .item.endpoint import api as item_api
 from .item_status.endpoint import api as item_status_api
 from .item_subtype.endpoint import api as item_subtype_api
 from .item_type.endpoint import api as item_type_api
+from .item_type_text.endpoint import api as item_type_text_api
 from .language.endpoint import api as language_api
 from .location.endpoint import api as location_api
-from .front_end_configs.endpoint import api as front_end_configs_api
 from .order.endpoint import api as order_api
 from .order_status.endpoint import api as order_status_api
 from .payment_methods.endpoint import api as payment_method_api
+from .restricted_dates.endpoint import api as restricted_date_api
 from .season.endpoint import api as season_api
 from .tag.endpoint import api as tag_api
 from .tax.endpoint import api as tax_api
@@ -67,6 +70,9 @@ api.add_namespace(associateEmail_api)
 api.add_namespace(checkout_api)
 api.add_namespace(file_upload_api)
 api.add_namespace(front_end_configs_api)
+api.add_namespace(restricted_date_api)
+api.add_namespace(item_type_text_api)
+api.add_namespace(email_text_api)
 
 
 @api.errorhandler(NotFound)
