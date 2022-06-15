@@ -43,3 +43,7 @@ class ItemType(Base, db.Model):
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
+
+    @classmethod
+    def get_by_item_type_name(cls, name):
+        return cls.query.filter(cls.name == name).first()

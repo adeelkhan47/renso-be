@@ -10,6 +10,7 @@ from model.booking import Booking
 from model.item import Item
 from model.item_location import ItemLocation
 from model.item_status import ItemStatus
+from model.item_subtype import ItemSubType
 from model.item_tag import ItemTag
 from . import api, schema
 
@@ -18,15 +19,15 @@ from . import api, schema
 class items_list_locationFilter(Resource):
     @api.doc("Get all filtered items")
     @api.marshal_list_with(schema.get_list_responseItem)
-    @api.param("item_type_id", required=True)
-    @api.param("location_ids", required=True)
+    @api.param("item_subtype_id")
+    @api.param("location_ids")
     @auth
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
-        if ("item_type_id" in args.keys() and args["item_type_id"]) and (
-                "location_ids" in args.keys() and args["location_ids"]):
-            dummy_args = {'item_type_id:eq': args["item_type_id"]}
+        if ("item_subtype_id" in args.keys() and args["item_subtype_id"]) and (
+                "location_ids" in args.keys() and args["location_ids"]) and (ItemSubType.query_by_id(args["item_subtype_id"])):
+            dummy_args = {'item_subtype_id:eq': args["item_subtype_id"]}
             location_ids = [int(x) for x in args["location_ids"].split(",")]
             all_items, total = Item.filtration(dummy_args)
             required_items_id = []
@@ -37,11 +38,12 @@ class items_list_locationFilter(Resource):
                         break
             all_filtered_id = ','.join((str(n) for n in required_items_id))
             del args["location_ids"]
-            del args["item_type_id"]
+            del args["item_subtype_id"]
             args["id:eq"] = all_filtered_id
             all_items, count = Item.filtration(args)
             return response_structure(all_items, count), 200
-        return response_structure([], 0), 400
+        all_items, count = Item.filtration(args)
+        return response_structure(all_items, count), 200
 
 
 @api.route("/available")

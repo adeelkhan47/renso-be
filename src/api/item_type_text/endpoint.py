@@ -17,7 +17,7 @@ class ItemTypeTextList(Resource):
         all_rows, count = ItemTypeText.filtration(args)
         return response_structure(all_rows, count), 200
 
-    @api.expect(schema.ItemTypeText_Expect)
+    @api.expect(schema.ItemTypeText_Expect2)
     @api.marshal_list_with(schema.get_by_id_ItemTypeText)
     @auth
     def post(self):
@@ -43,7 +43,7 @@ class ItemTypeText_by_id(Resource):
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_ItemTypeText)
-    @api.expect(schema.ItemTypeText_Expect)
+    @api.expect(schema.ItemTypeText_Expect2)
     @auth
     def patch(self, item_type_text_id):
         payload = api.payload.copy()

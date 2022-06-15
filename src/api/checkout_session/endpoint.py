@@ -11,7 +11,9 @@ from common.helper import response_structure
 from configuration import configs
 from model.associate_email import AssociateEmail
 from model.booking_status import BookingStatus
+from model.email_text import EmailText
 from model.front_end_configs import FrontEndCofigs
+from model.item_type import ItemType
 from model.order import Order
 from model.order_backup import OrderBackUp
 from model.order_status import OrderStatus
@@ -25,8 +27,36 @@ env = jinja2.Environment(
 )
 
 
+def create_email(order):
+    actual_text = ""
+    email_text = EmailText.get_by_user_id(order.user_id)
+    custom_values_dict = {}
+    custom_values = [x.custom_data for x in order.order_custom_data]
+    for each in custom_values:
+        custom_values_dict[each.name] = each.value
+    if email_text:
+        actual_text = email_text.text
+        custom_variables = [t for t in actual_text.split() if t.startswith('$')]
+        itemType_text_variables = [t for t in actual_text.split() if t.startswith('#')]
+        for each in itemType_text_variables:
+            item_type = ItemType.get_by_item_type_name(each[1:])
+            if item_type and item_type.itemTypeTexts:
+                data = item_type.itemTypeTexts[0].text
+                actual_text = actual_text.replace(each, data)
+            else:
+                actual_text = actual_text.replace(each, "")
+        for each in custom_variables:
+            if each[1:] in custom_values_dict.keys():
+                actual_text = actual_text.replace(each, custom_values_dict.get(each[1:]))
+            else:
+                actual_text = actual_text.replace(each, "")
+    actual_text = actual_text.replace('\n', '<br>')
+    return actual_text
+
+
 def process_order_completion(order, language, order_backup_id):
     order_backup = OrderBackUp.query_by_id(order_backup_id)
+    email_text = create_email(order)
     order_status_paid_id = OrderStatus.get_id_by_name("Paid")
     order_status_completed_id = OrderStatus.get_id_by_name("Completed")
     order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
@@ -57,7 +87,8 @@ def process_order_completion(order, language, order_backup_id):
         total=order.total_cost,
         tax_amount=order.tax_amount,
         edit_unique_key=order_backup.unique_key,
-        fe_url=FE_URL
+        fe_url=FE_URL,
+        email_text=email_text
     )
 
     send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)

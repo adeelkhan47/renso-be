@@ -41,6 +41,17 @@ BookingExpect = api.model(
     },
 )
 
+DummyOrder = api.model(
+    "dummyorder",
+    {
+        "id": fields.Integer()
+    }
+)
+order_bookings = api.model(
+    "order_bookings",
+    {"order_id": fields.Integer()}
+)
+
 Booking = api.model(
     "booking",
     {
@@ -51,6 +62,7 @@ Booking = api.model(
         "booking_status": fields.Nested(BookingStatus),
         "item": fields.Nested(Item),
         "location": fields.Nested(Location),
+        "order_bookings": fields.Nested(order_bookings, as_list=True)
 
     },
 )

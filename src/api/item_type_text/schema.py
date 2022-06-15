@@ -3,8 +3,8 @@ from flask_restx import fields
 from . import api
 from ..item_type.schema import Item_type
 
-ItemTypeText_Expect = api.model(
-    "ItemTypeText_Expect",
+ItemTypeText_Expect2 = api.model(
+    "ItemTypeText_Expect2",
     {
         "text": fields.String(),
         "item_type_id": fields.Integer(),
