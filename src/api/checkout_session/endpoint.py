@@ -46,6 +46,7 @@ def create_email(order):
                 actual_text = actual_text.replace(each, data)
             else:
                 actual_text = actual_text.replace(each, "")
+        actual_text = actual_text.replace("$name", order.client_name)
         for each in custom_variables:
             if each[1:] in custom_values_dict.keys():
                 actual_text = actual_text.replace(each, custom_values_dict.get(each[1:]))

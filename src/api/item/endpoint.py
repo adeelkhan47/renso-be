@@ -26,7 +26,8 @@ class items_list_locationFilter(Resource):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
         if ("item_subtype_id" in args.keys() and args["item_subtype_id"]) and (
-                "location_ids" in args.keys() and args["location_ids"]) and (ItemSubType.query_by_id(args["item_subtype_id"])):
+                "location_ids" in args.keys() and args["location_ids"]) and (
+        ItemSubType.query_by_id(args["item_subtype_id"])):
             dummy_args = {'item_subtype_id:eq': args["item_subtype_id"]}
             location_ids = [int(x) for x in args["location_ids"].split(",")]
             all_items, total = Item.filtration(dummy_args)
@@ -42,6 +43,7 @@ class items_list_locationFilter(Resource):
             args["id:eq"] = all_filtered_id
             all_items, count = Item.filtration(args)
             return response_structure(all_items, count), 200
+        args["item_subtype_id:eq"] = args["item_subtype_id"]
         all_items, count = Item.filtration(args)
         return response_structure(all_items, count), 200
 
