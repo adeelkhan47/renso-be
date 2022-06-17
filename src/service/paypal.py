@@ -47,3 +47,11 @@ class PayPal:
                 approval_url = str(link.href)
                 print("Redirect for approval: %s" % (approval_url))
         return approval_url
+
+    @classmethod
+    def execute_payment(cls, payment_id, payer_id):
+        payment = paypalrestsdk.Payment.find(payment_id)
+        if payment.execute({"payer_id": payer_id}):
+            print("payment successful.")
+        else:
+            print("paypal payment failed.")

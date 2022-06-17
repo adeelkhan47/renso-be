@@ -17,6 +17,7 @@ from model.item_type import ItemType
 from model.order import Order
 from model.order_backup import OrderBackUp
 from model.order_status import OrderStatus
+from service.paypal import PayPal
 from service.stripe_service import Stripe
 from . import api, schema
 
@@ -45,6 +46,7 @@ def create_email(order):
                 actual_text = actual_text.replace(each, data)
             else:
                 actual_text = actual_text.replace(each, "")
+        actual_text = actual_text.replace("$name", order.client_name)
         for each in custom_variables:
             if each[1:] in custom_values_dict.keys():
                 actual_text = actual_text.replace(each, custom_values_dict.get(each[1:]))
@@ -175,6 +177,7 @@ class CheckOutSessionSuccess(Resource):
         if session_id == "notStripe":
             payment_method = "Paypal"
             payment_reference = args["paymentId"]
+            PayPal.execute_payment(args["paymentId"], args["PayerID"])
 
         order_id = args["order_id"]
         language = args["language"]
