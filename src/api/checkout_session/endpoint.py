@@ -17,6 +17,7 @@ from model.item_type import ItemType
 from model.order import Order
 from model.order_backup import OrderBackUp
 from model.order_status import OrderStatus
+from model.voucher import Voucher
 from service.paypal import PayPal
 from service.stripe_service import Stripe
 from . import api, schema
@@ -90,7 +91,8 @@ def process_order_completion(order, language, order_backup_id):
         tax_amount=order.tax_amount,
         edit_unique_key=order_backup.unique_key,
         fe_url=FE_URL,
-        email_text=email_text
+        email_text=email_text,
+        footer_email=app_configs.email
     )
 
     send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)
@@ -108,7 +110,8 @@ def process_order_completion(order, language, order_backup_id):
     for email in association_data.keys():
         stuff_to_render2 = template2.render(
             configs=configs,
-            bookings=association_data[email]
+            bookings=association_data[email],
+            footer_email=app_configs.email
         )
         send_email(email, "Order Confirmation for Associations", stuff_to_render2, app_configs.email,
                    app_configs.email_password)
@@ -182,8 +185,13 @@ class CheckOutSessionSuccess(Resource):
         order_id = args["order_id"]
         language = args["language"]
         order = Order.query_by_id(int(order_id))
-
         unique_key = uuid.uuid4()
+        if voucher_code:
+            voucher = Voucher.get_voucher_by_code(voucher_code, order.user_id)
+            if voucher:
+                if not voucher.counter:
+                    Voucher.update(voucher.id, {"counter": 0})
+                Voucher.update(voucher.id, {"counter": voucher.counter + 1})
         order_backup = OrderBackUp(order.cart_id, str(unique_key), payment_method, payment_reference, voucher_code,
                                    str(order.total_cost))
         order_backup.insert()

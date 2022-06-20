@@ -10,16 +10,22 @@ class FrontEndCofigs(Base, db.Model):
     front_end_url = Column(String, default="")
     email = Column(String, default="")
     email_password = Column(String, default="")
-    privacy_policy_link = Column(String, default="")
+    link1_name = Column(String, nullable=True)
+    link2_name = Column(String, nullable=True)
+    link1 = Column(String, nullable=True)
+    link2 = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, url, front_end_url, email, email_password, privacy_policy_link,user_id):
+    def __init__(self, url, front_end_url, email, email_password, user_id, link1_name, link2_name, link1, link2):
         self.url = url
         self.user_id = user_id
         self.front_end_url = front_end_url
         self.email = email
         self.email_password = email_password
-        self.privacy_policy_link = privacy_policy_link
+        self.link1 = link1
+        self.link2 = link2
+        self.link1_name = link1_name
+        self.link2_name = link2_name
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

@@ -14,7 +14,9 @@ Item_subtype_Expect = api.model(
         "image": fields.String(),
         "least_price": fields.Float(),
         "discount_after_higher_price": fields.Integer(),
-        "same_price_days": fields.Integer()
+        "same_price_days": fields.Integer(),
+        "show_description": fields.Boolean(),
+        "description": fields.String()
     },
 )
 
@@ -29,8 +31,9 @@ Item_subtype = api.model(
         "item_type": fields.Nested(Item_type),
         "least_price": fields.Float(),
         "discount_after_higher_price": fields.Integer(),
-        "same_price_days": fields.Integer()
-
+        "same_price_days": fields.Integer(),
+        "show_description": fields.Boolean(),
+        "description": fields.String()
     },
 )
 

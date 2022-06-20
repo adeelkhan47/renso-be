@@ -9,15 +9,17 @@ class Voucher(Base, db.Model):
     code = Column(String, nullable=False)
     description = Column(String, nullable=True)
     price_factor = Column(Integer, nullable=False, default=100)
+    counter = Column(Integer, nullable=True, default=0)
     status = Column(Boolean, default=True)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, code, description, price_factor, status, user_id):
+    def __init__(self, code, description, price_factor, status, user_id, counter):
         self.code = code
         self.description = description
         self.price_factor = price_factor
         self.status = status
         self.user_id = user_id
+        self.counter = counter
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

@@ -27,7 +27,7 @@ class items_list_locationFilter(Resource):
         args["user_id:eq"] = str(g.current_user.id)
         if ("item_subtype_id" in args.keys() and args["item_subtype_id"]) and (
                 "location_ids" in args.keys() and args["location_ids"]) and (
-        ItemSubType.query_by_id(args["item_subtype_id"])):
+                ItemSubType.query_by_id(args["item_subtype_id"])):
             dummy_args = {'item_subtype_id:eq': args["item_subtype_id"]}
             location_ids = [int(x) for x in args["location_ids"].split(",")]
             all_items, total = Item.filtration(dummy_args)
@@ -127,6 +127,15 @@ class item_by_id(Resource):
     @api.doc("Delete item by id")
     @auth
     def delete(self, item_id):
+        order_bookings = [each.order_bookings for each in Booking.get_confirmed_bookings_by_item_id(item_id)]
+        final_data = []
+        for each in order_bookings:
+            for data in each:
+                final_data.append(data)
+        orders = list(set([each.order.id for each in final_data]))
+        active_orders = ",".join(str(x) for x in orders)
+        if active_orders:
+            return {"active_orders": active_orders}, 200
         Item.delete(item_id)
         return "ok", 200
 
@@ -135,6 +144,19 @@ class item_by_id(Resource):
     @auth
     def patch(self, item_id):
         data = api.payload.copy()
+        item_status_maintenance_id = ItemStatus.get_id_by_name("Maintenance")
+        if "item_status_id" in data.keys():
+            if data.get("item_status_id") == item_status_maintenance_id:
+                order_bookings = [each.order_bookings for each in Booking.get_confirmed_bookings_by_item_id(item_id)]
+                final_data = []
+                for each in order_bookings:
+                    for data in each:
+                        final_data.append(data)
+                orders = list(set([each.order.id for each in final_data]))
+                active_orders = ",".join(str(x) for x in orders)
+                if active_orders:
+                    return {"active_orders": active_orders}, 200
+
         if "tag_ids" in data.keys():
             ItemTag.delete_by_item_id(item_id)
             tag_ids = data.get("tag_ids").split(",")
@@ -149,6 +171,7 @@ class item_by_id(Resource):
                 if each:
                     ItemLocation(item_id=item_id, location_id=each).insert()
             del data["location_ids"]
+
         Item.update(item_id, data)
         item = Item.query_by_id(item_id)
         return response_structure(item), 200

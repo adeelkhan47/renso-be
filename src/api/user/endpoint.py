@@ -42,7 +42,7 @@ class user_list(Resource):
         user = User(name, email, password, subscription, image, gender, status, user_key)
         user.insert()
         FrontEndCofigs("", "http://www.front_end.com/", "dummy@strato.de", "EmailPassword",
-                       "http://www.privacy_polcy.com/", user.id).insert()
+                       "", user.id, "link1_name", "link2_name", "link1", "link2").insert()
         item_type = ItemType("Extra", 1, True, "", user.id, False)
         item_type.insert()
         Tag("Cheap", "", "blue", user.id).insert()
@@ -52,6 +52,7 @@ class user_list(Resource):
         PaymentMethod("Stripe", "description", True, user.id).insert()
         PaymentMethod("Paypal", "description", True, user.id).insert()
         return response_structure(User.query_by_id(user.id)), 201
+
 
 @api.route("/login")
 class user_by_login_id(Resource):

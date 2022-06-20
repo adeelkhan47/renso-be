@@ -9,6 +9,7 @@ from werkzeug.exceptions import NotFound, BadRequest
 from common.helper import response_structure
 from decorator.authorization import auth
 from model.booking import Booking
+from model.booking_status import BookingStatus
 from model.cart import Cart
 from model.custom_data import CustomData
 from model.custom_parameter import CustomParameter
@@ -49,6 +50,7 @@ class order_list(Resource):
         client_email = payload.get("client_email")
         order_status_payment_pending_id = OrderStatus.get_id_by_name("Payment Pending")
         order_status_Updated_id = OrderStatus.get_id_by_name("Updated")
+        booking_status_payment_pending_id = BookingStatus.get_id_by_name("Payment Pending")
         phone_number = payload.get("phone_number")
         language = "en"
         edit = False
@@ -119,6 +121,7 @@ class order_list(Resource):
                 customData.insert()
                 OrderCustomData(customData.id, order.id).insert()
         for each in bookings:
+            Booking.update(each.id, {"booking_status_id": booking_status_payment_pending_id})
             OrderBookings(each.id, order.id).insert()
 
         session_id = None
