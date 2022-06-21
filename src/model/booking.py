@@ -44,9 +44,9 @@ class Booking(Base, db.Model):
     @classmethod
     def get_bookings_by_item_id(cls, item_id):
         active_id = BookingStatus.get_id_by_name("Active")
-        pending_id = BookingStatus.get_id_by_name("Pending")
+        #pending_id = BookingStatus.get_id_by_name("Pending")
         # .in_((123,456)))
-        return cls.query.filter(cls.item_id == item_id, cls.booking_status_id.in_((active_id, pending_id))).all()
+        return cls.query.filter(cls.item_id == item_id, cls.booking_status_id.in_((active_id))).all()
 
 
 
