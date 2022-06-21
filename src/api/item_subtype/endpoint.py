@@ -101,7 +101,6 @@ class items_subtype_list(Resource):
     @api.param("end_time", required=True)
     @api.param("item_type_id", required=True)
     @api.param("location_id", required=True)
-    @api.param("")
     @auth
     def get(self):
         args = request.args
