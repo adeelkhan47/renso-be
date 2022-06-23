@@ -169,7 +169,6 @@ class booking_list(Resource):
         actual_total_price_after_tax = effected_total_price + tax_amount
 
         app_configs = FrontEndCofigs.get_by_user_id(g.current_user.id)
-        privacy_link = app_configs.privacy_policy_link
         updated_amount = 0
         price_already_paid = 0
         if edit:
@@ -184,7 +183,6 @@ class booking_list(Resource):
             "actual_total_price_after_tax": round(actual_total_price_after_tax, 2),
             "tax_amount": round(tax_amount, 2),
             "voucher": voucher,
-            "privacy_policy_link": privacy_link,
             "isEdited": edit,
             "price_already_paid": round(price_already_paid, 2),
             "updated_amount": round(updated_amount, 2)
@@ -214,11 +212,15 @@ class booking_list(Resource):
                 item_sub_type = ItemSubType.query_by_id(each.get("item_sub_type_id"))
                 least_price = item_sub_type.least_price
                 for item_id in each.get("item_ids"):
+                    item = Item.query_by_id(item_id)
                     if (item_sub_type.id, item_id) not in booking_dictionary.keys():
                         booking_dictionary[(item_sub_type.id, item_id)] = 0
                     diff = end_time - start_time
                     days, seconds = diff.days, diff.seconds
-                    hours = days * 24 + seconds // 3600
+                    if item.item_type.show_time_picker == False:
+                        hours = 24
+                    else:
+                        hours = days * 24 + seconds // 3600
                     price = (hours * item_sub_type.price) * factor / 100
                     final_price = price
                     if least_price > final_price / hours:

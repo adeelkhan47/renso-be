@@ -102,6 +102,7 @@
             margin: 5px;
         }
 
+
         .table {
             width: 100%;
             font-size: 14px;
@@ -261,9 +262,12 @@
     <div class="description row">
         <div class="text" style="text-align: left">
             {% autoescape false %}
-            {{ email_text }}
+            <a style="color:black; text-decoration:none;">
+                <span >
+                {{ email_text }}
+                </span>
+            </a>
             {% endautoescape %}
-
         </div>
     </div>
 

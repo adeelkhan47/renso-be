@@ -33,18 +33,26 @@ def create_email(order):
     actual_text = ""
     email_text = EmailText.get_by_user_id(order.user_id)
     custom_values_dict = {}
+    item_types_in_order = [each.booking.item.item_type.name for each in order.order_bookings]
+
+    for each in order.order_bookings:
+        print(each.booking.item.item_type.name)
     custom_values = [x.custom_data for x in order.order_custom_data]
     for each in custom_values:
         custom_values_dict[each.name] = each.value
+
     if email_text:
         actual_text = email_text.text
         custom_variables = [t for t in actual_text.split() if t.startswith('$')]
         itemType_text_variables = [t for t in actual_text.split() if t.startswith('#')]
         for each in itemType_text_variables:
-            item_type = ItemType.get_by_item_type_name(each[1:])
-            if item_type and item_type.itemTypeTexts:
-                data = item_type.itemTypeTexts[0].text
-                actual_text = actual_text.replace(each, data)
+            if each[1:] and each[1:] in item_types_in_order:
+                item_type = ItemType.get_by_item_type_name(each[1:])
+                if item_type and item_type.itemTypeTexts:
+                    data = item_type.itemTypeTexts[0].text
+                    actual_text = actual_text.replace(each, data)
+                else:
+                    actual_text = actual_text.replace(each, "")
             else:
                 actual_text = actual_text.replace(each, "")
         actual_text = actual_text.replace("$name", order.client_name)

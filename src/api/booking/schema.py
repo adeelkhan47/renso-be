@@ -77,7 +77,6 @@ Cart = api.model(
         "actual_total_price_after_tax": fields.Float(),
         "tax_amount": fields.Float(),
         "voucher": fields.Nested(Voucher, skip_none=True),
-        "privacy_policy_link": fields.String(),
         "isEdited": fields.Boolean(),
         "price_already_paid": fields.Float(),
         "updated_amount": fields.Float(),
