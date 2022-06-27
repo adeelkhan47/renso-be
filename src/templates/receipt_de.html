@@ -349,14 +349,16 @@
                 € {{ effected_total_price }}
             </div>
         </div>
-        <div class="subtitle">
-            <div class="name">
-                Steuer
+        {% for tax in taxs %}
+            <div class="subtitle">
+                <div class="name">
+                    {{ tax.name }}( {{ tax.percentage }}% )
+                </div>
+                <div class="value">
+                    € {{ ((tax.percentage/100)* effected_total_price)|round(2, 'common') }}
+                </div>
             </div>
-            <div class="value">
-                € {{ tax_amount }}
-            </div>
-        </div>
+        {% endfor %}
     </div>
     <div class="left"> Wenn Sie die Bestellung bearbeiten möchten, klicken Sie
         <a href="{{ fe_url }}cart/edit/{{ order.cart_id }}/{{ edit_unique_key }}" style="color: #222222"><b>hier</b></a>.

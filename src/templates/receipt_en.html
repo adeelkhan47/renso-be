@@ -263,7 +263,7 @@
         <div class="text" style="text-align: left">
             {% autoescape false %}
             <a style="color:black; text-decoration:none;">
-                <span >
+                <span>
                 {{ email_text }}
                 </span>
             </a>
@@ -299,7 +299,6 @@
             </thead>
             <tbody>
             {% for each in order.order_bookings %}
-
                 <tr>
                     <td colspan="7">
                         {{ each.booking.item.name }}
@@ -350,14 +349,17 @@
                 € {{ effected_total_price }}
             </div>
         </div>
-        <div class="subtitle">
-            <div class="name">
-                Tax
+        {% for tax in taxs %}
+            <div class="subtitle">
+                <div class="name">
+                    {{ tax.name }}( {{ tax.percentage }}% )
+                </div>
+                <div class="value">
+                    € {{ ((tax.percentage/100)* effected_total_price)|round(2, 'common') }}
+                </div>
             </div>
-            <div class="value">
-                € {{ tax_amount }}
-            </div>
-        </div>
+        {% endfor %}
+
     </div>
     <div class="left"> if you wanna edit the order click
         <a href="{{ fe_url }}cart/edit/{{ order.cart_id }}/{{ edit_unique_key }}" style="color: #222222"><b>here</b></a>.
@@ -420,3 +422,8 @@
 </body>
 
 </html>
+<script>
+    function round(value, decimals) {
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals).toFixed(decimals);
+    }
+</script>

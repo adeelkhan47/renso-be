@@ -17,6 +17,7 @@ from model.item_type import ItemType
 from model.order import Order
 from model.order_backup import OrderBackUp
 from model.order_status import OrderStatus
+from model.tax import Tax
 from model.voucher import Voucher
 from service.paypal import PayPal
 from service.stripe_service import Stripe
@@ -65,12 +66,13 @@ def create_email(order):
     return actual_text
 
 
-def process_order_completion(order, language, order_backup_id):
+def process_order_completion(order, language, order_backup_id, tax_ids):
     order_backup = OrderBackUp.query_by_id(order_backup_id)
     email_text = create_email(order)
     order_status_paid_id = OrderStatus.get_id_by_name("Paid")
     order_status_completed_id = OrderStatus.get_id_by_name("Completed")
     order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
+    taxs, total_taxs = Tax.filtration({"id:eq": tax_ids})
     if language == "de":
         associate_receipt_template = "associate_receipt_de.html"
         receipt_template = "receipt_de.html"
@@ -100,7 +102,8 @@ def process_order_completion(order, language, order_backup_id):
         edit_unique_key=order_backup.unique_key,
         fe_url=FE_URL,
         email_text=email_text,
-        footer_email=app_configs.email
+        footer_email=app_configs.email,
+        taxs=taxs
     )
 
     send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)
@@ -179,11 +182,13 @@ class CheckOutSessionSuccess(Resource):
     @api.param("paymentId", required=False)
     @api.param("voucher_code")
     @api.param("language")
+    @api.param("tax_ids")
     def get(self):
         payment_method = "Stripe"
         args = request.args
         session_id = args["session_id"]
         voucher_code = args["voucher_code"]
+        tax_ids = args["tax_ids"]
         payment_reference = session_id
         if session_id == "notStripe":
             payment_method = "Paypal"
@@ -203,7 +208,7 @@ class CheckOutSessionSuccess(Resource):
         order_backup = OrderBackUp(order.cart_id, str(unique_key), payment_method, payment_reference, voucher_code,
                                    str(order.total_cost))
         order_backup.insert()
-        process_order_completion(order, language, order_backup.id)
+        process_order_completion(order, language, order_backup.id, tax_ids)
         app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
         FE_URL = app_configs.front_end_url
 

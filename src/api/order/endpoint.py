@@ -130,24 +130,27 @@ class order_list(Resource):
             order_name = f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}"
         else:
             order_name = f"EDITED-{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}"
-
+        if taxs:
+            tax_ids = ",".join(str(each.id) for each in taxs)
+        else:
+            tax_ids = ""
         if payment_method.name == "Stripe":
             if order.total_cost > 0:
 
                 product_id = Stripe.create_product(order_name)
 
                 price_id = Stripe.create_price(product_id, order.total_cost)
-                session_id = Stripe.create_checkout_session(price_id, order.id, language, voucher_code)
+                session_id = Stripe.create_checkout_session(price_id, order.id, language, voucher_code, tax_ids)
             else:
                 unique_key = uuid.uuid4()
                 order_backup = OrderBackUp(order.cart_id, str(unique_key), "Stripe", "None",
                                            voucher_code,
                                            str(order.total_cost))
                 order_backup.insert()
-                process_order_completion(order, language, order_backup.id)
+                process_order_completion(order, language, order_backup.id, tax_ids)
         elif payment_method.name == "Paypal":
             if order.total_cost > 0:
-                paypal_url = PayPal.create_paypal_session(order_name, order.id, language, voucher_code)
+                paypal_url = PayPal.create_paypal_session(order_name, order.id, language, voucher_code,tax_ids)
                 if not paypal_url:
                     raise BadRequest("Paypal not working.")
             else:
@@ -156,7 +159,7 @@ class order_list(Resource):
                                            voucher_code,
                                            str(order.total_cost))
                 order_backup.insert()
-                process_order_completion(order, language, order_backup.id)
+                process_order_completion(order, language, order_backup.id,tax_ids)
 
         else:
             raise NotFound("Payment_Method not Found.")

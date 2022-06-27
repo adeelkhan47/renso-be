@@ -169,6 +169,7 @@ class booking_list(Resource):
         actual_total_price_after_tax = effected_total_price + tax_amount
 
         app_configs = FrontEndCofigs.get_by_user_id(g.current_user.id)
+
         updated_amount = 0
         price_already_paid = 0
         if edit:

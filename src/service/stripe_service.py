@@ -18,7 +18,7 @@ stripe.default_http_client = RequestsClient()
 
 class Stripe:
     @classmethod
-    def create_checkout_session(cls, price_key, order_id, language, voucher_code):
+    def create_checkout_session(cls, price_key, order_id, language, voucher_code, tax_ids):
         """
         create checkout session for given price
 
@@ -33,9 +33,9 @@ class Stripe:
         try:
             checkout_session = stripe.checkout.Session.create(
                 success_url=domain_url + "checkout_session/success?session_id={CHECKOUT_SESSION_ID}&order_id=" + str(
-                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}",
+                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}" + f"&tax_ids={tax_ids}",
                 cancel_url=domain_url + "checkout_session/failed?session_id={CHECKOUT_SESSION_ID}&order_id=" + str(
-                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}",
+                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}" + f"&tax_ids={tax_ids}",
                 payment_method_types=["card", "klarna", "eps", "ideal", "alipay", "bancontact", "p24", "sepa_debit",
                                       "sofort", "giropay"],
                 mode="payment",
