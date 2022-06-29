@@ -17,7 +17,7 @@ def auth(f):
         :param kwargs:
         :return:
         """
-        logging.info(request.base_url)
+        logging.error(request.base_url)
         authorization = request.headers.get("Authorization")
 
         if not authorization:
