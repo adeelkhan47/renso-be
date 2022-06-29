@@ -151,7 +151,7 @@ class CheckOutSessionFailed(Resource):
 
         :return:
         """
-        logging.error(request.base_url)
+        logging.error(request.url)
         order_status_Cancelled_id = OrderStatus.get_id_by_name("Cancelled")
         args = request.args
         logging.error("######### Transaction Failed #########")
@@ -175,7 +175,7 @@ class CheckOutSessionSuccess(Resource):
     @api.param("voucher_code")
     @api.param("language")
     def get(self):
-        logging.error(request.base_url)
+        logging.error(request.url)
         payment_method = "Stripe"
         args = request.args
         session_id = args["session_id"]
