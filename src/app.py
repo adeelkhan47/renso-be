@@ -1,5 +1,3 @@
-import logging
-
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -16,7 +14,6 @@ app.config["CORS_HEADERS"] = "Content-Type"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = configs.SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.logger(logging.INFO)
 db.init_app(app)
 
 
