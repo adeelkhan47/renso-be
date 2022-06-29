@@ -13,6 +13,7 @@ CompanyExpect = api.model(
         "legal_representative": fields.String(),
         "email_for_taxs": fields.String(),
         "company_tax_number": fields.String(),
+        "bate_number": fields.Integer(),
     },
 )
 
@@ -29,6 +30,7 @@ Company = api.model(
         "legal_representative": fields.String(),
         "email_for_taxs": fields.String(),
         "company_tax_number": fields.String(),
+        "bate_number": fields.Integer(),
         #"item_subtype": fields.Nested(Item_subtype),
         #"sub_category_company": fields.Nested(tags, as_list=True),
     },

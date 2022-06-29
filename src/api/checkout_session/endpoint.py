@@ -1,9 +1,9 @@
+import logging
 import uuid
 from http import HTTPStatus
 from pathlib import Path
 
 import jinja2
-import logging
 from flask import request, redirect
 from flask_restx import Resource
 
@@ -18,7 +18,6 @@ from model.item_type import ItemType
 from model.order import Order
 from model.order_backup import OrderBackUp
 from model.order_status import OrderStatus
-from model.tax import Tax
 from model.voucher import Voucher
 from service.paypal import PayPal
 from service.stripe_service import Stripe
@@ -98,47 +97,54 @@ def process_order_completion(order, language, order_backup_id):
     if order.order_status_id == order_status_cancelled_id:
         logging.error("######### Order Already Cancelled #########")
         return redirect(f"{FE_URL}failure")
-    template = env.get_template(receipt_template)
-
-    stuff_to_render = template.render(
-        configs=configs,
-        actual_total_price=order.actual_total_cost,
-        effected_total_price=order.effected_total_cost,
-        order=order,
-        total=order.total_cost,
-        tax_amount=order.tax_amount,
-        edit_unique_key=order_backup.unique_key,
-        fe_url=FE_URL,
-        email_text=email_text,
-        footer_email=app_configs.email,
-        tax_response=tax_response
-    )
-
-    send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)
-    emails, count = AssociateEmail.filtration({"status:eq": "true", "user_id:eq": str(order.user_id)})
-    bookings_to_check = [x.booking for x in order.order_bookings]
-    association_data = {}
-    for each in emails:
-        item_subtypes = [x.item_subtype for x in each.associate_email_subtypes]
-        for booking in bookings_to_check:
-            if booking.item.item_subtype in item_subtypes:
-                if each.email not in association_data.keys():
-                    association_data[each.email] = []
-                association_data[each.email].append(booking)
-    template2 = env.get_template(associate_receipt_template)
-    for email in association_data.keys():
-        stuff_to_render2 = template2.render(
-            order_id=order.id,
-            configs=configs,
-            bookings=association_data[email],
-            footer_email=app_configs.email
-        )
-        send_email(email, "Order Confirmation for Associations", stuff_to_render2, app_configs.email,
-                   app_configs.email_password)
     Order.update(order.id, {"order_status_id": order_status_paid_id})
     active_booking_status = BookingStatus.get_id_by_name("Active")
+
     for each in order.order_bookings:
         each.booking.update(each.booking.id, {"booking_status_id": active_booking_status})
+    try:
+
+        template = env.get_template(receipt_template)
+
+        stuff_to_render = template.render(
+            configs=configs,
+            actual_total_price=order.actual_total_cost,
+            effected_total_price=order.effected_total_cost,
+            order=order,
+            total=order.total_cost,
+            tax_amount=order.tax_amount,
+            edit_unique_key=order_backup.unique_key,
+            fe_url=FE_URL,
+            email_text=email_text,
+            footer_email=app_configs.email,
+            tax_response=tax_response
+        )
+
+        send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email,
+                   app_configs.email_password)
+        emails, count = AssociateEmail.filtration({"status:eq": "true", "user_id:eq": str(order.user_id)})
+        bookings_to_check = [x.booking for x in order.order_bookings]
+        association_data = {}
+        for each in emails:
+            item_subtypes = [x.item_subtype for x in each.associate_email_subtypes]
+            for booking in bookings_to_check:
+                if booking.item.item_subtype in item_subtypes:
+                    if each.email not in association_data.keys():
+                        association_data[each.email] = []
+                    association_data[each.email].append(booking)
+        template2 = env.get_template(associate_receipt_template)
+        for email in association_data.keys():
+            stuff_to_render2 = template2.render(
+                order_id=order.id,
+                configs=configs,
+                bookings=association_data[email],
+                footer_email=app_configs.email
+            )
+            send_email(email, "Order Confirmation for Associations", stuff_to_render2, app_configs.email,
+                       app_configs.email_password)
+    except Exception as e:
+        logging.exception(e)
+        logging.error(f"Sending Emails Failed for Order Id{order.id}")
 
 
 @api.route("")
@@ -195,35 +201,39 @@ class CheckOutSessionSuccess(Resource):
     @api.param("language")
     @api.param("tax_ids")
     def get(self):
-        logging.error(request.url)
-        payment_method = "Stripe"
-        args = request.args
-        session_id = args["session_id"]
-        voucher_code = args["voucher_code"]
-        payment_reference = session_id
-        if session_id == "notStripe":
-            payment_method = "Paypal"
-            payment_reference = args["paymentId"]
-            PayPal.execute_payment(args["paymentId"], args["PayerID"])
+        try:
+            logging.error(request.url)
+            payment_method = "Stripe"
+            args = request.args
+            session_id = args["session_id"]
+            voucher_code = args["voucher_code"]
+            payment_reference = session_id
+            if session_id == "notStripe":
+                payment_method = "Paypal"
+                payment_reference = args["paymentId"]
+                PayPal.execute_payment(args["paymentId"], args["PayerID"])
 
-        order_id = args["order_id"]
-        language = args["language"]
-        order = Order.query_by_id(int(order_id))
-        unique_key = uuid.uuid4()
-        if voucher_code:
-            voucher = Voucher.get_voucher_by_code(voucher_code, order.user_id)
-            if voucher:
-                if not voucher.counter:
-                    Voucher.update(voucher.id, {"counter": 0})
-                Voucher.update(voucher.id, {"counter": voucher.counter + 1})
-        order_backup = OrderBackUp(order.cart_id, str(unique_key), payment_method, payment_reference, voucher_code,
-                                   str(order.total_cost))
-        order_backup.insert()
-        process_order_completion(order, language, order_backup.id)
-        app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
-        FE_URL = app_configs.front_end_url
+            order_id = args["order_id"]
+            language = args["language"]
+            order = Order.query_by_id(int(order_id))
+            unique_key = uuid.uuid4()
+            if voucher_code:
+                voucher = Voucher.get_voucher_by_code(voucher_code, order.user_id)
+                if voucher:
+                    if not voucher.counter:
+                        Voucher.update(voucher.id, {"counter": 0})
+                    Voucher.update(voucher.id, {"counter": voucher.counter + 1})
+            order_backup = OrderBackUp(order.cart_id, str(unique_key), payment_method, payment_reference, voucher_code,
+                                       str(order.total_cost))
+            order_backup.insert()
+            process_order_completion(order, language, order_backup.id)
+            app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
+            FE_URL = app_configs.front_end_url
 
-        if session_id:
-            return redirect(f"{FE_URL}success")
-        logging.error("######### Transaction Process Failed #########")
-        return redirect(f"{FE_URL}failure")
+            if session_id:
+                return redirect(f"{FE_URL}success")
+            logging.error("######### Transaction Process Failed #########")
+            return redirect(f"{FE_URL}failure")
+        except Exception as e:
+            logging.exception(e)
+            logging.error(f"Succes Callback porcess failed.")

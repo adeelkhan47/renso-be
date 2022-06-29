@@ -1,3 +1,13 @@
+import datetime
+
+from fpdf import FPDF
+
+from model.front_end_configs import FrontEndCofigs
+from model.item_subtype import ItemSubType
+from model.order_backup import OrderBackUp
+from model.voucher import Voucher
+
+
 def response_structure(data, total_rows: int = None):
     response = {"objects": data}
     if total_rows is not None:
@@ -20,14 +30,158 @@ def get_booking_taxs(bookings):
             if booking.cost_without_tax:
                 data[(tax.name, tax.percentage)] += (tax.percentage / 100) * booking.cost_without_tax
             else:
-                data[(tax.name, tax.percentage)] += (tax.percentage / 100) * booking.cost_without_tax
+                data[(tax.name, tax.percentage)] += (tax.percentage / 100) * booking.cost
     return data
 
 
-def create_pdf_and_send_email(bookings):
+def get_pdf(company, bookings, order):
+    #
+
+    header = [("Item Category", 31.5), ("Location", 31.5), ("Start Time", 36.5), ("End Time", 36.5), ("Tax", 36.5),
+              ("Price", 15.5)]
+    # row = ["Simple Boat", "Hamburg", str(datetime.date.today()), str(datetime.date.today()), f'78.22 {chr(128)}']
+    pdf = FPDF()
+    pdf.add_page()
+
+    app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
+    logo = app_configs.logo
+
+    # Font
+    pdf.set_font("Arial", size=10)
+
+    # logo Part
+    pdf.cell(110, 10, txt="", border=0, ln=0, align="L")
+    pdf.image(w=80, h=40, name=logo)
+    pdf.cell(0, h=0, txt='', border=0, ln=1, align='C')
+    pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+
+    # company Info
+    pdf.cell(190, 5,
+             txt=f"{company.name}, {company.street} and {company.street_number}, {company.zipcode}, {company.city}",
+             border=0,
+             ln=1,
+             align="L")
+    pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+
+    # customer_info
+    pdf.cell(190, 5, txt="[customer name]", border=0, ln=1, align="L")
+    pdf.cell(190, 5, txt="[customer street and number]", border=0, ln=1, align="L")
+    pdf.cell(190, 5, txt="[customer zip code] [company city]", border=0, ln=1, align="L")
+    pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+
+    # date
+    pdf.cell(190, 5, txt=str(datetime.date.today()), border=0, ln=1, align="R")
+    pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+
+    # bate_Number
+    pdf.cell(190, 5, txt=f"Rechnungsnummer: {company.bate_number}", border=0, ln=1, align="R")
+    pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+
+    # title
+    pdf.set_font("Arial", "B", size=10)
+    pdf.cell(190, 5, txt="Rechnung", border=0, ln=1, align="L")
+    pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+
+    # setting header
+    for each in header:
+        pdf.cell(each[1], 5, txt=each[0], border=0, ln=0, align="C")
+    pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+
+    # add bookings
+    pdf.set_font("Arial", size=7)
+    price = 0.0
+    order_backup = OrderBackUp.get_by_cart_id(order.cart_id)
+    voucher = None
+    if order_backup.voucher:
+        voucher = Voucher.get_voucher_by_code(order_backup.voucher, order.user_id)
+    for index, booking in enumerate(bookings):
+        pdf.cell(31.5, 5, txt=booking.item.item_subtype.name, border=0, ln=0, align="C")
+        pdf.cell(31.5, 5, txt=booking.location.name, border=0, ln=0, align="C")
+        if booking.item.item_type.show_time_picker == True:
+            pdf.cell(36.5, 5, txt=str(booking.start_time), border=0, ln=0, align="C")
+            pdf.cell(36.5, 5, txt=str(booking.end_time), border=0, ln=0, align="C")
+        else:
+            pdf.cell(36.5, 5, txt=str(booking.start_time.date()), border=0, ln=0, align="C")
+            pdf.cell(36.5, 5, txt=str(booking.end_time.date()), border=0, ln=0, align="C")
+        tax_str = ""
+        if booking.item.item_subtype.itemSubTypeTaxs:
+            tax_str = ",".join(
+                [f"{each.tax.name}({each.tax.percentage}%)" for each in booking.item.item_subtype.itemSubTypeTaxs])
+        pdf.cell(36.5, 5, txt=tax_str, border=0, ln=0, align="C")
+        pdf.cell(15.5, 5, txt=f'{booking.cost} {chr(128)}', border=0, ln=0, align="C")
+        price += booking.cost
+
+        pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+    pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
+
+    # price calculations
+    pdf.set_font("Arial", "B", size=10)
+    pdf.cell(190, 5, txt=f"Nettosumme {round(price, 2)} {chr(128)}", border=0, ln=1, align="L")
+    pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
+    com_taxs = get_booking_taxs(bookings)
+    for each in com_taxs:
+        pdf.cell(190, 5, txt=f"{each[0]}({each[1]}%) {round(com_taxs[each], 2)}", border=0, ln=1, align="L")
+        pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+    if voucher:
+        pdf.cell(190, 5, txt=f"Ermäßigt {round(voucher.price_factor / 100 * price, 2)} {chr(128)}", border=0, ln=1,
+                 align="L")
+        pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
+        pdf.cell(190, 5, txt=f"Gesamtsumme {round(voucher.price_factor / 100 * price, 2)} {chr(128)}", border=0, ln=1,
+                 align="L")
+        # extra space
+        pdf.cell(0, h=30, txt='', border=0, ln=1, align='C')
+
+    else:
+        pdf.cell(190, 5, txt=f"Gesamtsumme {round(price, 2)} {chr(128)}", border=0, ln=1, align="L")
+        # extra space
+        pdf.cell(0, h=30, txt='', border=0, ln=1, align='C')
+
+    # ending note
+    pdf.set_font("Arial", size=10)
+    pdf.cell(190, 5, txt="Der Betrag ist bereits beglichen.", border=0, ln=1, align="L")
+
+    # footer
+    y_axis = pdf.get_y()  # 235
+    pdf.set_font("Arial", size=6)
+    if y_axis < 236:
+        # 40 ki gunjaish hay
+        add_space = 236 - y_axis
+
+        pdf.cell(0, h=20 + add_space, txt='', border=0, ln=1, align='C')
+        pdf.cell(190, h=3, txt=company.name, border=0, ln=1, align='L')
+        pdf.cell(190, h=3, txt=f'{company.street} and {company.city} , {company.zipcode}, {company.city}', border=0,
+                 ln=1, align='L')
+        pdf.cell(190, h=3, txt=company.commercial_registered_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=3, txt=company.legal_representative, border=0, ln=1, align='L')
+        pdf.cell(190, h=3, txt=company.email_for_taxs, border=0, ln=1, align='L')
+        pdf.cell(190, h=3, txt=company.company_tax_number, border=0, ln=1, align='L')
+    else:
+        pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
+        pdf.cell(190, h=3, txt=company.name, border=0, ln=1, align='L')
+        pdf.cell(190, h=3, txt=f'{company.street} and {company.city} , {company.zipcode}, {company.city}', border=0,
+                 ln=1, align='L')
+        pdf.cell(190, h=3, txt=company.commercial_registered_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=3, txt=company.legal_representative, border=0, ln=1, align='L')
+        pdf.cell(190, h=3, txt=company.email_for_taxs, border=0, ln=1, align='L')
+        pdf.cell(190, h=3, txt=company.company_tax_number, border=0, ln=1, align='L')
+
+    pdf.output(f"{len(bookings)}.pdf")
+
+    #
+
+
+def create_pdf_and_send_email(order):
+    bookings = [order_booking.booking for order_booking in order.order_bookings]
     data = {}
     for booking in bookings:
         item_type_id = booking.item.item_subtype_id
         if item_type_id not in data.keys():
             data[item_type_id] = []
-        data[item_type_id].append(booking.id)
+        data[item_type_id].append(booking)
+    # all_emails, count = AssociateEmail.filtration({"user_id:eq": user_id})
+    # for each in all_emails:
+    #     list_of_subtypeeach.associate_email_subtypes
+    for each in data.keys():
+        item_sub_type = ItemSubType.query_by_id(each)
+        if item_sub_type.company:
+            get_pdf(item_sub_type.company, data[each], order)

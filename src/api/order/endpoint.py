@@ -6,7 +6,7 @@ from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound, BadRequest
 
-from common.helper import response_structure
+from common.helper import response_structure, create_pdf_and_send_email
 from decorator.authorization import auth
 from model.booking import Booking
 from model.booking_status import BookingStatus
@@ -157,6 +157,10 @@ class order_by_id(Resource):
         order = Order.query_by_id(order_id)
         if not order:
             raise NotFound("Item Not Found.")
+        ##
+
+        create_pdf_and_send_email(order)
+        ##
         return response_structure(order), 200
 
     @api.doc("Delete item by id")
