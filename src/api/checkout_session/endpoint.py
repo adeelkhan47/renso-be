@@ -3,6 +3,7 @@ from http import HTTPStatus
 from pathlib import Path
 
 import jinja2
+import logging
 from flask import request, redirect
 from flask_restx import Resource
 
@@ -89,10 +90,13 @@ def process_order_completion(order, language, order_backup_id):
     app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
     FE_URL = app_configs.front_end_url
     if order.order_status_id == order_status_paid_id:
+        logging.error("######### Order Already Paid #########")
         return redirect(f"{FE_URL}failure")
     if order.order_status_id == order_status_completed_id:
+        logging.error("######### Order Already Completed #########")
         return redirect(f"{FE_URL}failure")
     if order.order_status_id == order_status_cancelled_id:
+        logging.error("######### Order Already Cancelled #########")
         return redirect(f"{FE_URL}failure")
     template = env.get_template(receipt_template)
 
@@ -166,8 +170,10 @@ class CheckOutSessionFailed(Resource):
 
         :return:
         """
+        logging.error(request.url)
         order_status_Cancelled_id = OrderStatus.get_id_by_name("Cancelled")
         args = request.args
+        logging.error("######### Transaction Failed #########")
         order_id = args["order_id"]
         order = Order.query_by_id(int(order_id))
         app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
@@ -189,6 +195,7 @@ class CheckOutSessionSuccess(Resource):
     @api.param("language")
     @api.param("tax_ids")
     def get(self):
+        logging.error(request.url)
         payment_method = "Stripe"
         args = request.args
         session_id = args["session_id"]
@@ -218,4 +225,5 @@ class CheckOutSessionSuccess(Resource):
 
         if session_id:
             return redirect(f"{FE_URL}success")
+        logging.error("######### Transaction Process Failed #########")
         return redirect(f"{FE_URL}failure")
