@@ -1,5 +1,5 @@
 from functools import wraps
-
+import logging
 from flask import g, request
 from werkzeug.exceptions import Unauthorized
 
@@ -17,7 +17,9 @@ def auth(f):
         :param kwargs:
         :return:
         """
+        logging.info(request.base_url)
         authorization = request.headers.get("Authorization")
+
         if not authorization:
             raise Unauthorized(error_message("Authorization Missing."))
         user = User.get_by_user_key(authorization)

@@ -14,7 +14,7 @@ app.config["CORS_HEADERS"] = "Content-Type"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = configs.SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.INFO)
 db.init_app(app)
 
 
