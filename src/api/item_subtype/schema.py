@@ -4,6 +4,15 @@ from . import api
 from ..company.schema import Company
 from ..item_type.schema import Item_type
 
+TaxInSubtype = api.model(
+    "tax",
+    {
+        "id": fields.Integer(),
+        "name": fields.String(),
+        "percentage": fields.Integer(),
+        "description": fields.String(),
+    },
+)
 Item_subtype_Expect = api.model(
     "item_subtype_expect",
     {
@@ -22,6 +31,10 @@ Item_subtype_Expect = api.model(
     },
 )
 
+subtype_taxs = api.model(
+    "subtype_taxs",
+    {"tax": fields.Nested(TaxInSubtype, as_list=True)}
+)
 Item_subtype = api.model(
     "item_sub_type",
     {
@@ -31,12 +44,13 @@ Item_subtype = api.model(
         "image": fields.String(),
         "person": fields.Integer(),
         "item_type": fields.Nested(Item_type),
-        "company": fields.Nested(Company),
+        "company": fields.Nested(Company, skip_none=True),
         "least_price": fields.Float(),
         "discount_after_higher_price": fields.Integer(),
         "same_price_days": fields.Integer(),
         "show_description": fields.Boolean(),
-        "description": fields.String()
+        "description": fields.String(),
+        "itemSubTypeTaxs": fields.Nested(subtype_taxs, as_list=True)
     },
 )
 

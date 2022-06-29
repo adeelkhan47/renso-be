@@ -5,13 +5,12 @@ from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import BadRequest, NotFound
 
-from common.helper import response_structure, error_message
+from common.helper import response_structure, error_message, get_booking_taxs
 from decorator.authorization import auth
 from model.booking import Booking
 from model.booking_status import BookingStatus
 from model.cart import Cart
 from model.cart_booking import CartBookings
-from model.front_end_configs import FrontEndCofigs
 from model.item import Item
 from model.item_subtype import ItemSubType
 from model.location import Location
@@ -44,6 +43,7 @@ class booking_list(Resource):
         item_id = payload.get("item_id")
         location_id = payload.get("location_id")
         cost = payload.get("cost")
+        cost_without_tax = payload.get("cost_without_tax")
 
         ##
         item = Item.query_by_id(item_id)
@@ -56,7 +56,8 @@ class booking_list(Resource):
         for each in all_bookings:
             if each.start_time <= end_time and start_time <= each.end_time:
                 raise BadRequest("Item Already booked with this time.")
-        booking = Booking(start_time, end_time, booking_status_id, item_id, cost, g.current_user.id, location_id)
+        booking = Booking(start_time, end_time, booking_status_id, item_id, cost, cost_without_tax, g.current_user.id,
+                          location_id)
         booking.insert()
         return response_structure(booking), 201
 
@@ -150,39 +151,28 @@ class booking_list(Resource):
         payment_method = PaymentMethod.get_payment_method_by_name("Stripe", g.current_user.id)
         if not payment_method:
             raise NotFound(error_message("Stripe Default Payment not found."))
-        actual_total_price = 0
-        effected_total_price = 0
-        taxs = []
-        tax_amount = 0
-        for booking in bookings:
-            actual_total_price += booking.cost
-            temp_tax_amount = 0
-            for each in payment_method.payment_tax:
-                if booking.item.item_subtype_id in [x.item_sub_type_id for x in each.tax.itemSubTypeTaxs]:
-                    temp_tax_amount += (price_factor / 100) * ((each.tax.percentage / 100) * booking.cost)
-                    if each.tax not in taxs:
-                        taxs.append(each.tax)
 
-            tax_amount += temp_tax_amount
-            effected_total_price += (price_factor / 100) * booking.cost
-
-        actual_total_price_after_tax = effected_total_price + tax_amount
-
-        app_configs = FrontEndCofigs.get_by_user_id(g.current_user.id)
+        price = sum([booking.cost for booking in bookings]) if bookings else 0
+        final_price = (price_factor / 100) * price
 
         updated_amount = 0
         price_already_paid = 0
         if edit:
-            updated_amount = actual_total_price_after_tax - round(float(order_backup.price_paid), 2)
+            updated_amount = final_price - round(float(order_backup.price_paid), 2)
             price_already_paid = round(float(order_backup.price_paid), 2)
+        tax_consumed = get_booking_taxs(bookings)
+
+        tax_response = []
+
+        for each in tax_consumed.keys():
+            entry = {"tax_name": f'{each[0]} ({each[1]}%)', "tax_amount": f'{round(tax_consumed[each], 2)}'}
+            tax_response.append(entry)
 
         response_data = {
+            "taxs": tax_response,
             "bookings": bookings,
-            "taxs": taxs,
-            "actual_total_price": round(actual_total_price, 2),
-            "effected_total_price": round(effected_total_price, 2),
-            "actual_total_price_after_tax": round(actual_total_price_after_tax, 2),
-            "tax_amount": round(tax_amount, 2),
+            "price": round(price, 2),
+            "final_price": round(final_price, 2),
             "voucher": voucher,
             "isEdited": edit,
             "price_already_paid": round(price_already_paid, 2),
@@ -290,7 +280,15 @@ class booking_list(Resource):
             item_sub_type = each.get("item_sub_type_id")
             for item_id in each.get("item_ids"):
                 cost = booking_dictionary[(item_sub_type, item_id)]
-                self.booking = Booking(start_time, end_time, pending_status, item_id, round(cost, 2), g.current_user.id,
+                item = Item.query_by_id(item_id)
+                # add tax
+                tax_percentage = sum([each.tax.percentage for each in
+                                      item.item_subtype.itemSubTypeTaxs]) if item.item_subtype.itemSubTypeTaxs else 0
+                #
+                final_cost = ((tax_percentage + 100) / 100) * cost
+                self.booking = Booking(start_time, end_time, pending_status, item_id, round(final_cost, 2),
+                                       round(cost, 2),
+                                       g.current_user.id,
                                        location.id)
                 booking = self.booking
                 booking.insert()

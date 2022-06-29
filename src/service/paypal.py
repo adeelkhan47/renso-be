@@ -21,9 +21,9 @@ class PayPal:
                 "payment_method": "paypal"},
             "redirect_urls": {
                 "return_url": domain_url + "checkout_session/success?session_id=notStripe&order_id=" + str(
-                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}" + f"&tax_ids={tax_ids}",
+                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}",
                 "cancel_url": domain_url + "checkout_session/failed?session_id=notStripe&order_id=" + str(
-                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}" + f"&tax_ids={tax_ids}"},
+                    order_id) + "&language=" + str(language) + f"&voucher_code={voucher_code}"},
             "transactions": [{
                 "item_list": {
                     "items": [{

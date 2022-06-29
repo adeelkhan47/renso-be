@@ -7,7 +7,7 @@ from flask import request, redirect
 from flask_restx import Resource
 
 from common.email_service import send_email
-from common.helper import response_structure
+from common.helper import response_structure, get_booking_taxs
 from configuration import configs
 from model.associate_email import AssociateEmail
 from model.booking_status import BookingStatus
@@ -36,8 +36,6 @@ def create_email(order):
     custom_values_dict = {}
     item_types_in_order = [each.booking.item.item_type.name for each in order.order_bookings]
 
-    for each in order.order_bookings:
-        print(each.booking.item.item_type.name)
     custom_values = [x.custom_data for x in order.order_custom_data]
     for each in custom_values:
         custom_values_dict[each.name] = each.value
@@ -66,13 +64,19 @@ def create_email(order):
     return actual_text
 
 
-def process_order_completion(order, language, order_backup_id, tax_ids):
+def process_order_completion(order, language, order_backup_id):
     order_backup = OrderBackUp.query_by_id(order_backup_id)
     email_text = create_email(order)
     order_status_paid_id = OrderStatus.get_id_by_name("Paid")
     order_status_completed_id = OrderStatus.get_id_by_name("Completed")
     order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
-    taxs, total_taxs = Tax.filtration({"id:eq": tax_ids})
+
+    tax_consumed = get_booking_taxs([each.booking for each in order.order_bookings])
+    tax_response = []
+    for each in tax_consumed.keys():
+        entry = {"tax_name": f'{each[0]} ({each[1]}%)', "tax_amount": f'{round(tax_consumed[each], 2)}'}
+        tax_response.append(entry)
+
     if language == "de":
         associate_receipt_template = "associate_receipt_de.html"
         receipt_template = "receipt_de.html"
@@ -103,7 +107,7 @@ def process_order_completion(order, language, order_backup_id, tax_ids):
         fe_url=FE_URL,
         email_text=email_text,
         footer_email=app_configs.email,
-        taxs=taxs
+        tax_response=tax_response
     )
 
     send_email(order.client_email, "Order Confirmation", stuff_to_render, app_configs.email, app_configs.email_password)
@@ -120,6 +124,7 @@ def process_order_completion(order, language, order_backup_id, tax_ids):
     template2 = env.get_template(associate_receipt_template)
     for email in association_data.keys():
         stuff_to_render2 = template2.render(
+            order_id=order.id,
             configs=configs,
             bookings=association_data[email],
             footer_email=app_configs.email
@@ -188,7 +193,6 @@ class CheckOutSessionSuccess(Resource):
         args = request.args
         session_id = args["session_id"]
         voucher_code = args["voucher_code"]
-        tax_ids = args["tax_ids"]
         payment_reference = session_id
         if session_id == "notStripe":
             payment_method = "Paypal"
@@ -208,7 +212,7 @@ class CheckOutSessionSuccess(Resource):
         order_backup = OrderBackUp(order.cart_id, str(unique_key), payment_method, payment_reference, voucher_code,
                                    str(order.total_cost))
         order_backup.insert()
-        process_order_completion(order, language, order_backup.id, tax_ids)
+        process_order_completion(order, language, order_backup.id)
         app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
         FE_URL = app_configs.front_end_url
 

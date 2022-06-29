@@ -4,7 +4,6 @@ from . import api
 from ..booking_status.schema import BookingStatus
 from ..item.schema import Item
 from ..location.schema import Location
-from ..tax.schema import Tax
 from ..voucher.schema import Voucher
 
 booking_count_ = api.model(
@@ -12,6 +11,13 @@ booking_count_ = api.model(
     {
         "item_sub_type_id": fields.Integer(),
         "item_ids": fields.List(fields.Integer()),
+    },
+)
+tax_obj = api.model(
+    "tax_obj",
+    {
+        "tax_name": fields.String(),
+        "tax_amount": fields.String(),
     },
 )
 
@@ -37,6 +43,7 @@ BookingExpect = api.model(
         "item_id": fields.Integer(),
         "location_id": fields.Integer(),
         "cost": fields.Float(),
+        "cost_without_tax": fields.Float(),
 
     },
 )
@@ -57,6 +64,7 @@ Booking = api.model(
     {
         "id": fields.Integer(),
         "cost": fields.Float(),
+        "cost_without_tax": fields.Float(),
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
         "booking_status": fields.Nested(BookingStatus),
@@ -71,11 +79,9 @@ Cart = api.model(
     "cart",
     {
         "bookings": fields.Nested(Booking, skip_none=True, as_list=True),
-        "taxs": fields.Nested(Tax, skip_none=True, as_list=True),
-        "actual_total_price": fields.Float(),
-        "effected_total_price": fields.Float(),
-        "actual_total_price_after_tax": fields.Float(),
-        "tax_amount": fields.Float(),
+        "taxs": fields.List(fields.Nested(tax_obj, as_list=True)),
+        "price": fields.Float(),
+        "final_price": fields.Float(),
         "voucher": fields.Nested(Voucher, skip_none=True),
         "isEdited": fields.Boolean(),
         "price_already_paid": fields.Float(),

@@ -349,13 +349,13 @@
                 € {{ effected_total_price }}
             </div>
         </div>
-        {% for tax in taxs %}
+        {% for tax in tax_response %}
             <div class="subtitle">
                 <div class="name">
-                    {{ tax.name }}( {{ tax.percentage }}% )
+                    {{ tax.get("tax_name") }}
                 </div>
                 <div class="value">
-                    € {{ ((tax.percentage/100)* effected_total_price)|round(2, 'common') }}
+                    € {{ tax.get("tax_amount") }}
                 </div>
             </div>
         {% endfor %}
