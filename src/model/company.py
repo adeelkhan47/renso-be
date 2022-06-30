@@ -16,13 +16,14 @@ class Company(Base, db.Model):
     legal_representative = Column(String, nullable=True)
     email_for_taxs = Column(String, nullable=True)
     company_tax_number = Column(String, nullable=True)
+    email = Column(String, nullable=True)
     bate_number = Column(Integer, nullable=True, default=1)
 
     sub_category_company = relationship("ItemSubType", backref="company")
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
 
     def __init__(self, name, street, street_number, zipcode, city, commercial_registered_number, legal_representative,
-                 email_for_taxs, company_tax_number, bate_number, user_id):
+                 email_for_taxs, company_tax_number, email, bate_number, user_id):
         self.name = name
         self.street = street
         self.street_number = street_number
@@ -33,6 +34,7 @@ class Company(Base, db.Model):
         self.email_for_taxs = email_for_taxs
         self.company_tax_number = company_tax_number
         self.bate_number = bate_number
+        self.email = email
         self.user_id = user_id
 
     def __repr__(self):

@@ -74,7 +74,7 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # bate_Number
-    pdf.cell(190, 5, txt=f"Rechnungsnummer: {company.bate_number}", border=0, ln=1, align="R")
+    pdf.cell(190, 5, txt="Rechnungsnummer: {company.bate_number}", border=0, ln=1, align="R")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # title
