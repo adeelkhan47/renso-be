@@ -1,9 +1,11 @@
 import datetime
+import logging
 
 from fpdf import FPDF
 
+from common.email_service import send_pdf_email
+from model.company import Company
 from model.front_end_configs import FrontEndCofigs
-from model.item_subtype import ItemSubType
 from model.order_backup import OrderBackUp
 from model.voucher import Voucher
 
@@ -36,6 +38,33 @@ def get_booking_taxs(bookings):
 
 def get_pdf(company, bookings, order):
     #
+    custom_values_dict = {}
+    custom_values = [x.custom_data for x in order.order_custom_data]
+    for each in custom_values:
+        custom_values_dict[each.name] = each.value
+    street = ""
+    number = ""
+    zipcode = ""
+    city = ""
+    if "street" in custom_values_dict.keys():
+        street = custom_values_dict.get("street")
+    elif "Straße" in custom_values_dict.keys():
+        street = custom_values_dict.get("Straße")
+
+    if "number" in custom_values_dict.keys():
+        number = custom_values_dict.get("number")
+    elif "Nummer" in custom_values_dict.keys():
+        number = custom_values_dict.get("Nummer")
+
+    if "zipcode" in custom_values_dict.keys():
+        zipcode = custom_values_dict.get("zipcode")
+    elif "PLZ" in custom_values_dict.keys():
+        zipcode = custom_values_dict.get("PLZ")
+
+    if "city" in custom_values_dict.keys():
+        city = custom_values_dict.get("city")
+    elif "Stadt" in custom_values_dict.keys():
+        city = custom_values_dict.get("Stadt")
 
     header = [("Item Category", 31.5), ("Location", 31.5), ("Start Time", 36.5), ("End Time", 36.5), ("Tax", 36.5),
               ("Price", 15.5)]
@@ -64,9 +93,9 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # customer_info
-    pdf.cell(190, 5, txt="[customer name]", border=0, ln=1, align="L")
-    pdf.cell(190, 5, txt="[customer street and number]", border=0, ln=1, align="L")
-    pdf.cell(190, 5, txt="[customer zip code] [company city]", border=0, ln=1, align="L")
+    pdf.cell(190, 5, txt=order.client_name, border=0, ln=1, align="L")
+    pdf.cell(190, 5, txt=f"{street} and {number}", border=0, ln=1, align="L")
+    pdf.cell(190, 5, txt=f"{zipcode} ,{city}", border=0, ln=1, align="L")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # date
@@ -74,7 +103,7 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # bate_Number
-    pdf.cell(190, 5, txt="Rechnungsnummer: {company.bate_number}", border=0, ln=1, align="R")
+    pdf.cell(190, 5, txt=f"Rechnungsnummer: Re-{company.bate_number}", border=0, ln=1, align="R")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # title
@@ -164,9 +193,9 @@ def get_pdf(company, bookings, order):
         pdf.cell(190, h=3, txt=company.legal_representative, border=0, ln=1, align='L')
         pdf.cell(190, h=3, txt=company.email_for_taxs, border=0, ln=1, align='L')
         pdf.cell(190, h=3, txt=company.company_tax_number, border=0, ln=1, align='L')
-
-    pdf.output(f"{len(bookings)}.pdf")
-
+    pdf_name = f'Invoice-Re{company.bate_number}.pdf'
+    Company.update(company.id, {"bate_number": company.bate_number + 1})
+    return pdf.output(f"Invoice-{len(bookings)}.pdf", dest="S"), pdf_name
     #
 
 
@@ -174,14 +203,24 @@ def create_pdf_and_send_email(order):
     bookings = [order_booking.booking for order_booking in order.order_bookings]
     data = {}
     for booking in bookings:
-        item_type_id = booking.item.item_subtype_id
-        if item_type_id not in data.keys():
-            data[item_type_id] = []
-        data[item_type_id].append(booking)
-    # all_emails, count = AssociateEmail.filtration({"user_id:eq": user_id})
-    # for each in all_emails:
-    #     list_of_subtypeeach.associate_email_subtypes
+        item_subtype = booking.item.item_subtype
+        if item_subtype.company:
+            if item_subtype.company.id not in data.keys():
+                data[item_subtype.company.id] = []
+        data[item_subtype.company.id].append((item_subtype, booking))
+
+    pdfs = []
+    app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
     for each in data.keys():
-        item_sub_type = ItemSubType.query_by_id(each)
-        if item_sub_type.company:
-            get_pdf(item_sub_type.company, data[each], order)
+        company = Company.query_by_id(each)
+        bookings = [record[1] for record in data.get(each)]
+        pdf = get_pdf(company, bookings, order)
+        pdfs.append(pdf)
+        if company.email:
+            try:
+                send_pdf_email(company.email, f"Invoice - {company.name}", [pdf], app_configs.email,
+                               app_configs.email_password)
+            except Exception as e:
+                logging.exception(e)
+    send_pdf_email(order.client_email, "Invoice For Order", pdfs, app_configs.email,
+                   app_configs.email_password)

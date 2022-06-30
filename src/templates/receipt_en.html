@@ -276,56 +276,66 @@
             <thead>
             <tr>
 
-                <th colspan="7">
+                <th colspan="8">
                     Item Name
                 </th>
-                <th colspan="6">
+                <th colspan="7">
                     Item Category
                 </th>
-                <th colspan="5">
+                <th colspan="6">
                     Location
                 </th>
-                <th colspan="4">
+                <th colspan="5">
                     Start Time
                 </th>
 
-                <th colspan="3">
+                <th colspan="4">
                     End Time
                 </th>
-                <th colspan="2" class="amount">
+                <th colspan="3" class="amount">
                     Amount
                 </th>
+                <th colspan="2" >
+                    Tax
+                </th>
+
             </tr>
             </thead>
             <tbody>
             {% for each in order.order_bookings %}
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         {{ each.booking.item.name }}
                     </td>
-                    <td colspan="6">
+                    <td colspan="7">
                         {{ each.booking.item.item_subtype.name }}
                     </td>
-                    <td colspan="5">
+                    <td colspan="6">
                         {{ each.booking.location.name }}
                     </td>
                     {% if each.booking.item.item_subtype.show_time_picker == True %}
-                        <td colspan="4">
+                        <td colspan="5">
                             {{ each.booking.start_time }}
                         </td>
-                        <td colspan="3">
+                        <td colspan="4">
                             {{ each.booking.end_time }}
                         </td>
                     {% else %}
-                        <td colspan="4">
+                        <td colspan="5">
                             {{ each.booking.start_time.date() }}
                         </td>
-                        <td colspan="3">
+                        <td colspan="4">
                         {{ each.booking.end_time.date() }}
 
                     {% endif %}
-                    <td colspan="2" class="amount">
+                    <td colspan="3" class="amount">
                         € {{ each.booking.cost }}
+                    </td>
+                    <td colspan="2" >
+                        {% for entry in  each.booking.item.item_subtype.itemSubTypeTaxs %}
+                            {{ entry.tax.name}}({{ entry.tax.percentage }}%)
+                        {% endfor %}
+
                     </td>
                 </tr>
             {% endfor %}
