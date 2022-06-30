@@ -181,6 +181,7 @@ class order_by_id(Resource):
             order = Order.query_by_id(order_id)
             for each in order.order_bookings:
                 Booking.close_booking(each.booking_id)
+            create_pdf_and_send_email(order)
                 # OrderBookings.delete_by_order_id(order_id)
         if "voucher" in data.keys():
             del data["voucher"]
