@@ -56,8 +56,8 @@ def get_pdf(company, bookings, order):
     elif "Nummer" in custom_values_dict.keys():
         number = custom_values_dict.get("Nummer")
 
-    if "zipcode" in custom_values_dict.keys():
-        zipcode = custom_values_dict.get("zipcode")
+    if "Zip Code" in custom_values_dict.keys():
+        zipcode = custom_values_dict.get("Zip Code")
     elif "PLZ" in custom_values_dict.keys():
         zipcode = custom_values_dict.get("PLZ")
 
@@ -193,7 +193,7 @@ def get_pdf(company, bookings, order):
         pdf.cell(190, h=3, txt=company.legal_representative, border=0, ln=1, align='L')
         pdf.cell(190, h=3, txt=company.email_for_taxs, border=0, ln=1, align='L')
         pdf.cell(190, h=3, txt=company.company_tax_number, border=0, ln=1, align='L')
-    pdf_name = f'Invoice-Re{company.bate_number}.pdf'
+    pdf_name = f'{company.name}-Invoice-Re{company.bate_number}.pdf'
     Company.update(company.id, {"bate_number": company.bate_number + 1})
     return pdf.output(f"Invoice-{len(bookings)}.pdf", dest="S"), pdf_name
     #
