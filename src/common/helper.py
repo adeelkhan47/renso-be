@@ -207,7 +207,7 @@ def create_pdf_and_send_email(order):
         if item_subtype.company:
             if item_subtype.company.id not in data.keys():
                 data[item_subtype.company.id] = []
-        data[item_subtype.company.id].append((item_subtype, booking))
+            data[item_subtype.company.id].append((item_subtype, booking))
 
     pdfs = []
     app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
