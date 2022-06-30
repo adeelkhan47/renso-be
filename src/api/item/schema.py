@@ -56,7 +56,8 @@ get_list_responseItem = api.model(
 get_by_id_responseItem = api.model(
     "getById_item",
     {
-        "objects": fields.Nested(Item),
+        "objects": fields.Nested(Item, skip_none=True),
+        "active_orders": fields.String(),
 
     },
 )

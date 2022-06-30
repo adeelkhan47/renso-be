@@ -34,12 +34,16 @@ class item_sub_types_list(Resource):
         image = payload.get("image")
         price = payload.get("price")
         item_type_id = payload.get("item_type_id")
+        company_id = payload.get("company_id")
         person = payload.get("person")
         least_price = payload.get("least_price")
         discount_after_higher_price = payload.get("discount_after_higher_price")
         same_price_days = payload.get("same_price_days")
+        description = payload.get("description")
+        show_description = payload.get("show_description")
         item_subtype = ItemSubType(name, price, person, item_type_id, image, g.current_user.id, least_price,
-                                   discount_after_higher_price, same_price_days)
+                                   discount_after_higher_price, same_price_days, show_description, description,
+                                   company_id)
         item_subtype.insert()
 
         return response_structure(item_subtype), 201

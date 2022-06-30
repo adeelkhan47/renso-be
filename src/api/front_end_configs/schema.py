@@ -9,7 +9,10 @@ FrontEndExpect = api.model(
         "front_end_url": fields.String(),
         "email": fields.String(),
         "email_password": fields.String(),
-        "privacy_policy_link": fields.String(),
+        "link1": fields.String(),
+        "link2": fields.String(),
+        "link1_name": fields.String(),
+        "link2_name": fields.String(),
     },
 )
 FrontEnd = api.model(
@@ -20,8 +23,10 @@ FrontEnd = api.model(
         "front_end_url": fields.String(),
         "email": fields.String(),
         "email_password": fields.String(),
-        "privacy_policy_link": fields.String(),
-
+        "link1": fields.String(),
+        "link2": fields.String(),
+        "link1_name": fields.String(),
+        "link2_name": fields.String(),
     },
 )
 

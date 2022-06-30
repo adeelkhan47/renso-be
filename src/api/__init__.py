@@ -11,6 +11,7 @@ from .booking.endpoint import api as booking_api
 from .booking_status.endpoint import api as booking_status_api
 from .booking_widget.endpoint import api as booking_widget_api
 from .checkout_session.endpoint import api as checkout_api
+from .company.endpoint import api as company_api
 from .custom_parameter.endpoint import api as custom_parameter_api
 from .day_picker.endpoint import api as day_picker_api
 from .email_text.endpoint import api as email_text_api
@@ -73,6 +74,7 @@ api.add_namespace(front_end_configs_api)
 api.add_namespace(restricted_date_api)
 api.add_namespace(item_type_text_api)
 api.add_namespace(email_text_api)
+api.add_namespace(company_api)
 
 
 @api.errorhandler(NotFound)

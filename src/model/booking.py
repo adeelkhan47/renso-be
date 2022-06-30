@@ -10,6 +10,7 @@ from model.item import Item
 class Booking(Base, db.Model):
     __tablename__ = "booking"
     cost = Column(Float, default=0)
+    cost_without_tax = Column(Float, default=0, nullable=True)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     booking_status_id = Column(Integer, ForeignKey("booking_status.id", ondelete="SET NULL"), nullable=True)
@@ -19,12 +20,13 @@ class Booking(Base, db.Model):
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
     location_id = Column(Integer, ForeignKey("location.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    def __init__(self, start_time, end_time, booking_status_id, item_id, cost, user_id, location_id):
+    def __init__(self, start_time, end_time, booking_status_id, item_id, cost, cost_without_tax, user_id, location_id):
         self.start_time = start_time
         self.end_time = end_time
         self.booking_status_id = booking_status_id
         self.item_id = item_id
         self.cost = cost
+        self.cost_without_tax = cost_without_tax
         self.user_id = user_id
         self.location_id = location_id
 
@@ -44,7 +46,17 @@ class Booking(Base, db.Model):
     @classmethod
     def get_bookings_by_item_id(cls, item_id):
         active_id = BookingStatus.get_id_by_name("Active")
-        return cls.query.filter(cls.item_id == item_id, cls.booking_status_id == active_id).all()
+        pending_id = BookingStatus.get_id_by_name("Pending")
+        payment_pending_id = BookingStatus.get_id_by_name("Payment Pending")
+        return cls.query.filter(cls.item_id == item_id,
+                                cls.booking_status_id.in_((active_id, pending_id, payment_pending_id))).all()
+
+    @classmethod
+    def get_confirmed_bookings_by_item_id(cls, item_id):
+        active_id = BookingStatus.get_id_by_name("Active")
+        payment_pending_id = BookingStatus.get_id_by_name("Payment Pending")
+        return cls.query.filter(cls.item_id == item_id,
+                                cls.booking_status_id.in_((active_id, payment_pending_id))).all()
 
     @classmethod
     def close_booking(cls, booking_id):

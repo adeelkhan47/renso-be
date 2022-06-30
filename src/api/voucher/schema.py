@@ -9,6 +9,7 @@ Voucher_Expect = api.model(
         "description": fields.String(),
         "price_factor": fields.Integer(),
         "status": fields.Boolean(),
+        "counter": fields.Integer(),
     },
 )
 
@@ -16,6 +17,7 @@ Voucher = api.model(
     "Voucher",
     {
         "id": fields.Integer(),
+        "counter": fields.Integer(),
         "code": fields.String(),
         "description": fields.String(),
         "price_factor": fields.Integer(),

@@ -6,9 +6,10 @@ from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound, BadRequest
 
-from common.helper import response_structure
+from common.helper import response_structure, create_pdf_and_send_email
 from decorator.authorization import auth
 from model.booking import Booking
+from model.booking_status import BookingStatus
 from model.cart import Cart
 from model.custom_data import CustomData
 from model.custom_parameter import CustomParameter
@@ -49,6 +50,7 @@ class order_list(Resource):
         client_email = payload.get("client_email")
         order_status_payment_pending_id = OrderStatus.get_id_by_name("Payment Pending")
         order_status_Updated_id = OrderStatus.get_id_by_name("Updated")
+        booking_status_payment_pending_id = BookingStatus.get_id_by_name("Payment Pending")
         phone_number = payload.get("phone_number")
         language = "en"
         edit = False
@@ -79,22 +81,8 @@ class order_list(Resource):
                 voucher_code = voucher.code
                 price_factor = voucher.price_factor
         payment_method = PaymentMethod.query_by_id(payment_method_id)
-        actual_total_price = 0
-        effected_total_price = 0
-        taxs = []
-        tax_amount = 0
-        for booking in bookings:
-            actual_total_price += booking.cost
-            temp_tax_amount = 0
-            for each in payment_method.payment_tax:
-                if booking.item.item_subtype_id in [x.item_sub_type_id for x in each.tax.itemSubTypeTaxs]:
-                    temp_tax_amount += (price_factor / 100) * ((each.tax.percentage / 100) * booking.cost)
-                    if each.tax not in taxs:
-                        taxs.append(each.tax)
-
-            tax_amount += temp_tax_amount
-            effected_total_price += (price_factor / 100) * booking.cost
-        actual_total_price_after_tax = effected_total_price + tax_amount
+        price = sum([booking.cost for booking in bookings]) if bookings else 0
+        final_price = (price_factor / 100) * price
         ##
         # update old order
         previous_orders = Order.get_order_by_cart_id(cart.id)
@@ -103,15 +91,15 @@ class order_list(Resource):
         ##
         if not edit:
             order = Order(client_name, client_email, phone_number, order_status_payment_pending_id,
-                          round(actual_total_price_after_tax, 2), cart.id, round(actual_total_price, 2),
-                          round(effected_total_price, 2), round(tax_amount, 2), g.current_user.id)
+                          round(final_price, 2), cart.id, round(price, 2),
+                          round(final_price, 2), round(0, 2), g.current_user.id)
         else:
-            edited_price = actual_total_price_after_tax - round(float(order_backup.price_paid), 2)
+            edited_price = final_price - round(float(order_backup.price_paid), 2)
             if edited_price < 0:
                 edited_price = 0
             order = Order(client_name, client_email, phone_number, order_status_payment_pending_id,
-                          round(edited_price, 2), cart.id, round(actual_total_price, 2),
-                          round(effected_total_price, 2), round(tax_amount, 2), g.current_user.id)
+                          round(edited_price, 2), cart.id, round(price, 2),
+                          round(edited_price, 2), round(0, 2), g.current_user.id)
         order.insert()
         for each in payload.keys():
             if each in custom_parameters:
@@ -119,15 +107,15 @@ class order_list(Resource):
                 customData.insert()
                 OrderCustomData(customData.id, order.id).insert()
         for each in bookings:
+            Booking.update(each.id, {"booking_status_id": booking_status_payment_pending_id})
             OrderBookings(each.id, order.id).insert()
 
         session_id = None
         paypal_url = None
         if not edit:
-            order_name = f"{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}"
+            order_name = f"{str(order.id)}_{client_name}_{str(final_price)}_{str(datetime.now())}"
         else:
-            order_name = f"EDITED-{str(order.id)}_{client_name}_{str(actual_total_price_after_tax)}_{str(datetime.now())}"
-
+            order_name = f"EDITED-{str(order.id)}_{client_name}_{str(final_price)}_{str(datetime.now())}"
         if payment_method.name == "Stripe":
             if order.total_cost > 0:
 
@@ -169,6 +157,10 @@ class order_by_id(Resource):
         order = Order.query_by_id(order_id)
         if not order:
             raise NotFound("Item Not Found.")
+        ##
+
+        create_pdf_and_send_email(order)
+        ##
         return response_structure(order), 200
 
     @api.doc("Delete item by id")

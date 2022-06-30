@@ -102,6 +102,7 @@
             margin: 5px;
         }
 
+
         .table {
             width: 100%;
             font-size: 14px;
@@ -261,9 +262,12 @@
     <div class="description row">
         <div class="text" style="text-align: left">
             {% autoescape false %}
-            {{ email_text }}
+            <a style="color:black; text-decoration:none;">
+                <span>
+                {{ email_text }}
+                </span>
+            </a>
             {% endautoescape %}
-
         </div>
     </div>
 
@@ -272,57 +276,66 @@
             <thead>
             <tr>
 
-                <th colspan="7">
+                <th colspan="8">
                     Item Name
                 </th>
-                <th colspan="6">
+                <th colspan="7">
                     Item Category
                 </th>
-                <th colspan="5">
+                <th colspan="6">
                     Location
                 </th>
-                <th colspan="4">
+                <th colspan="5">
                     Start Time
                 </th>
 
-                <th colspan="3">
+                <th colspan="4">
                     End Time
                 </th>
-                <th colspan="2" class="amount">
+                <th colspan="3" class="amount">
                     Amount
                 </th>
+                <th colspan="2" >
+                    Tax
+                </th>
+
             </tr>
             </thead>
             <tbody>
             {% for each in order.order_bookings %}
-
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         {{ each.booking.item.name }}
                     </td>
-                    <td colspan="6">
+                    <td colspan="7">
                         {{ each.booking.item.item_subtype.name }}
                     </td>
-                    <td colspan="5">
+                    <td colspan="6">
                         {{ each.booking.location.name }}
                     </td>
                     {% if each.booking.item.item_subtype.show_time_picker == True %}
-                        <td colspan="4">
+                        <td colspan="5">
                             {{ each.booking.start_time }}
                         </td>
-                        <td colspan="3">
+                        <td colspan="4">
                             {{ each.booking.end_time }}
                         </td>
                     {% else %}
-                        <td colspan="4">
+                        <td colspan="5">
                             {{ each.booking.start_time.date() }}
                         </td>
-                        <td colspan="3">
+                        <td colspan="4">
                         {{ each.booking.end_time.date() }}
 
                     {% endif %}
-                    <td colspan="2" class="amount">
+                    <td colspan="3" class="amount">
                         € {{ each.booking.cost }}
+                    </td>
+                    <td colspan="2" >
+                        {% for entry in  each.booking.item.item_subtype.itemSubTypeTaxs %}
+                            {{ entry.tax.name}}({{ entry.tax.percentage }}%)
+                        {% endfor %}
+
                     </td>
                 </tr>
             {% endfor %}
@@ -346,14 +359,17 @@
                 € {{ effected_total_price }}
             </div>
         </div>
-        <div class="subtitle">
-            <div class="name">
-                Tax
+        {% for tax in tax_response %}
+            <div class="subtitle">
+                <div class="name">
+                    {{ tax.get("tax_name") }}
+                </div>
+                <div class="value">
+                    € {{ tax.get("tax_amount") }}
+                </div>
             </div>
-            <div class="value">
-                € {{ tax_amount }}
-            </div>
-        </div>
+        {% endfor %}
+
     </div>
     <div class="left"> if you wanna edit the order click
         <a href="{{ fe_url }}cart/edit/{{ order.cart_id }}/{{ edit_unique_key }}" style="color: #222222"><b>here</b></a>.
@@ -407,7 +423,7 @@
         </div>
         <div class="footer-main-body">
             <a href="">Privacy Policy</a>
-            <p>rensoinfo@gmail.com</p>
+            <p>{{ footer_email }}</p>
         </div>
         <div class="footer-bottom-line">Renso ©2022 Created by Renso Corp.</div>
 
@@ -416,3 +432,8 @@
 </body>
 
 </html>
+<script>
+    function round(value, decimals) {
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals).toFixed(decimals);
+    }
+</script>

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import Integer, String, Float
+from sqlalchemy.sql.sqltypes import Integer, String, Float, Boolean
 
 from model.base import Base, db
 
@@ -8,14 +8,16 @@ from model.base import Base, db
 class ItemSubType(Base, db.Model):
     __tablename__ = "item_subtype"
     name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    show_description = Column(Boolean, nullable=True)
     price = Column(Float, nullable=False, unique=False)
     person = Column(Integer, nullable=False, unique=False)
     image = Column(String(500), nullable=False)
     item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=True)
+    company_id = Column(Integer, ForeignKey("company.id", ondelete="CASCADE"), nullable=True)
     least_price = Column(Float, nullable=True, unique=False, default=1)
     discount_after_higher_price = Column(Integer, nullable=True, unique=False, default=10)
     same_price_days = Column(Integer, nullable=True, unique=False, default=1)
-
 
     items = relationship("Item", backref="item_subtype")
     associate_email_subtypes = relationship("AssociateEmailSubtype", backref="item_subtype")
@@ -24,7 +26,7 @@ class ItemSubType(Base, db.Model):
     itemSubTypeTaxs = relationship("ItemSubTypeTaxs", backref="item_subtype")
 
     def __init__(self, name, price, person, item_type_id, image, user_id, least_price, discount_after_higher_price,
-                 same_price_days):
+                 same_price_days, show_description, description, company_id):
         self.name = name
         self.price = price
         self.person = person
@@ -34,6 +36,9 @@ class ItemSubType(Base, db.Model):
         self.least_price = least_price
         self.discount_after_higher_price = discount_after_higher_price
         self.same_price_days = same_price_days
+        self.show_description = show_description
+        self.description = description
+        self.company_id = company_id
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
