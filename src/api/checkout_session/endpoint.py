@@ -64,13 +64,19 @@ def create_email(order):
     return actual_text
 
 
-def process_order_completion(order, language, order_backup_id):
+def process_order_completion(order, language, order_backup_id, voucher_code):
     order_backup = OrderBackUp.query_by_id(order_backup_id)
     email_text = create_email(order)
     order_status_paid_id = OrderStatus.get_id_by_name("Paid")
     order_status_completed_id = OrderStatus.get_id_by_name("Completed")
     order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
 
+    if voucher_code:
+        voucher = Voucher.get_voucher_by_code(voucher_code, order.user_id)
+        if voucher:
+            if not voucher.counter:
+                Voucher.update(voucher.id, {"counter": 0})
+            Voucher.update(voucher.id, {"counter": voucher.counter + 1})
     tax_consumed = get_booking_taxs([each.booking for each in order.order_bookings])
     tax_response = []
     for each in tax_consumed.keys():
@@ -226,7 +232,7 @@ class CheckOutSessionSuccess(Resource):
             order_backup = OrderBackUp(order.cart_id, str(unique_key), payment_method, payment_reference, voucher_code,
                                        str(order.total_cost))
             order_backup.insert()
-            process_order_completion(order, language, order_backup.id)
+            process_order_completion(order, language, order_backup.id, voucher_code)
             app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
             FE_URL = app_configs.front_end_url
 

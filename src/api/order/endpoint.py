@@ -129,7 +129,7 @@ class order_list(Resource):
                                            voucher_code,
                                            str(order.total_cost))
                 order_backup.insert()
-                process_order_completion(order, language, order_backup.id)
+                process_order_completion(order, language, order_backup.id,voucher_code)
         elif payment_method.name == "Paypal":
             if order.total_cost > 0:
                 paypal_url = PayPal.create_paypal_session(order_name, order.id, language, voucher_code)
@@ -141,7 +141,7 @@ class order_list(Resource):
                                            voucher_code,
                                            str(order.total_cost))
                 order_backup.insert()
-                process_order_completion(order, language, order_backup.id)
+                process_order_completion(order, language, order_backup.id,voucher_code)
 
         else:
             raise NotFound("Payment_Method not Found.")
