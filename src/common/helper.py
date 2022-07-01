@@ -93,9 +93,10 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # customer_info
+    pdf.set_font("Arial", size=12)
     pdf.cell(190, 5, txt=order.client_name, border=0, ln=1, align="L")
-    pdf.cell(190, 5, txt=f"{street} and {number}", border=0, ln=1, align="L")
-    pdf.cell(190, 5, txt=f"{zipcode} ,{city}", border=0, ln=1, align="L")
+    pdf.cell(190, 5, txt=f"{street} {number}", border=0, ln=1, align="L")
+    pdf.cell(190, 5, txt=f"{zipcode} {city}", border=0, ln=1, align="L")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # date
@@ -107,17 +108,18 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # title
-    pdf.set_font("Arial", "B", size=10)
+    pdf.set_font("Arial", "B", size=12)
     pdf.cell(190, 5, txt="Rechnung", border=0, ln=1, align="L")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # setting header
+    pdf.set_font("Arial", "B", size=14)
     for each in header:
         pdf.cell(each[1], 5, txt=each[0], border=0, ln=0, align="C")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # add bookings
-    pdf.set_font("Arial", size=7)
+    pdf.set_font("Arial", size=12)
     price = 0.0
     order_backup = OrderBackUp.get_by_cart_id(order.cart_id)
     voucher = None
@@ -144,7 +146,7 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
 
     # price calculations
-    pdf.set_font("Arial", "B", size=10)
+    pdf.set_font("Arial", "B", size=14)
     pdf.cell(190, 5, txt=f"Nettosumme {round(price, 2)} {chr(128)}", border=0, ln=1, align="L")
     pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
     com_taxs = get_booking_taxs(bookings)
@@ -166,12 +168,12 @@ def get_pdf(company, bookings, order):
         pdf.cell(0, h=30, txt='', border=0, ln=1, align='C')
 
     # ending note
-    pdf.set_font("Arial", size=10)
+    pdf.set_font("Arial", size=12)
     pdf.cell(190, 5, txt="Der Betrag ist bereits beglichen.", border=0, ln=1, align="L")
 
     # footer
     y_axis = pdf.get_y()  # 235
-    pdf.set_font("Arial", size=6)
+    pdf.set_font("Arial", size=10)
     if y_axis < 236:
         # 40 ki gunjaish hay
         add_space = 236 - y_axis
