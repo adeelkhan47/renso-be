@@ -1,9 +1,7 @@
 import logging
 import smtplib
 import ssl
-from email import encoders
 from email.mime.application import MIMEApplication
-from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from os.path import basename
@@ -91,7 +89,8 @@ def send_email(recipient: str, subject: str, message: str, from_email: str, from
 
 
 @retry(Exception, tries=3)
-def send_pdf_email(recipient: str, subject: str, pdfs: list, from_email: str, from_email_password: str) -> NoReturn:
+def send_pdf_email(recipient: str, subject: str, pdfs: list, from_email: str, from_email_password: str,
+                   company=None) -> NoReturn:
     """
     Send email with okta credentials to recipient
 
@@ -113,22 +112,24 @@ def send_pdf_email(recipient: str, subject: str, pdfs: list, from_email: str, fr
         message["From"] = from_email
         message["To"] = receiver_email
         for each in pdfs:
-            #
-            # pdfname = each[1]
-            # payload = MIMEBase('application', 'octet-stream', Name=pdfname)
-            # payload.set_payload(each[0])
-            # encoders.encode_base64(payload)
-            # payload.add_header('Content-Disposition', 'attachment', filename=pdfname)
-            # message.attach(payload)
             part = MIMEApplication(
-                    each[0],
-                    Name=each[1]
-                )
+                each[0],
+                Name=each[1]
+            )
             # After the file is closed
             part['Content-Disposition'] = 'attachment; filename="%s"' % basename(each[1])
             message.attach(part)
 
         #
+        if company:
+            footer = f'{company.name}\n{company.street} {company.street_number} , {company.zipcode}, {company.city}\n' \
+                     f'{company.commercial_registered_number}\n{company.legal_representative}\n{company.email_for_taxs}\n' \
+                     f'{company.company_tax_number}'
+            body_text = f"Moin,\nim Anhang befindet sich die Rechnung zu Deiner Buchung.\nViele Grüße\n\n{footer}"
+        else:
+            body_text = "Moin,\nim Anhang befindet sich die Rechnung zu Deiner Buchung.\nViele Grüße."
+        text = MIMEText(body_text, 'plain')
+        message.attach(text)
         server.sendmail(from_email, receiver_email, message.as_string())
     except Exception as ex:
         logging.error(str(ex))

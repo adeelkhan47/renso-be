@@ -89,11 +89,15 @@ class item_types_for_season_list(Resource):
         seasons = [each.id for each in Season.current_seasons_by_user_id(g.current_user.id)]
         all_items, count = ItemType.filtration({"user_id:eq": str(g.current_user.id)})
         items_to_return = []
+        # for item_type in all_items:
+        #     for each_season in item_type.seasonItemTypes:
+        #         if each_season.season_id in seasons and item_type not in items_to_return and item_type.name != "Extra":
+        #             items_to_return.append(item_type)
+        #             break
         for item_type in all_items:
-            for each_season in item_type.seasonItemTypes:
-                if each_season.season_id in seasons and item_type not in items_to_return and item_type.name != "Extra":
-                    items_to_return.append(item_type)
-                    break
+            if item_type.name != "Extra":
+                items_to_return.append(item_type)
+
         return response_structure(items_to_return, len(items_to_return)), 200
 
 

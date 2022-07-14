@@ -84,16 +84,16 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=0, txt='', border=0, ln=1, align='C')
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
+    pdf.set_font("Arial", size=14)
     # company Info
     pdf.cell(190, 5,
-             txt=f"{company.name}, {company.street} and {company.street_number}, {company.zipcode}, {company.city}",
+             txt=f"{company.name}, {company.street} {company.street_number}, {company.zipcode}, {company.city}",
              border=0,
              ln=1,
              align="L")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # customer_info
-    pdf.set_font("Arial", size=12)
     pdf.cell(190, 5, txt=order.client_name, border=0, ln=1, align="L")
     pdf.cell(190, 5, txt=f"{street} {number}", border=0, ln=1, align="L")
     pdf.cell(190, 5, txt=f"{zipcode} {city}", border=0, ln=1, align="L")
@@ -108,12 +108,12 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # title
-    pdf.set_font("Arial", "B", size=12)
+    pdf.set_font("Arial", "B", size=16)
     pdf.cell(190, 5, txt="Rechnung", border=0, ln=1, align="L")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # setting header
-    pdf.set_font("Arial", "B", size=14)
+    pdf.set_font("Arial", "B", size=13)
     for each in header:
         pdf.cell(each[1], 5, txt=each[0], border=0, ln=0, align="C")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
@@ -146,7 +146,7 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
 
     # price calculations
-    pdf.set_font("Arial", "B", size=14)
+    pdf.set_font("Arial", "B", size=16)
     pdf.cell(190, 5, txt=f"Nettosumme {round(price, 2)} {chr(128)}", border=0, ln=1, align="L")
     pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
     com_taxs = get_booking_taxs(bookings)
@@ -168,33 +168,35 @@ def get_pdf(company, bookings, order):
         pdf.cell(0, h=30, txt='', border=0, ln=1, align='C')
 
     # ending note
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("Arial", size=16)
     pdf.cell(190, 5, txt="Der Betrag ist bereits beglichen.", border=0, ln=1, align="L")
 
     # footer
     y_axis = pdf.get_y()  # 235
-    pdf.set_font("Arial", size=10)
-    if y_axis < 236:
+    pdf.set_font("Arial", size=13)
+    if y_axis < 230:
         # 40 ki gunjaish hay
-        add_space = 236 - y_axis
+        add_space = 230 - y_axis
 
-        pdf.cell(0, h=20 + add_space, txt='', border=0, ln=1, align='C')
-        pdf.cell(190, h=3, txt=company.name, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=f'{company.street} and {company.city} , {company.zipcode}, {company.city}', border=0,
+        pdf.cell(0, h=15 + add_space, txt='', border=0, ln=1, align='C')
+        pdf.cell(190, h=5, txt=company.name, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=f'{company.street} {company.street_number} , {company.zipcode}, {company.city}',
+                 border=0,
                  ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.commercial_registered_number, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.legal_representative, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.email_for_taxs, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.company_tax_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.commercial_registered_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.legal_representative, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.email_for_taxs, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.company_tax_number, border=0, ln=1, align='L')
     else:
         pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
-        pdf.cell(190, h=3, txt=company.name, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=f'{company.street} and {company.city} , {company.zipcode}, {company.city}', border=0,
+        pdf.cell(190, h=5, txt=company.name, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=f'{company.street} {company.street_number} , {company.zipcode}, {company.city}',
+                 border=0,
                  ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.commercial_registered_number, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.legal_representative, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.email_for_taxs, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.company_tax_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.commercial_registered_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.legal_representative, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.email_for_taxs, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.company_tax_number, border=0, ln=1, align='L')
     pdf_name = f'{company.name}-Invoice-Re{company.bate_number}.pdf'
     Company.update(company.id, {"bate_number": company.bate_number + 1})
     return pdf.output(f"Invoice-{len(bookings)}.pdf", dest="S"), pdf_name
@@ -220,8 +222,8 @@ def create_pdf_and_send_email(order):
         pdfs.append(pdf)
         if company.email:
             try:
-                send_pdf_email(company.email, f"Invoice - {company.name}", [pdf], app_configs.email,
-                               app_configs.email_password)
+                send_pdf_email(company.email, f"Rechnung - Re{company.bate_number - 1}", [pdf], app_configs.email,
+                               app_configs.email_password, company)
             except Exception as e:
                 logging.exception(e)
     send_pdf_email(order.client_email, "Invoice For Order", pdfs, app_configs.email,

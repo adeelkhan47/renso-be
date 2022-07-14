@@ -11,6 +11,7 @@ from model.item_subtype import ItemSubType
 from model.item_type import ItemType
 from model.location import Location
 from model.restricted_dates import RestrictedDates
+from model.season import Season
 from . import api, schema
 
 
@@ -108,32 +109,48 @@ class items_subtype_list(Resource):
         args = request.args
         start_time = datetime.strptime(args["start_time"], '%Y-%m-%d %H:%M:%S')
         end_time = datetime.strptime(args["end_time"], '%Y-%m-%d %H:%M:%S')
-        item_sub_types = ItemType.query_by_id(args["item_type_id"]).item_sub_type
+        item_type = ItemType.query_by_id(args["item_type_id"])
+        item_sub_types = item_type.item_sub_type
         location = Location.query_by_id(args["location_id"])
         response_data = []
+        # VALIDATE CURRENT SEASON
+        seasons = [each.id for each in Season.current_seasons_by_user_id(g.current_user.id)]
+        in_season = False
+        for each in item_type.seasonItemTypes:
+            if start_time >= each.season.start_time and start_time <= each.season.end_time:
+                in_season = True
+
         # VALIDATE RESTRICTED DATES
         start_date = start_time.date()
         end_date = end_time.date()
         first = RestrictedDates.validate_booking_date(args["item_type_id"], start_date)
         second = RestrictedDates.validate_booking_date(args["item_type_id"], end_date)
+
         if not first or not second:
             return error_message("This Item_type is not available on these dates Temporary."), 400
         #
-        for each in item_sub_types:
-            data = {"item_sub_type_object": each}
-            list_of_ids = []
-            for item in each.items:
-                if item.item_status.name == "Available":
-                    if location in [loc.location for loc in item.item_locations]:
-                        found = False
-                        for each_booking in Booking.get_bookings_by_item_id(item.id):
-                            if each_booking.start_time <= end_time and start_time <= each_booking.end_time:
-                                found = True
-                                break
-                        if not found:
-                            list_of_ids.append(item.id)
-            data["available_item_ids"] = list_of_ids
-            response_data.append(data)
+        if not in_season:
+            for each in item_sub_types:
+                data = {"item_sub_type_object": each}
+                list_of_ids = []
+                data["available_item_ids"] = list_of_ids
+                response_data.append(data)
+        else:
+            for each in item_sub_types:
+                data = {"item_sub_type_object": each}
+                list_of_ids = []
+                for item in each.items:
+                    if item.item_status.name == "Available":
+                        if location in [loc.location for loc in item.item_locations]:
+                            found = False
+                            for each_booking in Booking.get_bookings_by_item_id(item.id):
+                                if each_booking.start_time <= end_time and start_time <= each_booking.end_time:
+                                    found = True
+                                    break
+                            if not found:
+                                list_of_ids.append(item.id)
+                data["available_item_ids"] = list_of_ids
+                response_data.append(data)
         return response_structure(response_data, len(response_data)), 200
 
 

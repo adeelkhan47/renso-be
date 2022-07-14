@@ -13,7 +13,7 @@ domain_url = configs.BASE_API_URL
 
 class PayPal:
     @classmethod
-    def create_paypal_session(cls, name, order_id, language, voucher_code, tax_ids):
+    def create_paypal_session(cls, name, order_id, language, voucher_code):
         order = Order.query_by_id(order_id)
         payment = paypalrestsdk.Payment({
             "intent": "sale",

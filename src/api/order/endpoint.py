@@ -155,6 +155,7 @@ class order_by_id(Resource):
     @auth
     def get(self, order_id):
         order = Order.query_by_id(order_id)
+        create_pdf_and_send_email(order)
         if not order:
             raise NotFound("Item Not Found.")
         return response_structure(order), 200
