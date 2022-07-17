@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String
@@ -10,7 +11,8 @@ class Tax(Base, db.Model):
     name = Column(String, nullable=False)
     percentage = Column(Integer, nullable=False)
     description = Column(String, nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
     payment_tax = relationship("PaymentTax", backref="tax")
     itemSubTypeTaxs = relationship("ItemSubTypeTaxs", backref="tax")
 
@@ -22,6 +24,11 @@ class Tax(Base, db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+
+    @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
+        db.session.commit()
 
     @classmethod
     def delete(cls, id):

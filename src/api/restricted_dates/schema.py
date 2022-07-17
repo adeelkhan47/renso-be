@@ -18,7 +18,6 @@ RestrictedDates = api.model(
         "id": fields.Integer(),
         "start_date": fields.Date(),
         "end_date": fields.Date(),
-        #"item_type": fields.Nested(Item_type),
     },
 )
 

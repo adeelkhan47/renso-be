@@ -33,6 +33,7 @@ Company = api.model(
         "company_tax_number": fields.String(),
         "email": fields.String(),
         "bate_number": fields.Integer(),
+        "is_deleted": fields.Boolean()
         #"item_subtype": fields.Nested(Item_subtype),
         #"sub_category_company": fields.Nested(tags, as_list=True),
     },

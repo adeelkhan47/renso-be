@@ -67,6 +67,7 @@ Booking = api.model(
         "cost_without_tax": fields.Float(),
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
+        "is_deleted": fields.Boolean(),
         "booking_status": fields.Nested(BookingStatus),
         "item": fields.Nested(Item),
         "location": fields.Nested(Location),

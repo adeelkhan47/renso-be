@@ -48,7 +48,7 @@ class booking_by_id(Resource):
 
     @auth
     def delete(self, season_id):
-        Season.delete(season_id)
+        Season.soft_delete(season_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseSeason, skip_none=True)

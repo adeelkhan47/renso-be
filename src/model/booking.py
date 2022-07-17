@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime, Float, Integer
@@ -14,11 +15,12 @@ class Booking(Base, db.Model):
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     booking_status_id = Column(Integer, ForeignKey("booking_status.id", ondelete="SET NULL"), nullable=True)
-    item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), nullable=False)
+    item_id = Column(Integer, ForeignKey("item.id", ondelete="SET NULL"), nullable=False)
     order_bookings = relationship("OrderBookings", backref="booking")
     cart_bookings = relationship("CartBookings", backref="booking")
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
-    location_id = Column(Integer, ForeignKey("location.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
+    location_id = Column(Integer, ForeignKey("location.id", ondelete="SET NULL"), nullable=False, index=True)
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
 
     def __init__(self, start_time, end_time, booking_status_id, item_id, cost, cost_without_tax, user_id, location_id):
         self.start_time = start_time
@@ -34,6 +36,11 @@ class Booking(Base, db.Model):
         return '<id {}>'.format(self.id)
 
     @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
+        db.session.commit()
+
+    @classmethod
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
@@ -46,16 +53,16 @@ class Booking(Base, db.Model):
     @classmethod
     def get_bookings_by_item_id(cls, item_id):
         active_id = BookingStatus.get_id_by_name("Active")
-        #pending_id = BookingStatus.get_id_by_name("Pending")
+        # pending_id = BookingStatus.get_id_by_name("Pending")
         payment_pending_id = BookingStatus.get_id_by_name("Payment Pending")
-        return cls.query.filter(cls.item_id == item_id,
+        return cls.query.filter(cls.item_id == item_id, cls.is_deleted == False,
                                 cls.booking_status_id.in_((active_id, payment_pending_id))).all()
 
     @classmethod
     def get_confirmed_bookings_by_item_id(cls, item_id):
         active_id = BookingStatus.get_id_by_name("Active")
         payment_pending_id = BookingStatus.get_id_by_name("Payment Pending")
-        return cls.query.filter(cls.item_id == item_id,
+        return cls.query.filter(cls.item_id == item_id, cls.is_deleted == False,
                                 cls.booking_status_id.in_((active_id, payment_pending_id))).all()
 
     @classmethod

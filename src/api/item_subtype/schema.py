@@ -27,7 +27,9 @@ Item_subtype_Expect = api.model(
         "discount_after_higher_price": fields.Integer(),
         "same_price_days": fields.Integer(),
         "show_description": fields.Boolean(),
-        "description": fields.String()
+        "description": fields.String(),
+        "is_deleted": fields.Boolean()
+
     },
 )
 

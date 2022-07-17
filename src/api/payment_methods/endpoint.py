@@ -17,6 +17,7 @@ class PaymentMethodList(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_rows, count = PaymentMethod.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -49,7 +50,7 @@ class Payment_Method_by_id(Resource):
     @api.doc("Delete method by id")
     @auth
     def delete(self, payment_method_id):
-        PaymentMethod.delete(payment_method_id)
+        PaymentMethod.soft_delete(payment_method_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responsePaymentMethod, skip_none=True)

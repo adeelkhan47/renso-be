@@ -16,6 +16,7 @@ class TagList(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_rows, count = Tag.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -44,5 +45,5 @@ class tag_by_id(Resource):
     @api.doc("Delete method by id")
     @auth
     def delete(self, tag_id):
-        Tag.delete(tag_id)
+        Tag.soft_delete(tag_id)
         return "ok", 200

@@ -23,6 +23,7 @@ class item_sub_types_list(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_items, count = ItemSubType.filtration(args)
         return response_structure(all_items, count), 200
 
@@ -61,7 +62,7 @@ class item_subtype_by_id(Resource):
     @api.doc("Delete ItemSubType by id")
     @auth
     def delete(self, item_subtype_id):
-        ItemSubType.delete(item_subtype_id)
+        ItemSubType.soft_delete(item_subtype_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem_Subtype)
@@ -92,7 +93,8 @@ class item_subtype_extra_by_item_type_id(Resource):
         itemType = ItemType.query_by_id(item_type_id)
         extra_sub_types = []
         for each in itemType.itemTypeExtras:
-            extra_sub_types.append(each.item_subtype)
+            if not each.item_subtype.is_deleted:
+                extra_sub_types.append(each.item_subtype)
         return response_structure(extra_sub_types, len(extra_sub_types)), 200
 
 
@@ -168,7 +170,7 @@ class items_extrasubtype_list(Resource):
         start_time = datetime.strptime(args["start_time"], '%Y-%m-%d %H:%M:%S')
         end_time = datetime.strptime(args["end_time"], '%Y-%m-%d %H:%M:%S')
         item_sub_types = ItemType.query_by_id(args["item_type_id"]).itemTypeExtras
-        item_sub_types = [x.item_subtype for x in item_sub_types]
+        item_sub_types = [x.item_subtype for x in item_sub_types if x.item_subtype.is_deleted == False]
         location = Location.query_by_id(args["location_id"])
         response_data = []
         for each in item_sub_types:

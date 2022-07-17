@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime, Integer
@@ -14,7 +15,8 @@ class Season(Base, db.Model):
     end_time = Column(DateTime, nullable=False)
     price_factor = Column(Integer, nullable=False, default=100)
     seasonItemTypes = relationship("SeasonItemTypes", backref="season")
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
 
     def __init__(self, start_time, end_time, price_factor, user_id):
         self.start_time = start_time
@@ -31,6 +33,11 @@ class Season(Base, db.Model):
         db.session.commit()
 
     @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
+        db.session.commit()
+
+    @classmethod
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)
         db.session.commit()
@@ -38,14 +45,16 @@ class Season(Base, db.Model):
     @classmethod
     def current_seasons_by_user_id(cls, user_id):
         current_date = datetime.today()
-        rows = db.session.query(cls).filter(cls.user_id == user_id, cls.start_time <= current_date,
+        rows = db.session.query(cls).filter(cls.user_id == user_id, cls.is_deleted == False,
+                                            cls.start_time <= current_date,
                                             cls.end_time >= current_date).all()
         return rows
 
     @classmethod
     def get_price_factor_on_date(cls, date, user_id):
         max_factor = 100
-        rows = db.session.query(cls).filter(cls.user_id == user_id, cls.start_time <= date, cls.end_time >= date).all()
+        rows = db.session.query(cls).filter(cls.user_id == user_id, cls.is_deleted == False, cls.start_time <= date,
+                                            cls.end_time >= date).all()
         if rows:
             factors = [row.price_factor for row in rows]
             return max(factors)

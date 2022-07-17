@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, String, Integer
@@ -11,7 +12,8 @@ class PaymentMethod(Base, db.Model):
     description = Column(String, nullable=True)
     status = Column(Boolean, nullable=False)
     payment_tax = relationship("PaymentTax", backref="payment_method")
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
 
     def __init__(self, name, description, status, user_id):
         self.name = name
@@ -21,6 +23,11 @@ class PaymentMethod(Base, db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+
+    @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
+        db.session.commit()
 
     @classmethod
     def delete(cls, id):
@@ -34,4 +41,5 @@ class PaymentMethod(Base, db.Model):
 
     @classmethod
     def get_payment_method_by_name(cls, name, user_id):
-        return cls.query.filter(cls.name == name, cls.status == True, cls.user_id == user_id).first()
+        return cls.query.filter(cls.name == name, cls.status == True, cls.user_id == user_id,
+                                cls.is_deleted == False).first()

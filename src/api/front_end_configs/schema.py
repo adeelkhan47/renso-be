@@ -13,6 +13,7 @@ FrontEndExpect = api.model(
         "link2": fields.String(),
         "link1_name": fields.String(),
         "link2_name": fields.String(),
+
     },
 )
 FrontEnd = api.model(
@@ -27,6 +28,8 @@ FrontEnd = api.model(
         "link2": fields.String(),
         "link1_name": fields.String(),
         "link2_name": fields.String(),
+        "is_deleted": fields.Boolean()
+
     },
 )
 

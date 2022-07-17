@@ -14,6 +14,8 @@ EmailText = api.model(
     {
         "id": fields.Integer(),
         "text": fields.String(),
+        "is_deleted": fields.Boolean()
+
         # "item_type": fields.Nested(Item_type),
     },
 )

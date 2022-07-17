@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String
@@ -19,8 +20,9 @@ class Company(Base, db.Model):
     email = Column(String, nullable=True)
     bate_number = Column(Integer, nullable=True, default=1)
 
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
     sub_category_company = relationship("ItemSubType", backref="company")
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
 
     def __init__(self, name, street, street_number, zipcode, city, commercial_registered_number, legal_representative,
                  email_for_taxs, company_tax_number, email, bate_number, user_id):
@@ -43,6 +45,12 @@ class Company(Base, db.Model):
     @classmethod
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)
+        db.session.commit()
+
+
+    @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
         db.session.commit()
 
     @classmethod

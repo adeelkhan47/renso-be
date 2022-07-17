@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String
 
@@ -14,7 +15,7 @@ class FrontEndCofigs(Base, db.Model):
     link2_name = Column(String, nullable=True)
     link1 = Column(String, nullable=True)
     link2 = Column(String, nullable=True)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
 
     def __init__(self, url, front_end_url, email, email_password, user_id, link1_name, link2_name, link1, link2):
         self.url = url
@@ -39,6 +40,7 @@ class FrontEndCofigs(Base, db.Model):
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)
         db.session.commit()
+
 
     @classmethod
     def get_by_user_id(cls, user_id):

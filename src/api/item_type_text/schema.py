@@ -17,6 +17,8 @@ ItemTypeText = api.model(
         "id": fields.Integer(),
         "text": fields.String(),
         "item_type": fields.Nested(Item_type),
+        "is_deleted": fields.Boolean()
+
     },
 )
 

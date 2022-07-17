@@ -18,6 +18,7 @@ class TimePickerList(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_rows, count = TimePicker.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -49,5 +50,5 @@ class picker_by_id(Resource):
     @api.doc("Delete time Picker by id")
     @auth
     def delete(self, time_picker_id):
-        TimePicker.delete(time_picker_id)
+        TimePicker.soft_delete(time_picker_id)
         return "ok", 204

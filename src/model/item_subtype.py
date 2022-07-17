@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String, Float, Boolean
@@ -13,15 +14,16 @@ class ItemSubType(Base, db.Model):
     price = Column(Float, nullable=False, unique=False)
     person = Column(Integer, nullable=False, unique=False)
     image = Column(String(500), nullable=False)
-    item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=True)
-    company_id = Column(Integer, ForeignKey("company.id", ondelete="CASCADE"), nullable=True)
+    item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="SET NULL"), nullable=True)
+    company_id = Column(Integer, ForeignKey("company.id", ondelete="SET NULL"), nullable=True)
     least_price = Column(Float, nullable=True, unique=False, default=1)
     discount_after_higher_price = Column(Integer, nullable=True, unique=False, default=10)
     same_price_days = Column(Integer, nullable=True, unique=False, default=1)
 
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
     items = relationship("Item", backref="item_subtype")
     associate_email_subtypes = relationship("AssociateEmailSubtype", backref="item_subtype")
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
     itemTypeExtras = relationship("ItemTypeExtra", backref="item_subtype")
     itemSubTypeTaxs = relationship("ItemSubTypeTaxs", backref="item_subtype")
 
@@ -54,6 +56,16 @@ class ItemSubType(Base, db.Model):
         db.session.commit()
 
     @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
+        db.session.commit()
+
+    @classmethod
+    def soft_delete_on_item_type(cls, item_type_id):
+        db.session.query(cls).filter(cls.item_type_id == item_type_id).update({"is_deleted": True})
+        db.session.commit()
+
+    @classmethod
     def get_by_item_type_id(cls, item_type_id):
-        rows = cls.query.filter(cls.item_type_id == item_type_id).all()
+        rows = cls.query.filter(cls.item_type_id == item_type_id, cls.is_deleted == False).all()
         return rows

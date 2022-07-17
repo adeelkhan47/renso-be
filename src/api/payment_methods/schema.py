@@ -26,6 +26,7 @@ PaymentMethod = api.model(
         "description": fields.String(),
         "status": fields.Boolean(),
         "payment_tax": fields.Nested(Tax_nested, as_list=True),
+        "is_deleted": fields.Boolean()
 
     },
 )

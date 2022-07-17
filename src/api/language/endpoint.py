@@ -16,6 +16,7 @@ class LanguageList(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_rows, count = Language.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -43,5 +44,5 @@ class Language_by_id(Resource):
     @auth
     @api.doc("Delete Widget by id")
     def delete(self, language_id):
-        Language.delete(language_id)
+        Language.soft_delete(language_id)
         return "ok", 200

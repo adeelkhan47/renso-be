@@ -1,7 +1,7 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, String, Integer
-
+from sqlalchemy import text
 from model.base import Base, db
 
 
@@ -10,7 +10,8 @@ class AssociateEmail(Base, db.Model):
     email = Column(String, nullable=False)
     associate_email_subtypes = relationship("AssociateEmailSubtype", backref="associate_email")
     status = Column(Boolean, default=True)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), index=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), index=True)
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
 
     def __init__(self, email, status, user_id):
         self.email = email
@@ -19,6 +20,12 @@ class AssociateEmail(Base, db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+
+
+    @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
+        db.session.commit()
 
     @classmethod
     def delete(cls, id):

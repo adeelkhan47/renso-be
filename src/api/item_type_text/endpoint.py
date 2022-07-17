@@ -14,6 +14,7 @@ class ItemTypeTextList(Resource):
     @auth
     def get(self):
         args = request.args.copy()
+        args["is_deleted:eq"] = "False"
         all_rows, count = ItemTypeText.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -39,7 +40,7 @@ class ItemTypeText_by_id(Resource):
     @api.doc("Delete method by id")
     @auth
     def delete(self, item_type_text_id):
-        ItemTypeText.delete(item_type_text_id)
+        ItemTypeText.soft_delete(item_type_text_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_ItemTypeText)

@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, Integer, String
@@ -19,9 +20,10 @@ class ItemType(Base, db.Model):
     itemTypeLocations = relationship("LocationItemTypes", backref="item_type")
     itemTypeExtras = relationship("ItemTypeExtra", backref="item_type")
     itemType_restricted_dates = relationship("RestrictedDates", backref="item_type")
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
 
     image = Column(String(500), nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
 
     def __init__(self, name, maintenance, delivery_available, image, user_id, show_time_picker):
         self.name = name
@@ -37,6 +39,12 @@ class ItemType(Base, db.Model):
     @classmethod
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)
+        db.session.commit()
+
+
+    @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
         db.session.commit()
 
     @classmethod

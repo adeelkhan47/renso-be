@@ -25,6 +25,7 @@ class items_list_locationFilter(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         if ("item_subtype_id" in args.keys() and args["item_subtype_id"]) and (
                 "location_ids" in args.keys() and args["location_ids"]) and (
                 ItemSubType.query_by_id(args["item_subtype_id"])):
@@ -80,6 +81,7 @@ class items_list(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_items, count = Item.filtration(args)
         return response_structure(all_items, count), 200
 
@@ -136,7 +138,7 @@ class item_by_id(Resource):
         active_orders = ",".join(str(x) for x in orders)
         if active_orders:
             return {"active_orders": active_orders}, 200
-        Item.delete(item_id)
+        Item.soft_delete(item_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem, skip_none=True)

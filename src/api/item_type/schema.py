@@ -55,7 +55,9 @@ Item_type = api.model(
         "image": fields.String(),
         "itemTypeLocations": fields.Nested(locations, as_list=True),
         "itemTypeExtras": fields.Nested(item_sub_types, as_list=True),
-        "item_sub_type": fields.Nested(Item_subtype_temp, as_list=True)
+        "item_sub_type": fields.Nested(Item_subtype_temp, as_list=True),
+        "is_deleted": fields.Boolean()
+
     },
 )
 

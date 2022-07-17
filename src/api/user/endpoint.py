@@ -22,6 +22,7 @@ class user_list(Resource):
     def get(self):
         args = request.args.copy()
         args["user_key:eq"] = g.current_user.user_key
+        args["is_deleted:eq"] = "False"
         all_users, count = User.filtration(args)
         return response_structure(all_users, count), 200
 
@@ -42,7 +43,7 @@ class user_list(Resource):
         user = User(name, email, password, subscription, image, gender, status, user_key)
         user.insert()
         FrontEndCofigs("", "http://www.front_end.com/", "dummy@strato.de", "EmailPassword",
-                       "", user.id, "link1_name", "link2_name", "link1", "link2").insert()
+                        user.id, "link1_name", "link2_name", "link1", "link2").insert()
         item_type = ItemType("Extra", 1, True, "", user.id, False)
         item_type.insert()
         Tag("Cheap", "", "blue", user.id).insert()
@@ -82,7 +83,7 @@ class user_by_ind_id(Resource):
     @auth
     @api.doc("Delete user by id")
     def delete(self, user_id):
-        User.delete(user_id)
+        User.soft_delete(user_id)
         return "ok", 200
 
     @auth

@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Date
 
@@ -8,7 +9,7 @@ class RestrictedDates(Base, db.Model):
     __tablename__ = "restricted_dates"
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-    item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=False, index=True,
+    item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="SET NULL"), nullable=False, index=True,
                           unique=False)
 
     def __init__(self, start_date, end_date, item_type_id):

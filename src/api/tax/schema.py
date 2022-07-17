@@ -23,7 +23,8 @@ Tax = api.model(
         "name": fields.String(),
         "percentage": fields.Integer(),
         "description": fields.String(),
-        "itemSubTypeTaxs": fields.Nested(Item_SubTypes_in, as_list=True)
+        "itemSubTypeTaxs": fields.Nested(Item_SubTypes_in, as_list=True),
+        "is_deleted": fields.Boolean()
     },
 )
 

@@ -12,7 +12,8 @@ class OrderStatusList(Resource):
     @api.doc("Get all OrderStatus")
     @api.marshal_list_with(schema.get_list_responseOrderStatus)
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["is_deleted:eq"] = "False"
         all_rows, count = OrderStatus.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -37,5 +38,5 @@ class OrderStatus_by_id(Resource):
 
     @api.doc("Delete method by id")
     def delete(self, order_status_id):
-        OrderStatus.delete(order_status_id)
+        OrderStatus.soft_delete(order_status_id)
         return "ok", 200

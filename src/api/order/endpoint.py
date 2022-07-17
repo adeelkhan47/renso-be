@@ -34,6 +34,7 @@ class order_list(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_items, count = Order.filtration(args)
         return response_structure(all_items, count), 200
 
@@ -42,7 +43,6 @@ class order_list(Resource):
     @auth
     def post(self):
         payload = api.payload.copy()
-
         parameters, count = CustomParameter.filtration({})
         custom_parameters = [each.name for each in parameters]
         payment_method_id = payload.get("payment_method_id")
@@ -166,7 +166,7 @@ class order_by_id(Resource):
         order = Order.query_by_id(order_id)
         for each in order.order_bookings:
             Booking.cancel_booking(each.booking_id)
-        Order.delete(order_id)
+        Order.soft_delete(order_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
@@ -194,6 +194,7 @@ class order_by_id(Resource):
     def get(self, item_type_id):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         orders_query = Order.getQuery_OrderByItemType(item_type_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200
@@ -206,6 +207,7 @@ class order_by_item_subtype_id(Resource):
     def get(self, item_subtype_id):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         orders_query = Order.getQuery_OrderByItemSubType(item_subtype_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200

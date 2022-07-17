@@ -18,6 +18,7 @@ class DayPickerList(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_rows, count = DayPicker.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -54,7 +55,7 @@ class day_picker_by_id(Resource):
     @api.doc("Delete Date Picker by id")
     @auth
     def delete(self, day_picker_id):
-        DayPicker.delete(day_picker_id)
+        DayPicker.soft_delete(day_picker_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseDay_Picker, skip_none=True)

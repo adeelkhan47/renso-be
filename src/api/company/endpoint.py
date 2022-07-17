@@ -16,6 +16,7 @@ class Company_list(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_items, count = Company.filtration(args)
         return response_structure(all_items, count), 200
 
@@ -42,7 +43,7 @@ class item_by_id(Resource):
     @api.doc("Delete Companies by id")
     @auth
     def delete(self, company_id):
-        Company.delete(company_id)
+        Company.soft_delete(company_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseCompany, skip_none=True)
