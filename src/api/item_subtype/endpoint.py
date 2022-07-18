@@ -192,4 +192,5 @@ class items_extrasubtype_list(Resource):
                             list_of_ids.append(item.id)
             data["available_item_ids"] = list_of_ids
             response_data.append(data)
+
         return response_structure(response_data, len(response_data)), 200
