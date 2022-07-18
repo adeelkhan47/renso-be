@@ -12,7 +12,6 @@ do
      sleep 1
 done
 
-#exec celery -A tasks.email worker -l INFO --pool=solo &
-#exec celery -A tasks.email beat -l INFO &
-#exec celery -A tasks.queue beat -l INFO &
+exec celery -A tasks.order worker -l INFO --pool=solo &
+exec celery -A tasks.order beat -l INFO &
 exec gunicorn --bind 0.0.0.0:5000 --forwarded-allow-ips='*' wsgi:app
