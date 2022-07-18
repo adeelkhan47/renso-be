@@ -43,9 +43,11 @@ class Company(Base, db.Model):
         return '<id {}>'.format(self.id)
 
     @classmethod
-    def update(cls, id, data):
-        db.session.query(cls).filter(cls.id == id).update(data)
-        db.session.commit()
+    def update(cls, id, data,session=None):
+        if not session:
+            session = db.session
+        session.query(cls).filter(cls.id == id).update(data)
+        session.commit()
 
 
     @classmethod

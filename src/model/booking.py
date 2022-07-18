@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
@@ -46,9 +48,20 @@ class Booking(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def update(cls, id, data):
-        db.session.query(cls).filter(cls.id == id).update(data)
-        db.session.commit()
+    def update(cls, id, data, session=None):
+        if not session:
+            session = db.session
+        session.query(cls).filter(cls.id == id).update(data)
+        session.commit()
+
+    @classmethod
+    def delete_pending_bookings(cls, session=None):
+        if not session:
+            session = db.session
+        pending_id = BookingStatus.get_id_by_name("Pending", session)
+        start_time = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        session.query(cls).filter(cls.booking_status_id == pending_id, cls.created_at < start_time).delete()
+        session.commit()
 
     @classmethod
     def get_bookings_by_item_id(cls, item_id):

@@ -1,4 +1,3 @@
-from sqlalchemy import text
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String
 
@@ -41,8 +40,9 @@ class FrontEndCofigs(Base, db.Model):
         db.session.query(cls).filter(cls.id == id).update(data)
         db.session.commit()
 
-
     @classmethod
-    def get_by_user_id(cls, user_id):
-        row = cls.query.filter(cls.user_id == user_id).first()
+    def get_by_user_id(cls, user_id, session=None):
+        if not session:
+            session = db.session
+        row = session.query(cls).filter(cls.user_id == user_id).first()
         return row

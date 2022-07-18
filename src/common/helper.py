@@ -5,7 +5,9 @@ from fpdf import FPDF
 
 from common.email_service import send_pdf_email
 from model.company import Company
+from model.email_text import EmailText
 from model.front_end_configs import FrontEndCofigs
+from model.item_type import ItemType
 from model.order_backup import OrderBackUp
 from model.voucher import Voucher
 
@@ -203,7 +205,41 @@ def get_pdf(company, bookings, order):
     #
 
 
-def create_pdf_and_send_email(order):
+def create_email(order, session=None):
+    actual_text = ""
+    email_text = EmailText.get_by_user_id(order.user_id, session)
+    custom_values_dict = {}
+    item_types_in_order = [each.booking.item.item_type.name for each in order.order_bookings]
+
+    custom_values = [x.custom_data for x in order.order_custom_data]
+    for each in custom_values:
+        custom_values_dict[each.name] = each.value
+
+    if email_text:
+        actual_text = email_text.text
+        custom_variables = [t for t in actual_text.split() if t.startswith('$')]
+        itemType_text_variables = [t for t in actual_text.split() if t.startswith('#')]
+        for each in itemType_text_variables:
+            if each[1:] and each[1:] in item_types_in_order:
+                item_type = ItemType.get_by_item_type_name(each[1:], session)
+                if item_type and item_type.itemTypeTexts:
+                    data = item_type.itemTypeTexts[0].text
+                    actual_text = actual_text.replace(each, data)
+                else:
+                    actual_text = actual_text.replace(each, "")
+            else:
+                actual_text = actual_text.replace(each, "")
+        actual_text = actual_text.replace("$name", order.client_name)
+        for each in custom_variables:
+            if each[1:] in custom_values_dict.keys():
+                actual_text = actual_text.replace(each, custom_values_dict.get(each[1:]))
+            else:
+                actual_text = actual_text.replace(each, "")
+    actual_text = actual_text.replace('\n', '<br>')
+    return actual_text
+
+
+def create_pdf_and_send_email(order, session=None):
     bookings = [order_booking.booking for order_booking in order.order_bookings]
     data = {}
     for booking in bookings:
@@ -214,9 +250,9 @@ def create_pdf_and_send_email(order):
             data[item_subtype.company.id].append((item_subtype, booking))
 
     pdfs = []
-    app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
+    app_configs = FrontEndCofigs.get_by_user_id(order.user_id, session)
     for each in data.keys():
-        company = Company.query_by_id(each)
+        company = Company.query_by_id(each, session)
         bookings = [record[1] for record in data.get(each)]
         pdf = get_pdf(company, bookings, order)
         pdfs.append(pdf)

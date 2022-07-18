@@ -43,8 +43,10 @@ class OrderBackUp(Base, db.Model):
 
     @classmethod
     def get_order_backUp_by_unique_key(cls, unique_key):
-        return cls.query.filter(cls.unique_key == unique_key, cls.is_deleted == Falseo).first()
+        return cls.query.filter(cls.unique_key == unique_key, cls.is_deleted == False).first()
 
     @classmethod
-    def get_by_cart_id(cls, cart_id):
-        return cls.query.filter(cls.cart_id == cart_id).first()
+    def get_by_cart_id(cls, cart_id, session=None):
+        if not session:
+            session = db.session
+        return session.query(cls).filter(cls.cart_id == cart_id).first()

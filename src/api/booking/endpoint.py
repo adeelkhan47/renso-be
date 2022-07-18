@@ -31,6 +31,7 @@ class booking_list(Resource):
         args["user_id:eq"] = str(g.current_user.id)
         args["is_deleted:eq"] = "False"
         all_items, count = Booking.filtration(args)
+        Booking.delete_pending_bookings()
         return response_structure(all_items, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseBooking, skip_none=True)

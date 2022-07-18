@@ -1,7 +1,8 @@
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, String, Integer
-from sqlalchemy import text
+
 from model.base import Base, db
 
 
@@ -21,7 +22,6 @@ class AssociateEmail(Base, db.Model):
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
-
     @classmethod
     def soft_delete(cls, id):
         db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
@@ -36,3 +36,9 @@ class AssociateEmail(Base, db.Model):
     def update(cls, id, data):
         db.session.query(cls).filter(cls.id == id).update(data)
         db.session.commit()
+
+    @classmethod
+    def getall(cls, user_id, session=None):
+        if not session:
+            session = db.session
+        return session.query(cls).filter(cls.user_id == user_id, cls.status == True).all()

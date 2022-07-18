@@ -6,6 +6,7 @@ from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound, BadRequest
 
+#from common.helper import response_structure, create_pdf_and_send_email
 from common.helper import response_structure, create_pdf_and_send_email
 from decorator.authorization import auth
 from model.booking import Booking
@@ -123,6 +124,11 @@ class order_list(Resource):
 
                 price_id = Stripe.create_price(product_id, order.total_cost)
                 session_id = Stripe.create_checkout_session(price_id, order.id, language, voucher_code)
+                unique_key = uuid.uuid4()
+                order_backup = OrderBackUp(order.cart_id, str(unique_key), "Stripe", session_id,
+                                           voucher_code,
+                                           str(order.total_cost))
+                order_backup.insert()
             else:
                 unique_key = uuid.uuid4()
                 order_backup = OrderBackUp(order.cart_id, str(unique_key), "Stripe", "None",
@@ -133,8 +139,14 @@ class order_list(Resource):
         elif payment_method.name == "Paypal":
             if order.total_cost > 0:
                 paypal_url = PayPal.create_paypal_session(order_name, order.id, language, voucher_code)
+
                 if not paypal_url:
                     raise BadRequest("Paypal not working.")
+                unique_key = uuid.uuid4()
+                order_backup = OrderBackUp(order.cart_id, str(unique_key), "Paypal", paypal_url,
+                                           voucher_code,
+                                           str(order.total_cost))
+                order_backup.insert()
             else:
                 unique_key = uuid.uuid4()
                 order_backup = OrderBackUp(order.cart_id, str(unique_key), "Paypal", "None",

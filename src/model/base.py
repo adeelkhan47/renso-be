@@ -32,8 +32,10 @@ class Base(object):
     )
 
     @classmethod
-    def query_by_id(cls, id: int):
-        row = db.session.query(cls).filter_by(id=id).first()
+    def query_by_id(cls, id: int, session=None):
+        if not session:
+            session = db.session
+        row = session.query(cls).filter_by(id=id).first()
         return row
 
     def insert(self):
@@ -82,13 +84,15 @@ class Base(object):
         return query
 
     @classmethod
-    def filtration(cls, args: Dict, query: str = None):
+    def filtration(cls, args: Dict, query: str = None, session=None):
         """
         Get list of rows queried from database as per the arguments passed in request
         :param query:
         :param args: Dict containing the query args passed in request
         :return: List of objects of the class on which the function is called and an Int representing length of list
         """
+        if not session:
+            session = db.session
 
         def inspect_field(field: String) -> InstrumentedAttribute:
             if field not in inspect(cls).all_orm_descriptors:

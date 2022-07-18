@@ -41,7 +41,6 @@ class ItemType(Base, db.Model):
         db.session.query(cls).filter(cls.id == id).update(data)
         db.session.commit()
 
-
     @classmethod
     def soft_delete(cls, id):
         db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
@@ -53,5 +52,7 @@ class ItemType(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def get_by_item_type_name(cls, name):
-        return cls.query.filter(cls.name == name).first()
+    def get_by_item_type_name(cls, name, session=None):
+        if not session:
+            session = db.session
+        return session.query(cls).filter(cls.name == name).first()

@@ -1,7 +1,8 @@
+from sqlalchemy import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import String
-from sqlalchemy import text
+
 from model.base import Base, db
 
 
@@ -24,13 +25,14 @@ class BookingStatus(Base, db.Model):
         cls.query.filter(cls.id == id).delete()
         db.session.commit()
 
-
     @classmethod
     def soft_delete(cls, id):
         db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
         db.session.commit()
 
     @classmethod
-    def get_id_by_name(cls, name: str):
-        row = db.session.query(cls).filter_by(name=name).first()
+    def get_id_by_name(cls, name: str, session=None):
+        if not session:
+            session = db.session
+        row = session.query(cls).filter_by(name=name).first()
         return row.id

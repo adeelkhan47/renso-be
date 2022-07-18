@@ -37,10 +37,15 @@ class Voucher(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def update(cls, id, data):
-        db.session.query(cls).filter(cls.id == id).update(data)
-        db.session.commit()
+    def update(cls, id, data, session=None):
+        if not session:
+            session = db.session
+        session.query(cls).filter(cls.id == id).update(data)
+        session.commit()
 
     @classmethod
-    def get_voucher_by_code(cls, code, user_id):
-        return cls.query.filter(cls.code == code, cls.status == True, cls.user_id == user_id, cls.is_deleted == False).first()
+    def get_voucher_by_code(cls, code, user_id,session=None):
+        if not session:
+            session = db.session
+        return session.query(cls).filter(cls.code == code, cls.status == True, cls.user_id == user_id,
+                                cls.is_deleted == False).first()

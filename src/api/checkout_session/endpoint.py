@@ -1,5 +1,4 @@
 import logging
-import uuid
 from http import HTTPStatus
 from pathlib import Path
 
@@ -64,15 +63,15 @@ def create_email(order):
     return actual_text
 
 
-def process_order_completion(order, language, order_backup_id, voucher_code):
-    order_backup = OrderBackUp.query_by_id(order_backup_id)
+def process_order_completion(order, language, order_backup_id, voucher_code, session=None):
+    order_backup = OrderBackUp.query_by_id(order_backup_id, session)
     email_text = create_email(order)
-    order_status_paid_id = OrderStatus.get_id_by_name("Paid")
-    order_status_completed_id = OrderStatus.get_id_by_name("Completed")
-    order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled")
+    order_status_paid_id = OrderStatus.get_id_by_name("Paid", session)
+    order_status_completed_id = OrderStatus.get_id_by_name("Completed", session)
+    order_status_cancelled_id = OrderStatus.get_id_by_name("Cancelled", session)
 
     if voucher_code:
-        voucher = Voucher.get_voucher_by_code(voucher_code, order.user_id)
+        voucher = Voucher.get_voucher_by_code(voucher_code, order.user_id, session)
         if voucher:
             if not voucher.counter:
                 Voucher.update(voucher.id, {"counter": 0})
@@ -153,6 +152,7 @@ def process_order_completion(order, language, order_backup_id, voucher_code):
         logging.error(f"Sending Emails Failed for Order Id{order.id}")
 
 
+
 @api.route("")
 class CheckOutSession(Resource):
     @api.doc("Create Stripe Session for checkout")
@@ -209,29 +209,15 @@ class CheckOutSessionSuccess(Resource):
     def get(self):
         try:
             logging.error(request.url)
-            payment_method = "Stripe"
             args = request.args
             session_id = args["session_id"]
             voucher_code = args["voucher_code"]
-            payment_reference = session_id
             if session_id == "notStripe":
-                payment_method = "Paypal"
-                payment_reference = args["paymentId"]
                 PayPal.execute_payment(args["paymentId"], args["PayerID"])
-
             order_id = args["order_id"]
             language = args["language"]
             order = Order.query_by_id(int(order_id))
-            unique_key = uuid.uuid4()
-            if voucher_code:
-                voucher = Voucher.get_voucher_by_code(voucher_code, order.user_id)
-                if voucher:
-                    if not voucher.counter:
-                        Voucher.update(voucher.id, {"counter": 0})
-                    Voucher.update(voucher.id, {"counter": voucher.counter + 1})
-            order_backup = OrderBackUp(order.cart_id, str(unique_key), payment_method, payment_reference, voucher_code,
-                                       str(order.total_cost))
-            order_backup.insert()
+            order_backup = OrderBackUp.get_by_cart_id(order.cart_id)
             process_order_completion(order, language, order_backup.id, voucher_code)
             app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
             FE_URL = app_configs.front_end_url

@@ -35,5 +35,7 @@ class EmailText(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def get_by_user_id(cls, user_id):
-        return cls.query.filter(cls.user_id == user_id).first()
+    def get_by_user_id(cls, user_id,session=None):
+        if not session:
+            session = db.session
+        return session.query(cls).filter(cls.user_id == user_id).first()

@@ -3,6 +3,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String
 
+from model.item_tag import ItemTag
+from model.item_location import ItemLocation
 from model.base import Base, db
 from model.item_status import ItemStatus
 

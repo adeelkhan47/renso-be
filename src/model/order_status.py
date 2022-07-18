@@ -31,6 +31,8 @@ class OrderStatus(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def get_id_by_name(cls, name: str):
-        row = db.session.query(cls).filter_by(name=name, is_deleted=False).first()
+    def get_id_by_name(cls, name: str, session=None):
+        if not session:
+            session = db.session
+        row = session.query(cls).filter_by(name=name, is_deleted=False).first()
         return row.id
