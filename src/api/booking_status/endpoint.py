@@ -13,6 +13,7 @@ class BookingStatusList(Resource):
     @api.marshal_list_with(schema.get_list_responseBookingStatus)
     def get(self):
         args = request.args
+        args["is_deleted:eq"] = "False"
         all_rows, count = BookingStatus.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -38,5 +39,5 @@ class BookingStatus_by_id(Resource):
 
     @api.doc("Delete method by id")
     def delete(self, booking_status_id):
-        BookingStatus.delete(booking_status_id)
+        BookingStatus.soft_delete(booking_status_id)
         return "ok", 200

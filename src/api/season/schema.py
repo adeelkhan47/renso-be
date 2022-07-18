@@ -24,6 +24,7 @@ Season = api.model(
         "start_time": fields.DateTime(),
         "end_time": fields.DateTime(),
         "price_factor": fields.Integer(),
+        "is_deleted": fields.Boolean(),
         "seasonItemTypes": fields.Nested(item_types,as_list=True)
     },
 )

@@ -14,7 +14,7 @@ class FrontEndCofigs(Base, db.Model):
     link2_name = Column(String, nullable=True)
     link1 = Column(String, nullable=True)
     link2 = Column(String, nullable=True)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
 
     def __init__(self, url, front_end_url, email, email_password, user_id, link1_name, link2_name, link1, link2):
         self.url = url
@@ -41,6 +41,8 @@ class FrontEndCofigs(Base, db.Model):
         db.session.commit()
 
     @classmethod
-    def get_by_user_id(cls, user_id):
-        row = cls.query.filter(cls.user_id == user_id).first()
+    def get_by_user_id(cls, user_id, session=None):
+        if not session:
+            session = db.session
+        row = session.query(cls).filter(cls.user_id == user_id).first()
         return row

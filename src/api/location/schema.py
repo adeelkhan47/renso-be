@@ -19,6 +19,7 @@ Location = api.model(
         "name": fields.String(),
         "description": fields.String(),
         "price_factor": fields.Integer(),
+        "is_deleted": fields.Boolean()
 
     },
 )

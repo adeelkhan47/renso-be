@@ -19,6 +19,7 @@ Tag = api.model(
         "name": fields.String(),
         "description": fields.String(),
         "color": fields.String(),
+        "is_deleted": fields.Boolean()
 
     },
 )

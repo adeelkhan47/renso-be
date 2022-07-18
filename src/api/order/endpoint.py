@@ -6,6 +6,7 @@ from flask import request
 from flask_restx import Resource
 from werkzeug.exceptions import NotFound, BadRequest
 
+#from common.helper import response_structure, create_pdf_and_send_email
 from common.helper import response_structure, create_pdf_and_send_email
 from decorator.authorization import auth
 from model.booking import Booking
@@ -34,6 +35,7 @@ class order_list(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_items, count = Order.filtration(args)
         return response_structure(all_items, count), 200
 
@@ -42,7 +44,6 @@ class order_list(Resource):
     @auth
     def post(self):
         payload = api.payload.copy()
-
         parameters, count = CustomParameter.filtration({})
         custom_parameters = [each.name for each in parameters]
         payment_method_id = payload.get("payment_method_id")
@@ -123,6 +124,11 @@ class order_list(Resource):
 
                 price_id = Stripe.create_price(product_id, order.total_cost)
                 session_id = Stripe.create_checkout_session(price_id, order.id, language, voucher_code)
+                unique_key = uuid.uuid4()
+                order_backup = OrderBackUp(order.cart_id, str(unique_key), "Stripe", session_id,
+                                           voucher_code,
+                                           str(order.total_cost))
+                order_backup.insert()
             else:
                 unique_key = uuid.uuid4()
                 order_backup = OrderBackUp(order.cart_id, str(unique_key), "Stripe", "None",
@@ -133,8 +139,14 @@ class order_list(Resource):
         elif payment_method.name == "Paypal":
             if order.total_cost > 0:
                 paypal_url = PayPal.create_paypal_session(order_name, order.id, language, voucher_code)
+
                 if not paypal_url:
                     raise BadRequest("Paypal not working.")
+                unique_key = uuid.uuid4()
+                order_backup = OrderBackUp(order.cart_id, str(unique_key), "Paypal", paypal_url,
+                                           voucher_code,
+                                           str(order.total_cost))
+                order_backup.insert()
             else:
                 unique_key = uuid.uuid4()
                 order_backup = OrderBackUp(order.cart_id, str(unique_key), "Paypal", "None",
@@ -155,6 +167,7 @@ class order_by_id(Resource):
     @auth
     def get(self, order_id):
         order = Order.query_by_id(order_id)
+        create_pdf_and_send_email(order)
         if not order:
             raise NotFound("Item Not Found.")
         return response_structure(order), 200
@@ -165,7 +178,7 @@ class order_by_id(Resource):
         order = Order.query_by_id(order_id)
         for each in order.order_bookings:
             Booking.cancel_booking(each.booking_id)
-        Order.delete(order_id)
+        Order.soft_delete(order_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseOrder, skip_none=True)
@@ -193,6 +206,7 @@ class order_by_id(Resource):
     def get(self, item_type_id):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         orders_query = Order.getQuery_OrderByItemType(item_type_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200
@@ -205,6 +219,7 @@ class order_by_item_subtype_id(Resource):
     def get(self, item_subtype_id):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         orders_query = Order.getQuery_OrderByItemSubType(item_subtype_id)
         allorders, rows = Order.filtration(args, orders_query)
         return response_structure(allorders, rows), 200

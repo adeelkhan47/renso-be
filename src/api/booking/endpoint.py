@@ -29,7 +29,9 @@ class booking_list(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_items, count = Booking.filtration(args)
+        Booking.delete_pending_bookings()
         return response_structure(all_items, count), 200
 
     @api.marshal_list_with(schema.get_by_id_responseBooking, skip_none=True)
@@ -96,6 +98,7 @@ class bookings_by_item_type_id(Resource):
     def get(self, item_type_id):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         booking_query = Booking.getQuery_BookingByItemType(item_type_id)
         allBookings, rows = Booking.filtration(args, booking_query)
         return response_structure(allBookings, rows), 200
@@ -108,6 +111,7 @@ class bookings_by_item_Subtype_id(Resource):
     def get(self, item_subtype_id):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         booking_query = Booking.getQuery_BookingByItemSubType(item_subtype_id)
         allBookings, rows = Booking.filtration(args, booking_query)
         return response_structure(allBookings, rows), 200

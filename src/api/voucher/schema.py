@@ -22,6 +22,7 @@ Voucher = api.model(
         "description": fields.String(),
         "price_factor": fields.Integer(),
         "status": fields.Boolean(),
+        "is_deleted": fields.Boolean()
     },
 )
 

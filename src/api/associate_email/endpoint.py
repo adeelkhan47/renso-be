@@ -18,6 +18,7 @@ class AssociateEmailList(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_rows, count = AssociateEmail.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -49,7 +50,8 @@ class voucher_by_id(Resource):
     @api.doc("Delete method by id")
     @auth
     def delete(self, associate_email_id):
-        AssociateEmail.delete(associate_email_id)
+        AssociateEmail.soft_delete(associate_email_id)
+        AssociateEmailSubtype.delete_by_email_id(associate_email_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseAssociateEmail)

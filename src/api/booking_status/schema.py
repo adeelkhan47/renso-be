@@ -17,6 +17,7 @@ BookingStatus = api.model(
         "id": fields.Integer(),
         "name": fields.String(),
         "color": fields.String(),
+        "is_deleted": fields.Boolean()
 
     },
 )

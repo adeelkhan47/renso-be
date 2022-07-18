@@ -16,6 +16,7 @@ class VoucherList(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_rows, count = Voucher.filtration(args)
         return response_structure(all_rows, count), 200
 
@@ -42,7 +43,7 @@ class voucher_by_id(Resource):
     @api.doc("Delete method by id")
     @auth
     def delete(self, voucher_id):
-        Voucher.delete(voucher_id)
+        Voucher.soft_delete(voucher_id)
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseVoucher)

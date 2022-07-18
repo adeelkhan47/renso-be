@@ -32,7 +32,8 @@ User = api.model(
         "image": fields.String(),
         "gender": fields.String(),
         "status": fields.Boolean(),
-        "user_key": fields.String()
+        "user_key": fields.String(),
+        "is_deleted": fields.Boolean()
     },
 )
 

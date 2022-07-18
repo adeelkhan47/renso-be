@@ -12,8 +12,10 @@ class ItemStatusList(Resource):
     @api.doc("Get all ItemStatus")
     @api.marshal_list_with(schema.get_list_responseItemStatus)
     def get(self):
-        args = request.args
+        args = request.args.copy()
+        args["is_deleted:eq"] = "False"
         all_rows, count = ItemStatus.filtration(args)
+
         return response_structure(all_rows, count), 200
 
     @api.expect(schema.ItemStatus_Expect)
@@ -37,5 +39,5 @@ class tag_by_id(Resource):
 
     @api.doc("Delete method by id")
     def delete(self, item_status_id):
-        ItemStatus.delete(item_status_id)
+        ItemStatus.soft_delete(item_status_id)
         return "ok", 200

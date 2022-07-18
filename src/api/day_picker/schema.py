@@ -29,6 +29,7 @@ Day_Picker = api.model(
         "saturday": fields.Boolean(),
         "sunday": fields.Boolean(),
         "item_type": fields.Nested(Item_type),
+        "is_deleted": fields.Boolean()
 
     },
 )

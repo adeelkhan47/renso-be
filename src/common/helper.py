@@ -5,7 +5,9 @@ from fpdf import FPDF
 
 from common.email_service import send_pdf_email
 from model.company import Company
+from model.email_text import EmailText
 from model.front_end_configs import FrontEndCofigs
+from model.item_type import ItemType
 from model.order_backup import OrderBackUp
 from model.voucher import Voucher
 
@@ -84,16 +86,16 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=0, txt='', border=0, ln=1, align='C')
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
+    pdf.set_font("Arial", size=14)
     # company Info
     pdf.cell(190, 5,
-             txt=f"{company.name}, {company.street} and {company.street_number}, {company.zipcode}, {company.city}",
+             txt=f"{company.name}, {company.street} {company.street_number}, {company.zipcode}, {company.city}",
              border=0,
              ln=1,
              align="L")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # customer_info
-    pdf.set_font("Arial", size=12)
     pdf.cell(190, 5, txt=order.client_name, border=0, ln=1, align="L")
     pdf.cell(190, 5, txt=f"{street} {number}", border=0, ln=1, align="L")
     pdf.cell(190, 5, txt=f"{zipcode} {city}", border=0, ln=1, align="L")
@@ -108,12 +110,12 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # title
-    pdf.set_font("Arial", "B", size=12)
+    pdf.set_font("Arial", "B", size=16)
     pdf.cell(190, 5, txt="Rechnung", border=0, ln=1, align="L")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
 
     # setting header
-    pdf.set_font("Arial", "B", size=14)
+    pdf.set_font("Arial", "B", size=13)
     for each in header:
         pdf.cell(each[1], 5, txt=each[0], border=0, ln=0, align="C")
     pdf.cell(0, h=5, txt='', border=0, ln=1, align='C')
@@ -146,7 +148,7 @@ def get_pdf(company, bookings, order):
     pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
 
     # price calculations
-    pdf.set_font("Arial", "B", size=14)
+    pdf.set_font("Arial", "B", size=16)
     pdf.cell(190, 5, txt=f"Nettosumme {round(price, 2)} {chr(128)}", border=0, ln=1, align="L")
     pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
     com_taxs = get_booking_taxs(bookings)
@@ -168,40 +170,76 @@ def get_pdf(company, bookings, order):
         pdf.cell(0, h=30, txt='', border=0, ln=1, align='C')
 
     # ending note
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("Arial", size=16)
     pdf.cell(190, 5, txt="Der Betrag ist bereits beglichen.", border=0, ln=1, align="L")
 
     # footer
     y_axis = pdf.get_y()  # 235
-    pdf.set_font("Arial", size=10)
-    if y_axis < 236:
+    pdf.set_font("Arial", size=13)
+    if y_axis < 230:
         # 40 ki gunjaish hay
-        add_space = 236 - y_axis
+        add_space = 230 - y_axis
 
-        pdf.cell(0, h=20 + add_space, txt='', border=0, ln=1, align='C')
-        pdf.cell(190, h=3, txt=company.name, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=f'{company.street} and {company.city} , {company.zipcode}, {company.city}', border=0,
+        pdf.cell(0, h=15 + add_space, txt='', border=0, ln=1, align='C')
+        pdf.cell(190, h=5, txt=company.name, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=f'{company.street} {company.street_number} , {company.zipcode}, {company.city}',
+                 border=0,
                  ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.commercial_registered_number, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.legal_representative, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.email_for_taxs, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.company_tax_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.commercial_registered_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.legal_representative, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.email_for_taxs, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.company_tax_number, border=0, ln=1, align='L')
     else:
         pdf.cell(0, h=10, txt='', border=0, ln=1, align='C')
-        pdf.cell(190, h=3, txt=company.name, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=f'{company.street} and {company.city} , {company.zipcode}, {company.city}', border=0,
+        pdf.cell(190, h=5, txt=company.name, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=f'{company.street} {company.street_number} , {company.zipcode}, {company.city}',
+                 border=0,
                  ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.commercial_registered_number, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.legal_representative, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.email_for_taxs, border=0, ln=1, align='L')
-        pdf.cell(190, h=3, txt=company.company_tax_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.commercial_registered_number, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.legal_representative, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.email_for_taxs, border=0, ln=1, align='L')
+        pdf.cell(190, h=5, txt=company.company_tax_number, border=0, ln=1, align='L')
     pdf_name = f'{company.name}-Invoice-Re{company.bate_number}.pdf'
     Company.update(company.id, {"bate_number": company.bate_number + 1})
     return pdf.output(f"Invoice-{len(bookings)}.pdf", dest="S"), pdf_name
     #
 
 
-def create_pdf_and_send_email(order):
+def create_email(order, session=None):
+    actual_text = ""
+    email_text = EmailText.get_by_user_id(order.user_id, session)
+    custom_values_dict = {}
+    item_types_in_order = [each.booking.item.item_type.name for each in order.order_bookings]
+
+    custom_values = [x.custom_data for x in order.order_custom_data]
+    for each in custom_values:
+        custom_values_dict[each.name] = each.value
+
+    if email_text:
+        actual_text = email_text.text
+        custom_variables = [t for t in actual_text.split() if t.startswith('$')]
+        itemType_text_variables = [t for t in actual_text.split() if t.startswith('#')]
+        for each in itemType_text_variables:
+            if each[1:] and each[1:] in item_types_in_order:
+                item_type = ItemType.get_by_item_type_name(each[1:], session)
+                if item_type and item_type.itemTypeTexts:
+                    data = item_type.itemTypeTexts[0].text
+                    actual_text = actual_text.replace(each, data)
+                else:
+                    actual_text = actual_text.replace(each, "")
+            else:
+                actual_text = actual_text.replace(each, "")
+        actual_text = actual_text.replace("$name", order.client_name)
+        for each in custom_variables:
+            if each[1:] in custom_values_dict.keys():
+                actual_text = actual_text.replace(each, custom_values_dict.get(each[1:]))
+            else:
+                actual_text = actual_text.replace(each, "")
+    actual_text = actual_text.replace('\n', '<br>')
+    return actual_text
+
+
+def create_pdf_and_send_email(order, session=None):
     bookings = [order_booking.booking for order_booking in order.order_bookings]
     data = {}
     for booking in bookings:
@@ -212,16 +250,16 @@ def create_pdf_and_send_email(order):
             data[item_subtype.company.id].append((item_subtype, booking))
 
     pdfs = []
-    app_configs = FrontEndCofigs.get_by_user_id(order.user_id)
+    app_configs = FrontEndCofigs.get_by_user_id(order.user_id, session)
     for each in data.keys():
-        company = Company.query_by_id(each)
+        company = Company.query_by_id(each, session)
         bookings = [record[1] for record in data.get(each)]
         pdf = get_pdf(company, bookings, order)
         pdfs.append(pdf)
         if company.email:
             try:
-                send_pdf_email(company.email, f"Invoice - {company.name}", [pdf], app_configs.email,
-                               app_configs.email_password)
+                send_pdf_email(company.email, f"Rechnung - Re{company.bate_number - 1}", [pdf], app_configs.email,
+                               app_configs.email_password, company)
             except Exception as e:
                 logging.exception(e)
     send_pdf_email(order.client_email, "Invoice For Order", pdfs, app_configs.email,

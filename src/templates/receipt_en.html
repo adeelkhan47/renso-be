@@ -241,6 +241,10 @@
             font-size: 14px;
         }
 
+        .email_text a {
+            color: blue !important;
+        }
+
         @media (max-width: 560px) {
             .about {
                 border: none
@@ -262,11 +266,9 @@
     <div class="description row">
         <div class="text" style="text-align: left">
             {% autoescape false %}
-            <a style="color:black; text-decoration:none;">
-                <span>
+                <span class="email_text">
                 {{ email_text }}
                 </span>
-            </a>
             {% endautoescape %}
         </div>
     </div>

@@ -16,6 +16,7 @@ Language = api.model(
         "id": fields.Integer(),
         "name": fields.String(),
         "status": fields.Boolean(),
+        "is_deleted": fields.Boolean()
 
     },
 )

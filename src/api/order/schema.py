@@ -56,7 +56,9 @@ Order = api.model(
         "order_status": fields.Nested(OrderStatus),
         "total_cost": fields.Float(),
         "order_bookings": fields.Nested(bookings, as_list=True),
-        "order_custom_data": fields.Nested(customData, as_list=True)
+        "order_custom_data": fields.Nested(customData, as_list=True),
+        "is_deleted": fields.Boolean()
+
     },
 )
 Order_With_Session = api.model(

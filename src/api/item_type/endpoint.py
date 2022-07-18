@@ -6,6 +6,7 @@ from werkzeug.exceptions import NotFound
 from common.helper import response_structure
 from decorator.authorization import auth
 from model.day_picker import DayPicker
+from model.item_subtype import ItemSubType
 from model.item_type import ItemType
 from model.item_type_extra import ItemTypeExtra
 from model.location_item_type import LocationItemTypes
@@ -21,6 +22,7 @@ class item_types_list(Resource):
     def get(self):
         args = request.args.copy()
         args["user_id:eq"] = str(g.current_user.id)
+        args["is_deleted:eq"] = "False"
         all_items, count = ItemType.filtration(args)
         return response_structure(all_items, count), 200
 
@@ -61,7 +63,9 @@ class item_type_by_id(Resource):
     @api.doc("Delete item by id")
     @auth
     def delete(self, item_type_id):
-        ItemType.delete(item_type_id)
+        ItemType.soft_delete(item_type_id)
+        ItemSubType.soft_delete_on_item_type(item_type_id)
+
         return "ok", 200
 
     @api.marshal_list_with(schema.get_by_id_responseItem_type)
@@ -87,13 +91,17 @@ class item_types_for_season_list(Resource):
     @auth
     def get(self):
         seasons = [each.id for each in Season.current_seasons_by_user_id(g.current_user.id)]
-        all_items, count = ItemType.filtration({"user_id:eq": str(g.current_user.id)})
+        all_items, count = ItemType.filtration({"user_id:eq": str(g.current_user.id), "is_deleted:eq": "False"})
         items_to_return = []
+        # for item_type in all_items:
+        #     for each_season in item_type.seasonItemTypes:
+        #         if each_season.season_id in seasons and item_type not in items_to_return and item_type.name != "Extra":
+        #             items_to_return.append(item_type)
+        #             break
         for item_type in all_items:
-            for each_season in item_type.seasonItemTypes:
-                if each_season.season_id in seasons and item_type not in items_to_return and item_type.name != "Extra":
-                    items_to_return.append(item_type)
-                    break
+            if item_type.name != "Extra":
+                items_to_return.append(item_type)
+
         return response_structure(items_to_return, len(items_to_return)), 200
 
 

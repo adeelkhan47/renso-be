@@ -24,6 +24,7 @@ AssociateEmail = api.model(
         "email": fields.String(),
         "status": fields.Boolean(),
         "associate_email_subtypes": fields.Nested(Associate_emails_subtypes, as_list=True),
+        "is_deleted": fields.Boolean()
 
     },
 )

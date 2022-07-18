@@ -21,6 +21,7 @@ Time_Picker = api.model(
         "end_time": fields.String(),
         "day": fields.String(),
         "day_picker_id": fields.Integer(),
+        "is_deleted": fields.Boolean()
 
     },
 )

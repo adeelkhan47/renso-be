@@ -43,6 +43,8 @@ Item = api.model(
         "item_subtype": fields.Nested(Item_subtype),
         "item_tags": fields.Nested(tags, as_list=True),
         "item_locations": fields.Nested(locations, as_list=True),
+        "is_deleted": fields.Boolean()
+
     },
 )
 

@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, Integer
 
@@ -13,8 +14,9 @@ class DayPicker(Base, db.Model):
     friday = Column(Boolean, nullable=False)
     saturday = Column(Boolean, nullable=False)
     sunday = Column(Boolean, nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
-    item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="SET NULL"), nullable=False, index=True)
+    item_type_id = Column(Integer, ForeignKey("item_type.id", ondelete="SET NULL"), nullable=False)
+    is_deleted = db.Column(db.Boolean, nullable=False, server_default=text("False"))
 
     def __init__(self, monday, tuesday, wednesday, thursday, friday, saturday, sunday, item_type_id, user_id):
         self.monday = monday
@@ -33,6 +35,12 @@ class DayPicker(Base, db.Model):
     @classmethod
     def delete(cls, id):
         cls.query.filter(cls.id == id).delete()
+        db.session.commit()
+
+
+    @classmethod
+    def soft_delete(cls, id):
+        db.session.query(cls).filter(cls.id == id).update({"is_deleted": True})
         db.session.commit()
 
     @classmethod
