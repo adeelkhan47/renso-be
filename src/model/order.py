@@ -448,5 +448,5 @@ class Order(Base, db.Model):
                     completed = False
                 Booking.close_booking(each.booking.id, session)
             if completed:
-                cls.update(order.id, {"order_status_id": completed_id}, session)
                 create_pdf_and_send_email_in_order(order, session)
+                cls.update(order.id, {"order_status_id": completed_id}, session)
