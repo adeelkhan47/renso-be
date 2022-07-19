@@ -107,7 +107,7 @@ def send_pdf_email(recipient: str, subject: str, pdfs: list, from_email: str, fr
         logging.info(f"Send email to {recipient} with subject {subject} and message:")
 
         receiver_email = recipient
-        message = MIMEMultipart("alternative")
+        message = MIMEMultipart("html")
         message["Subject"] = subject
         message["From"] = from_email
         message["To"] = receiver_email
@@ -118,18 +118,18 @@ def send_pdf_email(recipient: str, subject: str, pdfs: list, from_email: str, fr
             )
             # After the file is closed
             part['Content-Disposition'] = 'attachment; filename="%s"' % basename(each[1])
+            #
+            if company:
+                footer = f'{company.name}\n{company.street} {company.street_number} , {company.zipcode}, {company.city}\n' \
+                         f'{company.commercial_registered_number}\n{company.legal_representative}\n{company.email_for_taxs}\n' \
+                         f'{company.company_tax_number}'
+                body_text = f"\nMoin,\nim Anhang befindet sich die Rechnung zu Deiner Buchung.\nViele Grüße\n\n{footer}\n"
+            else:
+                body_text = "\nMoin,\nim Anhang befindet sich die Rechnung zu Deiner Buchung.\nViele Grüße.\n"
+            text = MIMEText(body_text, 'plain')
+            message.attach(text)
             message.attach(part)
 
-        #
-        if company:
-            footer = f'{company.name}\n{company.street} {company.street_number} , {company.zipcode}, {company.city}\n' \
-                     f'{company.commercial_registered_number}\n{company.legal_representative}\n{company.email_for_taxs}\n' \
-                     f'{company.company_tax_number}'
-            body_text = f"Moin,\nim Anhang befindet sich die Rechnung zu Deiner Buchung.\nViele Grüße\n\n{footer}"
-        else:
-            body_text = "Moin,\nim Anhang befindet sich die Rechnung zu Deiner Buchung.\nViele Grüße."
-        text = MIMEText(body_text, 'plain')
-        message.attach(text)
         server.sendmail(from_email, receiver_email, message.as_string())
     except Exception as ex:
         logging.error(str(ex))
