@@ -213,6 +213,7 @@ def create_pdf_and_send_email_in_order(order, session=None):
 
     pdfs = []
     app_configs = FrontEndCofigs.get_by_user_id(order.user_id, session)
+    companies = []
     for each in data.keys():
         company = Company.query_by_id(each, session)
         bookings = [record[1] for record in data.get(each)]
@@ -222,10 +223,16 @@ def create_pdf_and_send_email_in_order(order, session=None):
             try:
                 send_pdf_email(company.email, f"Rechnung - Re{company.bate_number - 1}", [pdf], app_configs.email,
                                app_configs.email_password, company)
+                companies.append(company)
             except Exception as e:
                 logging.exception(e)
-    send_pdf_email(order.client_email, "Invoice For Order", pdfs, app_configs.email,
-                   app_configs.email_password)
+    if len(companies) == 1:
+        send_pdf_email(order.client_email, "Invoice For Order", pdfs, app_configs.email,
+                       app_configs.email_password, companies[0])
+    else:
+
+        send_pdf_email(order.client_email, "Invoice For Order", pdfs, app_configs.email,
+                       app_configs.email_password)
 
 
 def get_booking_taxs_in_order(bookings):
