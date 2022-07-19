@@ -22,6 +22,6 @@ beat_schedule = {
         "schedule": crontab(minute="3", hour="*"),
     }, "mark_order_complete_if_bookings_completed_every_hour_at_12th_min": {
         "task": "tasks.order.mark_order_complete_on_completion",
-        "schedule": crontab(minute="*/2"),
+        "schedule": crontab(minute="*/1"),
     },
 }
