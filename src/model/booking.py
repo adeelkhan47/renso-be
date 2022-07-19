@@ -66,10 +66,10 @@ class Booking(Base, db.Model):
     @classmethod
     def get_bookings_by_item_id(cls, item_id):
         active_id = BookingStatus.get_id_by_name("Active")
-        # pending_id = BookingStatus.get_id_by_name("Pending")
+        pending_id = BookingStatus.get_id_by_name("Pending")
         payment_pending_id = BookingStatus.get_id_by_name("Payment Pending")
         return cls.query.filter(cls.item_id == item_id, cls.is_deleted == False,
-                                cls.booking_status_id.in_((active_id, payment_pending_id))).all()
+                                cls.booking_status_id.in_((active_id, payment_pending_id, pending_id))).all()
 
     @classmethod
     def get_confirmed_bookings_by_item_id(cls, item_id):
