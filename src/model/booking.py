@@ -84,7 +84,7 @@ class Booking(Base, db.Model):
             session = db.session
         closed_id = BookingStatus.get_id_by_name("Closed", session)
         session.query(cls).filter(cls.id == booking_id).update({"booking_status_id": closed_id})
-        db.session.commit()
+        session.commit()
 
     @classmethod
     def cancel_booking(cls, booking_id):
