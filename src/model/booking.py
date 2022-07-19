@@ -59,7 +59,7 @@ class Booking(Base, db.Model):
         if not session:
             session = db.session
         pending_id = BookingStatus.get_id_by_name("Pending", session)
-        start_time = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        start_time = datetime.datetime.now() - datetime.timedelta(minutes=15)
         session.query(cls).filter(cls.booking_status_id == pending_id, cls.created_at < start_time).delete()
         session.commit()
 
@@ -79,9 +79,11 @@ class Booking(Base, db.Model):
                                 cls.booking_status_id.in_((active_id, payment_pending_id))).all()
 
     @classmethod
-    def close_booking(cls, booking_id):
+    def close_booking(cls, booking_id, session=None):
+        if not session:
+            session = db.session
         closed_id = BookingStatus.get_id_by_name("Closed")
-        cls.query.filter(cls.id == booking_id).update({"booking_status_id": closed_id})
+        session.query(cls).filter(cls.id == booking_id).update({"booking_status_id": closed_id})
         db.session.commit()
 
     @classmethod

@@ -85,7 +85,7 @@ def get_pdf(company, bookings, order, session=None):
     pdf.set_font("Arial", size=14)
     # company Info
     pdf.cell(190, 5,
-             txt=f"{company.name}, {company.street} {company.street_number}, {company.zipcode}, {company.city}",
+             txt=f"{company.name}, {company.street} {company.street_number}, {company.zipcode} {company.city}",
              border=0,
              ln=1,
              align="L")
@@ -121,7 +121,7 @@ def get_pdf(company, bookings, order, session=None):
     price = 0.0
     order_backup = OrderBackUp.get_by_cart_id(order.cart_id, session)
     voucher = None
-    if order_backup.voucher:
+    if order_backup and order_backup.voucher:
         voucher = Voucher.get_voucher_by_code(order_backup.voucher, order.user_id, session)
     for index, booking in enumerate(bookings):
         pdf.cell(31.5, 5, txt=booking.item.item_subtype.name, border=0, ln=0, align="C")
@@ -446,6 +446,7 @@ class Order(Base, db.Model):
             for each in order.order_bookings:
                 if each.booking.end_time > datetime.datetime.now():
                     completed = False
+                each.booking.close_booking(session)
             if completed:
                 cls.update(order.id, {"order_status_id": completed_id}, session)
                 create_pdf_and_send_email_in_order(order, session)
