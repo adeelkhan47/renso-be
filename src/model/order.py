@@ -446,7 +446,7 @@ class Order(Base, db.Model):
             for each in order.order_bookings:
                 if each.booking.end_time > datetime.datetime.now():
                     completed = False
-                each.booking.close_booking(each.booking.id, session)
+                Booking.close_booking(each.booking.id, session)
             if completed:
                 cls.update(order.id, {"order_status_id": completed_id}, session)
                 create_pdf_and_send_email_in_order(order, session)
