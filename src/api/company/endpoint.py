@@ -51,6 +51,8 @@ class item_by_id(Resource):
     @auth
     def patch(self, company_id):
         data = api.payload.copy()
+        if "is_deleted" not in data.keys():
+            data["is_deleted"] = False
         Company.update(company_id, data)
         item = Company.query_by_id(company_id)
         return response_structure(item), 200
