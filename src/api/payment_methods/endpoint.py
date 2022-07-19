@@ -59,8 +59,6 @@ class Payment_Method_by_id(Resource):
     def patch(self, payment_method_id):
         payload = api.payload
         data = payload.copy()
-        if "is_deleted" not in data.keys():
-            data["is_deleted"] = bool("false")
         if "status" in data.keys():
             data["status"] = bool(data["status"])
 
