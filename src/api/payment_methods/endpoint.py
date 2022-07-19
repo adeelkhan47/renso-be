@@ -60,7 +60,7 @@ class Payment_Method_by_id(Resource):
         payload = api.payload
         data = payload.copy()
         if "is_deleted" not in data.keys():
-            data["is_deleted"] = False
+            data["is_deleted"] = 'False'
         if "status" in data.keys():
             data["status"] = bool(data["status"])
 
