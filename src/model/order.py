@@ -33,6 +33,8 @@ env = jinja2.Environment(
     autoescape=jinja2.select_autoescape(),
 )
 
+def truncate(string):
+    return (string[:10] + '..') if len(string) > 10 else string
 
 def get_pdf(company, bookings, order, session=None):
     #
@@ -124,19 +126,19 @@ def get_pdf(company, bookings, order, session=None):
     if order_backup and order_backup.voucher:
         voucher = Voucher.get_voucher_by_code(order_backup.voucher, order.user_id, session)
     for index, booking in enumerate(bookings):
-        pdf.cell(31.5, 5, txt=booking.item.item_subtype.name, border=0, ln=0, align="C")
-        pdf.cell(31.5, 5, txt=booking.location.name, border=0, ln=0, align="C")
+        pdf.cell(31.5, 5, txt=truncate(booking.item.item_subtype.name), border=0, ln=0, align="C")
+        pdf.cell(31.5, 5, txt=truncate(booking.location.name), border=0, ln=0, align="C")
         if booking.item.item_type.show_time_picker == True:
-            pdf.cell(36.5, 5, txt=str(booking.start_time), border=0, ln=0, align="C")
-            pdf.cell(36.5, 5, txt=str(booking.end_time), border=0, ln=0, align="C")
+            pdf.cell(36.5, 5, txt=truncate(str(booking.start_time)), border=0, ln=0, align="C")
+            pdf.cell(36.5, 5, txt=truncate(str(booking.end_time)), border=0, ln=0, align="C")
         else:
-            pdf.cell(36.5, 5, txt=str(booking.start_time.date()), border=0, ln=0, align="C")
-            pdf.cell(36.5, 5, txt=str(booking.end_time.date()), border=0, ln=0, align="C")
+            pdf.cell(36.5, 5, txt=truncate(str(booking.start_time.date())), border=0, ln=0, align="C")
+            pdf.cell(36.5, 5, txt=truncate(str(booking.end_time.date())), border=0, ln=0, align="C")
         tax_str = ""
         if booking.item.item_subtype.itemSubTypeTaxs:
             tax_str = ",".join(
                 [f"{each.tax.name}({each.tax.percentage}%)" for each in booking.item.item_subtype.itemSubTypeTaxs])
-        pdf.cell(36.5, 5, txt=tax_str, border=0, ln=0, align="C")
+        pdf.cell(36.5, 5, txt=truncate(tax_str), border=0, ln=0, align="C")
         pdf.cell(15.5, 5, txt=f'{booking.cost} {chr(128)}', border=0, ln=0, align="C")
         price += booking.cost
 
